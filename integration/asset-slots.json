@@ -1,0 +1,372 @@
+{
+  "schema": "bikini-slots/v1",
+  "version": "1.0",
+  "updated": "2026-11-10",
+  "demo": "src/index.html (Demo v1.0)",
+  "authority": "集成 AI 维护；美术 AI 只读",
+  "world": {
+    "width": 2600,
+    "height": 1370,
+    "source": "var WORLD_W=2600, WORLD_H=1370"
+  },
+  "room_canvas": {
+    "width": 1200,
+    "height": 760,
+    "source": "#room CSS"
+  },
+  "mount_rules": {
+    "fit": "object-fit: contain / background-size: contain —— 绝对像素不是硬约束，宽高比与透明边距才是",
+    "facing": "所有素材统一朝右；左向用 CSS transform: scaleX(-1)，不另出图",
+    "highlight": "交互高亮金 #FFD23F、呼吸发光、虚线光路、气泡、粒子一律 CSS 叠加，不来自 PNG",
+    "text": "门牌、号码、计数、导航文字一律 HTML 渲染，不来自 PNG",
+    "fallback": "manifest.json 中 status!=accepted 的插槽保持 CSS 占位，不得出现破图",
+    "retina": "优先使用 @2x 文件（若存在），否则用 1x"
+  },
+  "slots": [
+    {
+      "slot": "building.pineapple",
+      "asset": "B-01",
+      "target": ".building[data-bid='pineapple']",
+      "source": "buildings[] in src/index.html (var buildings, line ~878)",
+      "mount": "background-image: url(../assets/buildings/<file>); background-size: contain; background-position: center bottom; background-repeat: no-repeat",
+      "box": [
+        104,
+        150
+      ],
+      "anchor": "bottom-center",
+      "placeholder": "solid color block",
+      "note": "集成时给 .building 补 data-bid 属性；z-index 保持 1000-b.y 不变"
+    },
+    {
+      "slot": "building.moai",
+      "asset": "B-02",
+      "target": ".building[data-bid='moai']",
+      "source": "buildings[] in src/index.html (var buildings, line ~878)",
+      "mount": "background-image: url(../assets/buildings/<file>); background-size: contain; background-position: center bottom; background-repeat: no-repeat",
+      "box": [
+        96,
+        170
+      ],
+      "anchor": "bottom-center",
+      "placeholder": "solid color block",
+      "note": "集成时给 .building 补 data-bid 属性；z-index 保持 1000-b.y 不变"
+    },
+    {
+      "slot": "building.rock",
+      "asset": "B-03",
+      "target": ".building[data-bid='rock']",
+      "source": "buildings[] in src/index.html (var buildings, line ~878)",
+      "mount": "background-image: url(../assets/buildings/<file>); background-size: contain; background-position: center bottom; background-repeat: no-repeat",
+      "box": [
+        84,
+        84
+      ],
+      "anchor": "bottom-center",
+      "placeholder": "solid color block",
+      "note": "集成时给 .building 补 data-bid 属性；z-index 保持 1000-b.y 不变"
+    },
+    {
+      "slot": "building.treedome",
+      "asset": "B-04",
+      "target": ".building[data-bid='treedome']",
+      "source": "buildings[] in src/index.html (var buildings, line ~878)",
+      "mount": "background-image: url(../assets/buildings/<file>); background-size: contain; background-position: center bottom; background-repeat: no-repeat",
+      "box": [
+        130,
+        130
+      ],
+      "anchor": "bottom-center",
+      "placeholder": "solid color block",
+      "note": "集成时给 .building 补 data-bid 属性；z-index 保持 1000-b.y 不变"
+    },
+    {
+      "slot": "building.krusty",
+      "asset": "B-05",
+      "target": ".building[data-bid='krusty']",
+      "source": "buildings[] in src/index.html (var buildings, line ~878)",
+      "mount": "background-image: url(../assets/buildings/<file>); background-size: contain; background-position: center bottom; background-repeat: no-repeat",
+      "box": [
+        190,
+        160
+      ],
+      "anchor": "bottom-center",
+      "placeholder": "solid color block",
+      "note": "集成时给 .building 补 data-bid 属性；z-index 保持 1000-b.y 不变"
+    },
+    {
+      "slot": "building.chum",
+      "asset": "B-06",
+      "target": ".building[data-bid='chum']",
+      "source": "buildings[] in src/index.html (var buildings, line ~878)",
+      "mount": "background-image: url(../assets/buildings/<file>); background-size: contain; background-position: center bottom; background-repeat: no-repeat",
+      "box": [
+        130,
+        130
+      ],
+      "anchor": "bottom-center",
+      "placeholder": "solid color block",
+      "note": "集成时给 .building 补 data-bid 属性；z-index 保持 1000-b.y 不变"
+    },
+    {
+      "slot": "room.krusty_hall",
+      "asset": "G-01-krusty_hall",
+      "target": "#room background layer",
+      "source": "ROOMS['krusty_hall'] / THEME['krusty']",
+      "mount": "background-image layered over THEME gradient; background-size: 1200px 760px",
+      "box": [
+        1200,
+        760
+      ],
+      "anchor": "stretch",
+      "placeholder": "THEME 渐变 + 菱形地砖 CSS",
+      "note": "物件由 .obj 叠在空白地面上，务必保留大面积空地"
+    },
+    {
+      "slot": "room.krusty_kitchen",
+      "asset": "G-01-krusty_kitchen",
+      "target": "#room background layer",
+      "source": "ROOMS['krusty_kitchen'] / THEME['krusty']",
+      "mount": "background-image layered over THEME gradient; background-size: 1200px 760px",
+      "box": [
+        1200,
+        760
+      ],
+      "anchor": "stretch",
+      "placeholder": "THEME 渐变 + 菱形地砖 CSS",
+      "note": "物件由 .obj 叠在空白地面上，务必保留大面积空地"
+    },
+    {
+      "slot": "room.krusty_office",
+      "asset": "G-01-krusty_office",
+      "target": "#room background layer",
+      "source": "ROOMS['krusty_office'] / THEME['krusty']",
+      "mount": "background-image layered over THEME gradient; background-size: 1200px 760px",
+      "box": [
+        1200,
+        760
+      ],
+      "anchor": "stretch",
+      "placeholder": "THEME 渐变 + 菱形地砖 CSS",
+      "note": "物件由 .obj 叠在空白地面上，务必保留大面积空地"
+    },
+    {
+      "slot": "room.moai_f1",
+      "asset": "G-01-moai_f1",
+      "target": "#room background layer",
+      "source": "ROOMS['moai_f1'] / THEME['moai']",
+      "mount": "background-image layered over THEME gradient; background-size: 1200px 760px",
+      "box": [
+        1200,
+        760
+      ],
+      "anchor": "stretch",
+      "placeholder": "THEME 渐变 + 菱形地砖 CSS",
+      "note": "物件由 .obj 叠在空白地面上，务必保留大面积空地"
+    },
+    {
+      "slot": "room.moai_f2",
+      "asset": "G-01-moai_f2",
+      "target": "#room background layer",
+      "source": "ROOMS['moai_f2'] / THEME['moai']",
+      "mount": "background-image layered over THEME gradient; background-size: 1200px 760px",
+      "box": [
+        1200,
+        760
+      ],
+      "anchor": "stretch",
+      "placeholder": "THEME 渐变 + 菱形地砖 CSS",
+      "note": "物件由 .obj 叠在空白地面上，务必保留大面积空地"
+    },
+    {
+      "slot": "room.moai_f3",
+      "asset": "G-01-moai_f3",
+      "target": "#room background layer",
+      "source": "ROOMS['moai_f3'] / THEME['moai']",
+      "mount": "background-image layered over THEME gradient; background-size: 1200px 760px",
+      "box": [
+        1200,
+        760
+      ],
+      "anchor": "stretch",
+      "placeholder": "THEME 渐变 + 菱形地砖 CSS",
+      "note": "物件由 .obj 叠在空白地面上，务必保留大面积空地"
+    },
+    {
+      "slot": "room.pineapple_main",
+      "asset": "G-01-pineapple_main",
+      "target": "#room background layer",
+      "source": "ROOMS['pineapple_main'] / THEME['pineapple']",
+      "mount": "background-image layered over THEME gradient; background-size: 1200px 760px",
+      "box": [
+        1200,
+        760
+      ],
+      "anchor": "stretch",
+      "placeholder": "THEME 渐变 + 菱形地砖 CSS",
+      "note": "物件由 .obj 叠在空白地面上，务必保留大面积空地"
+    },
+    {
+      "slot": "room.pineapple_kitchen",
+      "asset": "G-01-pineapple_kitchen",
+      "target": "#room background layer",
+      "source": "ROOMS['pineapple_kitchen'] / THEME['pineapple']",
+      "mount": "background-image layered over THEME gradient; background-size: 1200px 760px",
+      "box": [
+        1200,
+        760
+      ],
+      "anchor": "stretch",
+      "placeholder": "THEME 渐变 + 菱形地砖 CSS",
+      "note": "物件由 .obj 叠在空白地面上，务必保留大面积空地"
+    },
+    {
+      "slot": "room.rock_main",
+      "asset": "G-01-rock_main",
+      "target": "#room background layer",
+      "source": "ROOMS['rock_main'] / THEME['rock']",
+      "mount": "background-image layered over THEME gradient; background-size: 1200px 760px",
+      "box": [
+        1200,
+        760
+      ],
+      "anchor": "stretch",
+      "placeholder": "THEME 渐变 + 菱形地砖 CSS",
+      "note": "物件由 .obj 叠在空白地面上，务必保留大面积空地"
+    },
+    {
+      "slot": "room.rock_under",
+      "asset": "G-01-rock_under",
+      "target": "#room background layer",
+      "source": "ROOMS['rock_under'] / THEME['rock']",
+      "mount": "background-image layered over THEME gradient; background-size: 1200px 760px",
+      "box": [
+        1200,
+        760
+      ],
+      "anchor": "stretch",
+      "placeholder": "THEME 渐变 + 菱形地砖 CSS",
+      "note": "物件由 .obj 叠在空白地面上，务必保留大面积空地"
+    },
+    {
+      "slot": "room.treedome_main",
+      "asset": "G-01-treedome_main",
+      "target": "#room background layer",
+      "source": "ROOMS['treedome_main'] / THEME['treedome']",
+      "mount": "background-image layered over THEME gradient; background-size: 1200px 760px",
+      "box": [
+        1200,
+        760
+      ],
+      "anchor": "stretch",
+      "placeholder": "THEME 渐变 + 菱形地砖 CSS",
+      "note": "物件由 .obj 叠在空白地面上，务必保留大面积空地"
+    },
+    {
+      "slot": "room.treedome_airlock",
+      "asset": "G-01-treedome_airlock",
+      "target": "#room background layer",
+      "source": "ROOMS['treedome_airlock'] / THEME['treedome']",
+      "mount": "background-image layered over THEME gradient; background-size: 1200px 760px",
+      "box": [
+        1200,
+        760
+      ],
+      "anchor": "stretch",
+      "placeholder": "THEME 渐变 + 菱形地砖 CSS",
+      "note": "物件由 .obj 叠在空白地面上，务必保留大面积空地"
+    },
+    {
+      "slot": "room.chum_counter",
+      "asset": "G-01-chum_counter",
+      "target": "#room background layer",
+      "source": "ROOMS['chum_counter'] / THEME['chum']",
+      "mount": "background-image layered over THEME gradient; background-size: 1200px 760px",
+      "box": [
+        1200,
+        760
+      ],
+      "anchor": "stretch",
+      "placeholder": "THEME 渐变 + 菱形地砖 CSS",
+      "note": "物件由 .obj 叠在空白地面上，务必保留大面积空地"
+    },
+    {
+      "slot": "room.chum_lab",
+      "asset": "G-01-chum_lab",
+      "target": "#room background layer",
+      "source": "ROOMS['chum_lab'] / THEME['chum']",
+      "mount": "background-image layered over THEME gradient; background-size: 1200px 760px",
+      "box": [
+        1200,
+        760
+      ],
+      "anchor": "stretch",
+      "placeholder": "THEME 渐变 + 菱形地砖 CSS",
+      "note": "物件由 .obj 叠在空白地面上，务必保留大面积空地"
+    },
+    {
+      "slot": "world.panorama",
+      "asset": "A-01",
+      "target": "#world background",
+      "box": [
+        2600,
+        1370
+      ],
+      "mount": "background-image: url(../assets/world/A-01-world_panorama.png); background-size: 2600px 1370px",
+      "anchor": "top-left",
+      "placeholder": "CSS 渐变 + 沙路 SVG",
+      "note": "建筑层叠在其上，图内建筑须与 buildings[] 坐标大致对应"
+    },
+    {
+      "slot": "npc.*",
+      "asset": "D-01..D-09",
+      "target": "renderNPCs() / 世界层 NPC 元素",
+      "mount": "<img> 替换文字或色盘占位；object-fit: contain；朝右原样，左向 transform: scaleX(-1)",
+      "box": [
+        64,
+        96
+      ],
+      "anchor": "bottom-center",
+      "placeholder": "emoji / 色盘 + 中文名",
+      "note": "立绘用于对话面板，token 用于世界层；同一 slot 按用途二选一"
+    },
+    {
+      "slot": "obj.*",
+      "asset": "E-* / G-04",
+      "target": ".obj .ic (renderObjects())",
+      "mount": "<img> 替换 .ic 文本；object-fit: contain；双态按 toggleState 切换 src",
+      "box": [
+        56,
+        52
+      ],
+      "anchor": "center",
+      "placeholder": "emoji + 中文标签",
+      "note": "o.w/o.h 已在 ROOMS 数据里，按容器缩放；交互金光仍由 CSS 叠加"
+    },
+    {
+      "slot": "portal.*",
+      "asset": "G-02",
+      "target": "renderPortals() 生成的门 / 楼梯热点",
+      "mount": "<img> 替换几何占位；门牌文字、发光呼吸仍由 CSS/HTML 叠加",
+      "box": [
+        90,
+        120
+      ],
+      "anchor": "bottom-center",
+      "placeholder": "CSS 拱门 / 三级阶梯",
+      "note": ""
+    },
+    {
+      "slot": "ui.egg_icons",
+      "asset": "G-05",
+      "target": "藏品册 27 格圆底图标",
+      "mount": "<img> 替换 CSS 圆底 + 文字兜底",
+      "box": [
+        44,
+        44
+      ],
+      "anchor": "center",
+      "placeholder": "CSS 圆底 + 文字",
+      "note": "可选；不交则保持兜底"
+    }
+  ]
+}

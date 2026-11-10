@@ -1,0 +1,11 @@
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp
+__pycache__/
+*.pyc
+.idea/
+.vscode/
+# 本地自检报告（每次运行会变，不进仓库）
+assets/_review/validation-report.md
+# 注意：不要忽略 assets/**/*.png —— 美术资源必须进仓库

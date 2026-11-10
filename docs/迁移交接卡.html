@@ -1,0 +1,107 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>比奇堡项目 · 迁移交接卡（云端 → 桌面端）</title>
+<style>
+:root{--bg:#0b1420;--card:#111e2e;--ink:#e8f0f8;--mut:#8fa6bd;--line:#24384e;--acc:#ffcf5c;--acc2:#5cd6c0;--code:#0a1119}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);
+ font:15px/1.75 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+.wrap{display:flex;max-width:1180px;margin:0 auto}
+nav{position:sticky;top:0;align-self:flex-start;width:250px;height:100vh;overflow:auto;
+ padding:26px 16px;border-right:1px solid var(--line);background:#0d1a28;flex:0 0 auto}
+nav h3{color:var(--acc);font-size:13px;letter-spacing:.1em;margin:0 0 14px;text-transform:uppercase}
+nav a{display:block;color:var(--mut);text-decoration:none;padding:6px 10px;border-radius:6px;font-size:13px;margin:2px 0}
+nav a:hover{background:#15263a;color:var(--ink)}
+main{flex:1;padding:36px 40px 80px;min-width:0}
+.hero{border:1px solid var(--line);border-radius:14px;padding:26px 28px;margin-bottom:30px;
+ background:linear-gradient(135deg,#12243a,#0f1c2c)}
+.hero h1{margin:0 0 8px;font-size:26px;color:#fff}
+.hero .sub{color:var(--mut);font-size:13px}
+.hero .tags{margin-top:16px;display:flex;gap:8px;flex-wrap:wrap}
+.tag{font-size:12px;padding:4px 10px;border-radius:20px;border:1px solid var(--line);color:var(--acc2)}
+.tag.warn{color:var(--acc);border-color:#5a4a1e}
+h2{font-size:20px;color:#fff;margin:38px 0 14px;padding-bottom:10px;border-bottom:1px solid var(--line);scroll-margin-top:16px}
+p{margin:10px 0}a{color:var(--acc2);text-decoration:none}a:hover{text-decoration:underline}
+code{background:var(--code);color:#9fe0cf;padding:2px 6px;border-radius:4px;font:12.5px/1.5 ui-monospace,Menlo,Consolas,monospace;
+ word-break:break-word}
+table{border-collapse:collapse;width:100%;margin:14px 0;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#16283d;color:#fff;white-space:nowrap}
+tr:nth-child(even) td{background:#0e1b29}
+blockquote{border-left:3px solid var(--acc);background:#1a2230;margin:16px 0;padding:12px 18px;
+ border-radius:0 8px 8px 0;color:#d7e2ee}
+ul,ol{padding-left:22px}li{margin:5px 0}
+hr{border:0;border-top:1px solid var(--line);margin:26px 0}
+.cb{position:relative;margin:14px 0}
+pre{background:var(--code);border:1px solid var(--line);border-radius:10px;padding:16px 18px;overflow:auto;
+ font:12.5px/1.7 ui-monospace,Menlo,Consolas,monospace;color:#cfe0ee;white-space:pre-wrap;word-break:break-word}
+.copy{position:absolute;top:8px;right:8px;background:#1c3550;color:#cfe0ee;border:1px solid #2d4a68;
+ border-radius:6px;padding:4px 12px;font-size:12px;cursor:pointer}
+.copy:hover{background:#28527a}
+.footer{margin-top:50px;padding-top:18px;border-top:1px solid var(--line);color:var(--mut);font-size:12px}
+@media(max-width:820px){nav{display:none}main{padding:22px 18px 60px}.wrap{display:block}}
+</style></head><body>
+<div class="wrap">
+<nav><h3>目录</h3><a href="#s1">0. 一句话结论（先读这个）</a><a href="#s2">1. 项目空间地址 / 定位标识清单</a><a href="#s3">2. 迁移步骤（桌面端照做）</a><a href="#s4">3. 当前任务状态（桌面端 AI 必读）</a><a href="#s5">4. 唯一未完事项：GitHub 推送（桌面端最可能要接着做的）</a><a href="#s6">5. 产物索引</a><a href="#s7">6. 给桌面端 AI 的接手提示词（可直接复制）</a></nav>
+<main>
+<div class="hero">
+  <h1>比奇堡项目 · 迁移交接卡</h1>
+  <div class="sub">云端 → WorkBuddy 桌面端　·　生成 2026-11-10　·　自包含，可直接转发给另一个 AI</div>
+  <div class="tags">
+    <span class="tag">Demo v1.0</span><span class="tag">方案 v2.8</span>
+    <span class="tag">交付规范 v1.0</span><span class="tag warn">GitHub 推送待办</span>
+  </div>
+</div>
+<blockquote>生成时间：2026-11-10　|　用途：把当前云端任务整体迁移到 WorkBuddy 桌面端继续 本文件自包含，可直接发给桌面端的 AI，让它据此无缝接手。</blockquote>
+<hr>
+<h2 id="s1">0. 一句话结论（先读这个）</h2>
+<p><strong>桌面端的「项目空间」不是网址，而是绑定到你电脑本地文件夹的「工作空间」。</strong></p>
+<p>迁移动作 = 把云端 <code>/workspace</code> 里的产物下载到你桌面端某个本地目录，然后在桌面端新建任务时点「选择工作空间」指向该目录（或对空间右键「在 CodeBuddy 打开 / 打开文件夹」）。云端没有任何一个可以粘贴进桌面端就自动搬迁的链接。</p>
+<hr>
+<h2 id="s2">1. 项目空间地址 / 定位标识清单</h2>
+<table><thead><tr><th>类型</th><th>值</th><th>用途 / 是否可点开</th></tr></thead><tbody><tr><td><strong>桌面端工作空间（真正要用的）</strong></td><td>你电脑上的<strong>本地文件夹路径</strong>（例如把交付包解压到 <code>~/bikini-bottom/</code>）</td><td>★ 桌面端「选择工作空间」指向这里；不是一个 URL</td></tr><tr><td>云端空间 Key</td><td><code>934441e05fab404a8a63585ae5144ac4</code></td><td>标识当前云端沙箱，桌面端用不上，仅供对账</td></tr><tr><td>云端空间入口（登录态下）</td><td><code>https://sandbox.cloudstudio.club/ws/934441e05fab404a8a63585ae5144ac4</code></td><td>你在桌面应用/浏览器<strong>已登录</strong>时可在云端侧查看该工作空间；未登录会跳 <code>reason=unauthorized</code>（已实测）</td></tr><tr><td>会话 ID</td><td><code>2f8a7d30-9c21-4f0b-1d69-43fd914c2000</code></td><td>定位「当前这一次对话」，用于找回上下文 / 对账</td></tr><tr><td>AgentOS 会话 ID</td><td><code>2119299855998001152</code></td><td>平台侧会话标识</td></tr><tr><td>云端工作目录</td><td><code>/workspace</code></td><td>所有产物的根目录（仅在云端沙箱内有效）</td></tr><tr><td>区域 / Pod</td><td><code>ap-beijing</code> / <code>cs-spacelet-v2-cpu-66fb6cb7f5-7x876</code></td><td>云端环境信息，迁移不需要</td></tr></tbody></table>
+<blockquote>⚠️ 不要尝试用 <code>934441…ap-beijing.sandbox.cloudstudio.club</code> 这类子域当项目地址：实测它对<strong>任意</strong>随机子域都返回同样的 302 通配跳转，不是有效项目空间链接。</blockquote>
+<p>### 已发布的在线成品（可点开、可转发，200 已复核）</p>
+<table><thead><tr><th>内容</th><th>地址</th></tr></thead><tbody><tr><td>可玩 Demo v1.0</td><td><code>https://af61182161416f288.app.workbuddy.host/?sharecode=PRK5VCDQUO</code></td></tr><tr><td>方案 v2.8</td><td><code>https://af61182161416f288.app.workbuddy.host/plan-v28.html?sharecode=PRK5VCDQUO</code></td></tr></tbody></table>
+<blockquote>这两个是<strong>只读成品预览</strong>，不是工作空间。带 <code>sharecode</code> 才能访问（不带会 403）。</blockquote>
+<hr>
+<h2 id="s3">2. 迁移步骤（桌面端照做）</h2>
+<ol><li><strong>下载产物</strong>：把 <code>bikini-bottom-交付包-20261110.zip</code>（29 MB，仓库全量，不含 <code>.git/</code>）保存到本机。</li><li><strong>解压到本地目录</strong>：例如 <code>~/Documents/bikini-bottom/</code>，解压后顶层应是 <code>bikini-bottom/</code>，内含 <code>README.md</code>、<code>assets/</code>、<code>src/</code>、<code>docs/</code>、<code>integration/</code>、<code>tools/</code>、<code>previews/</code>。</li><li><strong>桌面端绑定工作空间</strong>：WorkBuddy 桌面端新建任务 → 输入框左下角「<strong>选择工作空间</strong>」→ 选中刚才那个文件夹。之后所有读写都在该目录，和云端一致。</li></ol>
+<p>   - 或在左侧「空间」右键 →「<strong>打开文件夹</strong>」/「<strong>在 CodeBuddy 打开</strong>」继续代码开发。</p>
+<ol><li><strong>恢复上下文</strong>：把本交接卡（或 <code>docs/开发日志.md</code>、<code>docs/交付产物清单.md</code>）作为上下文 <code>@</code> 引用进新任务，桌面端 AI 就知道现状与待办。</li><li><strong>恢复 Git（可选）</strong>：交付包不含 <code>.git/</code>。如需保留提交历史，在目录内 <code>git init -b main</code> 即可重新起步；或直接 <code>git clone</code> 已推送的 GitHub 仓库（若推送已完成）。</li></ol>
+<blockquote>桌面端文档依据：<a href="https://www.workbuddy.cn/docs/workbuddy/Create-Task" target="_blank" rel="noopener">创建任务·选择工作空间</a>、<a href="https://www.workbuddy.cn/docs/workbuddy/Task-Management" target="_blank" rel="noopener">任务管理·管理工作空间</a>。</blockquote>
+<hr>
+<h2 id="s4">3. 当前任务状态（桌面端 AI 必读）</h2>
+<table><thead><tr><th>项</th><th>状态</th></tr></thead><tbody><tr><td>Demo</td><td><strong>v1.0</strong>，三处世界内小玩法（水母田 / 泡泡摊 / 空手道场），155 项断言 0 报错</td></tr><tr><td>方案文档</td><td><strong>v2.8</strong>（<code>docs/比奇堡沉浸场景方案-v2.html</code>）</td></tr><tr><td>主交付规范</td><td><code>docs/美术资源需求与交付规范.md</code> + 网页版 <code>docs/index.html</code>（同源自包含）</td></tr><tr><td>协作契约</td><td><code>assets/manifest.json</code>：61 条 / 55 可交付 / 161 期望 PNG；<code>status = pending→delivered→accepted/rejected</code></td></tr><tr><td>代码插槽</td><td><code>integration/asset-slots.json</code>：25 个插槽映射到 Demo v1.0</td></tr><tr><td>美术资源</td><td><strong>全部 pending</strong>，等另一个 AI 生成；CSS/SVG 占位已可跑</td></tr><tr><td>本地 Git</td><td>已 <code>git init -b main</code>，3 次提交（最新 <code>ca68a99</code>），49 tracked 文件，工作区干净</td></tr><tr><td><strong>GitHub 推送</strong></td><td><strong>未完成（阻塞）</strong> —— 详见 §4</td></tr></tbody></table>
+<p>三方写入边界（迁移后仍生效）：<code>assets/**</code> = 美术 AI 独占；<code>src/</code> + <code>integration/</code> + <code>docs/</code> + <code>tools/</code> = 集成 AI 独占；唯一共享 <code>manifest.json</code> 按字段分工。完整约定见 <code>README.md</code> §1、<code>CONTRIBUTING.md</code>。</p>
+<hr>
+<h2 id="s5">4. 唯一未完事项：GitHub 推送（桌面端最可能要接着做的）</h2>
+<p><strong>根因（已穷尽排查）</strong>：桌面应用「登录 GitHub 账号」≠ 沙箱会话的「GitHub 连接器 OAuth 授权」，网关持续返回 <code>17009 Connector &quot;github&quot; is not authorized</code>。网络实测：<code>github.com</code> 网页与设备码端点超时；<strong><code>api.github.com</code> REST 可达</strong>（仅差认证）。</p>
+<p>在桌面端（你已登录、网络策略不同）通常更容易成功，二选一：</p>
+<ul><li><strong>A. 连接器授权</strong>：桌面端「设置 → 连接器 → GitHub」完成 OAuth，然后执行 <code>./tools/push-to-github.sh &lt;owner/repo&gt;</code>（Token 仅在进程内传递，不落盘）。</li><li><strong>B. PAT + REST（推荐，最稳）</strong>：生成一个 fine-grained PAT（只授目标仓库 <code>Contents: read/write</code>；需新建仓库再临时开 <code>Administration: write</code>），执行：</li></ul>
+<div class="cb"><button class="copy">复制</button><pre><code>GITHUB_PAT=&lt;token&gt; python3 tools/push-rest.py                # 推到 &lt;用户名&gt;/bikini-bottom
+GITHUB_PAT=&lt;token&gt; python3 tools/push-rest.py owner/repo     # 推到指定仓库
+python3 tools/push-rest.py --check                           # 离线自检（不联网）</code></pre></div>
+<p><code>push-rest.py</code> 走 GitHub Git Data API，一次 commit 导入全部 50 个文件 / 18 张 PNG / 29.04 MB，不依赖连接器、不依赖 <code>github.com</code>。<strong>不要把 Token 写进任何仓库文件。</strong></p>
+<ul><li><strong>C. 兜底</strong>：直接在 GitHub 网页上传交付包 zip。</li></ul>
+<blockquote>美术 AI <strong>不需要任何 GitHub 授权</strong>，只按 <code>assets/README.md</code> 往 <code>assets/</code> 放 PNG、改 <code>manifest.json</code>。</blockquote>
+<hr>
+<h2 id="s6">5. 产物索引</h2>
+<table><thead><tr><th>路径</th><th>内容</th></tr></thead><tbody><tr><td><code>README.md</code></td><td>仓库总览、三方边界、目录结构、§7 授权与推送</td></tr><tr><td><code>docs/美术资源需求与交付规范.md</code> / <code>docs/index.html</code></td><td>给美术 AI 的主交付（需求 + 设计规范 + 交付规范 + FAQ）</td></tr><tr><td><code>docs/美术资产规格与提示词包.md</code></td><td>风格锚点 / 模板 A~J / 负面词 / L1-L3 调用估算</td></tr><tr><td><code>docs/交付产物清单.md</code></td><td>资产 A~G、代码 K、协作产物 R 全量状态</td></tr><tr><td><code>docs/开发日志.md</code></td><td>逐版本进度 + 阻塞项</td></tr><tr><td><code>docs/比奇堡沉浸场景方案-v2.html</code> / <code>docs/PRD-比奇堡的一天.html</code></td><td>方案 v2.8 / 初版 PRD</td></tr><tr><td><code>docs/reference/</code> · <code>previews/</code></td><td>13 张概念参考图 · 5 张 Demo 实图</td></tr><tr><td><code>src/index.html</code></td><td>可运行 Demo v1.0</td></tr><tr><td><code>assets/manifest.json</code> · <code>integration/asset-slots.json</code></td><td>协作契约 · 插槽映射</td></tr><tr><td><code>tools/validate-assets.py</code> · <code>tools/push-to-github.sh</code> · <code>tools/push-rest.py</code></td><td>自检 · 两种推送</td></tr><tr><td><code>bikini-bottom-交付包-20261110.zip</code>（在 <code>/workspace</code> 根）</td><td>全量打包，用于迁移 / 网页上传</td></tr></tbody></table>
+<hr>
+<h2 id="s7">6. 给桌面端 AI 的接手提示词（可直接复制）</h2>
+<div class="cb"><button class="copy">复制</button><pre><code>接手「比奇堡沉浸式 2.5D 连通世界」项目。先读 docs/迁移交接卡.md 与 docs/开发日志.md。
+当前 Demo v1.0 / 方案 v2.8 / 交付规范已定稿；美术资源全部 pending，等另一个 AI 按
+assets/manifest.json 交付；写入边界见 README §1。
+唯一未完事项是「把本仓库推送到我的 GitHub」，请按交接卡 §4 的 A/B/C 三选一完成，
+优先 B（PAT + tools/push-rest.py）。不要伪造凭证、不要假装推送成功；完成后把在线地址与
+commit 短哈希回报给我。之后的工作是等美术资源到位并按 integration/asset-slots.json 挂载。</code></pre></div>
+<div class="footer">本页由 docs/迁移交接卡.md 自动生成，内容与 md 同源。桌面端「项目空间」= 本地文件夹，不是网址。</div>
+</main></div><script>
+document.querySelectorAll('.copy').forEach(function(b){
+  b.addEventListener('click',function(){
+    var t=b.parentNode.querySelector('code').innerText;
+    navigator.clipboard.writeText(t).then(function(){b.textContent='已复制';
+      setTimeout(function(){b.textContent='复制';},1600);});
+  });
+});
+</script></body></html>

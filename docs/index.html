@@ -1,0 +1,1516 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>比奇堡 · 美术资源需求与交付规范 v1.0</title>
+<style>
+:root{--navy:#062338;--sea:#1AA3C4;--gold:#CAA86A;--hi:#FFD23F;--paper:#F7FBFE;--ink:#16324a;--line:#dbe6ec;--soft:#eef5f8}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--soft);color:var(--ink);font:15px/1.75 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",sans-serif}
+header.top{background:linear-gradient(120deg,#062338 0%,#0b3b57 60%,#1AA3C4 140%);color:#fff;padding:34px 40px 28px;border-bottom:4px solid var(--hi)}
+header.top .kicker{font-size:12px;letter-spacing:.22em;color:var(--hi);text-transform:uppercase;margin-bottom:8px}
+header.top h1{margin:0 0 10px;font-size:30px;line-height:1.35;font-weight:800;letter-spacing:.01em}
+header.top .meta{font-size:13px;color:#cfe6f0;margin-top:12px;line-height:1.9}
+header.top .meta b{color:var(--hi);font-weight:600}
+.wrap{display:flex;align-items:flex-start;max-width:1500px;margin:0 auto}
+nav.toc{position:sticky;top:0;flex:0 0 272px;height:100vh;overflow-y:auto;background:#fff;border-right:1px solid var(--line);padding:22px 14px 60px 20px;font-size:13px}
+nav.toc .t{font-weight:800;color:var(--navy);font-size:12px;letter-spacing:.16em;margin:0 0 14px;padding-left:8px}
+nav.toc ul{list-style:none;margin:0;padding:0}
+nav.toc ul ul{padding-left:12px;border-left:1px dashed #d6e2e8;margin:2px 0 6px}
+nav.toc li{margin:1px 0}
+nav.toc a{display:block;padding:4px 8px;color:#46647a;text-decoration:none;border-radius:6px;line-height:1.5}
+nav.toc a:hover{background:var(--soft);color:var(--sea)}
+nav.toc>ul>li>a{font-weight:700;color:var(--navy);margin-top:6px}
+main{flex:1;min-width:0;padding:30px 44px 90px;max-width:1060px}
+main>.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:30px 36px 46px;box-shadow:0 8px 28px rgba(6,35,56,.06)}
+h1,h2,h3,h4{color:var(--navy);line-height:1.4}
+main h1{font-size:27px;border-bottom:3px solid var(--hi);padding-bottom:12px;margin:0 0 22px}
+main h2{font-size:21px;margin:44px 0 16px;padding:0 0 10px;border-bottom:2px solid var(--line)}
+main h2::before{content:"";display:inline-block;width:8px;height:8px;background:var(--sea);border-radius:2px;margin-right:10px;vertical-align:middle}
+main h3{font-size:17px;margin:28px 0 10px;color:#0b3b57}
+main h4{font-size:15px;margin:20px 0 8px}
+p{margin:12px 0}
+a{color:#0d7fa8}
+strong{color:var(--navy)}
+blockquote{margin:16px 0;padding:12px 18px;background:#f4f9fb;border-left:4px solid var(--sea);border-radius:0 8px 8px 0;color:#33566b;font-size:14px}
+blockquote p{margin:6px 0}
+hr{border:0;border-top:1px solid var(--line);margin:34px 0}
+table{border-collapse:collapse;width:100%;margin:16px 0;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top;line-height:1.65}
+th{background:#eaf3f7;color:var(--navy);font-weight:700;white-space:nowrap}
+tr:nth-child(even) td{background:#fbfdfe}
+tr:hover td{background:#f2f9fc}
+code{background:#eaf1f5;color:#0b4a66;padding:1px 5px;border-radius:4px;font-size:12.5px;font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace}
+pre{position:relative;background:var(--navy);color:#dceef5;border-radius:10px;padding:18px 18px 18px;margin:16px 0;overflow-x:auto;font-size:12.5px;line-height:1.7;border:1px solid #0d3a52}
+pre code{background:none;color:inherit;padding:0;font-size:12.5px;white-space:pre}
+.copy{position:absolute;right:10px;top:9px;background:rgba(255,255,255,.1);color:#bfe6f2;border:1px solid rgba(255,255,255,.22);border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer}
+.copy:hover{background:rgba(255,255,255,.2)}
+.copy.ok{color:var(--hi);border-color:var(--hi)}
+ul,ol{padding-left:24px;margin:12px 0}
+li{margin:5px 0}
+.sw{display:inline-block;width:13px;height:13px;border-radius:3px;border:1px solid rgba(6,35,56,.25);vertical-align:-2px;margin-right:7px}
+.badge{display:inline-block;background:var(--hi);color:var(--navy);font-size:11px;font-weight:800;padding:2px 8px;border-radius:20px;margin-left:8px;vertical-align:2px}
+.foot{text-align:center;color:#7e96a5;font-size:12px;padding:24px 0 0}
+@media(max-width:960px){
+ .wrap{display:block}nav.toc{position:static;width:auto;height:auto;max-height:290px;border-right:0;border-bottom:1px solid var(--line);padding:16px 20px}
+ header.top{padding:24px 22px}header.top h1{font-size:23px}main{padding:18px 16px 60px}main>.card{padding:20px 16px 34px}
+}
+@media print{nav.toc,.copy{display:none!important}header.top{background:var(--navy)!important;-webkit-print-color-adjust:exact}main>.card{box-shadow:none;border:0}body{background:#fff}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="kicker">Bikini Bottom · Art Handoff Spec</div>
+  <h1>比奇堡沉浸式连通世界 · 美术资源需求与交付规范 <span class="badge">v1.0</span></h1>
+  <div class="meta">
+    面向 <b>负责生成美术资源的 AI</b> 的自足交付文档 · 对应 <b>Demo v1.0 / 方案 v2.8 / 提示词包 v1.2</b> · 2026-11-10<br>
+    协作仓库：<b>bikini-bottom</b> ｜ 你的写入区：<b>assets/</b> ｜ 契约文件：<b>assets/manifest.json</b> ｜ 集成方：<b>集成 AI</b>
+  </div>
+</header>
+<div class="wrap">
+  <nav class="toc"><div class="t">目录 / CONTENTS</div><div class="toc">
+<ul>
+<li><a href="#0-一页速览先读这-10-条能避开-90-的返工">0. 一页速览（先读这 10 条，能避开 90% 的返工）</a></li>
+<li><a href="#1-项目是什么">1. 项目是什么</a><ul>
+<li><a href="#合规红线">合规红线</a></li>
+</ul>
+</li>
+<li><a href="#2-美术风格结论">2. 美术风格结论</a></li>
+<li><a href="#3-设计基线逐字复用--不得改写">3. 设计基线（逐字复用 · 不得改写）</a><ul>
+<li><a href="#31-中文风格锚点原样复制">3.1 中文风格锚点（原样复制）</a></li>
+<li><a href="#32-EN-风格锚点原样复制">3.2 EN 风格锚点（原样复制）</a></li>
+<li><a href="#33-色板单图用色--6">3.3 色板（单图用色 ≤ 6）</a></li>
+<li><a href="#34-负面提示词逐字复用">3.4 负面提示词（逐字复用）</a></li>
+<li><a href="#35-提示词拼装公式与起手样板">3.5 提示词拼装公式与起手样板</a></li>
+</ul>
+</li>
+<li><a href="#4-需要的美术资源全量清单">4. 需要的美术资源（全量清单）</a><ul>
+<li><a href="#40-尺寸规格总表-本次新增交付前必读">4.0 尺寸规格总表（★ 本次新增，交付前必读）</a></li>
+<li><a href="#41-assetsworld--A-类-世界层">4.1 assets/world/ — A 类 世界层</a></li>
+<li><a href="#42-assetsbuildings--B-类-建筑外观7-张">4.2 assets/buildings/ — B 类 建筑外观（7 张）</a></li>
+<li><a href="#43-assetsrooms--C--G-01-类-子房间背景14-张">4.3 assets/rooms/ — C / G-01 类 子房间背景（14 张）</a></li>
+<li><a href="#44-assetscharacters--D-类-角色与-bot">4.4 assets/characters/ — D 类 角色与 bot</a></li>
+<li><a href="#45-assetsprops--E--G-02--G-03--G-04-类-道具与交互物件">4.5 assets/props/ — E / G-02 / G-03 / G-04 类 道具与交互物件</a></li>
+<li><a href="#46-assetsui--F-类-UI-贴纸面板可选默认已由-CSS-实现">4.6 assets/ui/ — F 类 UI 贴纸面板（可选，默认已由 CSS 实现）</a></li>
+<li><a href="#47-assetsicons--G-05-类-彩蛋藏品图标可选27-枚">4.7 assets/icons/ — G-05 类 彩蛋藏品图标（可选，27 枚）</a></li>
+<li><a href="#48-assetsfx-与-assetsworld--可选手绘替换默认纯-CSS非必生图">4.8 assets/fx/ 与 assets/world/ — 可选手绘替换（默认纯 CSS，非必生图）</a></li>
+<li><a href="#49-不进图清单-严禁排产生图">4.9 不进图清单（★ 严禁排产生图）</a></li>
+</ul>
+</li>
+<li><a href="#5-设计规范硬约束">5. 设计规范（硬约束）</a></li>
+<li><a href="#6-交付规范与交付形式-重点">6. 交付规范与交付形式（★ 重点）</a><ul>
+<li><a href="#61-交付三件套缺一不算完成">6.1 交付三件套（缺一不算完成）</a></li>
+<li><a href="#62-目录归属谁写哪里--协作不冲突的关键">6.2 目录归属（谁写哪里 —— 协作不冲突的关键）</a></li>
+<li><a href="#63-文件命名">6.3 文件命名</a></li>
+<li><a href="#64-格式与技术参数">6.4 格式与技术参数</a></li>
+<li><a href="#65-manifestjson-状态机协作握手协议">6.5 manifest.json 状态机（协作握手协议）</a></li>
+<li><a href="#66-三种交付形式按优先级">6.6 三种交付形式（按优先级）</a></li>
+<li><a href="#67-拒收清单会被直接-rejected">6.7 拒收清单（会被直接 rejected）</a></li>
+<li><a href="#68-验收脚本">6.8 验收脚本</a></li>
+</ul>
+</li>
+<li><a href="#7-协作与集成两个-AI-怎么在同一个仓库里干活">7. 协作与集成（两个 AI 怎么在同一个仓库里干活）</a><ul>
+<li><a href="#71-仓库目录树-已预留请按此结构落盘">7.1 仓库目录树（★ 已预留，请按此结构落盘）</a></li>
+<li><a href="#72-写入边界表">7.2 写入边界表</a></li>
+<li><a href="#73-协作时序">7.3 协作时序</a></li>
+<li><a href="#74-commit--分支约定">7.4 commit / 分支约定</a></li>
+<li><a href="#75-集成回填流程集成-AI-这边做什么供你理解交付为何要这么规范">7.5 集成回填流程（集成 AI 这边做什么，供你理解交付为何要这么规范）</a></li>
+<li><a href="#76-冲突与异议处理">7.6 冲突与异议处理</a></li>
+</ul>
+</li>
+<li><a href="#8-验收自检清单逐条勾选后再标-delivered">8. 验收自检清单（逐条勾选后再标 delivered）</a></li>
+<li><a href="#9-批量执行顺序严格按序别跳步">9. 批量执行顺序（严格按序，别跳步）</a><ul>
+<li><a href="#建议批次对应-10-的-L1--L2--L3">建议批次（对应 §10 的 L1 / L2 / L3）</a></li>
+</ul>
+</li>
+<li><a href="#10-成本口径不假定单价">10. 成本口径（不假定单价）</a></li>
+<li><a href="#11-FAQ">11. FAQ</a></li>
+<li><a href="#附录--与其他文档的关系">附录 · 与其他文档的关系</a></li>
+</ul>
+</div>
+</nav>
+  <main><div class="card"><h1 id="比奇堡沉浸式连通世界--美术资源需求与交付规范-v10">比奇堡沉浸式连通世界 · 美术资源需求与交付规范 v1.0</h1>
+<blockquote>
+<p><strong>这份文档给谁看</strong>：负责「生成美术资源」的 AI（下称 <strong>美术 AI</strong>）。拿到本文件即可开工，不需要再向人类逐条口述需求。</p>
+<p><strong>对应版本</strong>：Demo v1.0 / 方案 v2.8 / 提示词包 v1.2 · 日期 2026-11-10
+<strong>协作对象</strong>：负责把资源集成进网页的 AI（下称 <strong>集成 AI</strong>），与你在同一个 Git 仓库里并行工作。
+<strong>合规基线</strong>：非官方同人、非商用；「神似非形似」，<strong>不 1:1 复刻</strong>受版权保护的精确角色造型、标语与商标；不复用原作音轨。提示词里禁止出现角色专有名词与原作商标字样，只写<strong>形体、色块与构图特征</strong>。</p>
+</blockquote>
+<hr />
+<h2 id="0-一页速览先读这-10-条能避开-90-的返工">0. 一页速览（先读这 10 条，能避开 90% 的返工）</h2>
+<ol>
+<li><strong>只写 <code>assets/</code></strong>。仓库里 <code>src/</code>、<code>integration/</code>、<code>docs/</code>、<code>tools/</code> 是集成 AI 的地盘，请不要修改，否则合并会冲突。</li>
+<li><strong>风格锚点逐字复制</strong>，一个字都不改（§3.1 / §3.2）。跨批次改写锚点 = 素材摆进同一房间立刻露馅。</li>
+<li><strong>每条提示词 = 锚点 + 类别模板 + 负面词</strong>，只替换模板里的【】槽位，其余原样。</li>
+<li><strong>透明底 PNG / sRGB</strong>，主体四周留 8–12% 透明边距，<strong>基线齐平</strong>，统一<strong>朝右</strong>，单图用色 ≤ 6，描边固定 <code>#062338</code>。</li>
+<li><strong>交互高亮金 <code>#FFD23F</code>、呼吸发光、碎星光、粒子、文字、数字、门牌、号码屏内容一律不进图</strong>——全部由 CSS/HTML 叠加（§4.9 不进图清单）。</li>
+<li><strong>双态物件成对生成</strong>，除【状态】槽位外提示词逐字一致；「亮」态只改色块明度，绝不画光晕。</li>
+<li><strong>先跑 1 张锁风格</strong>（推荐 B-05），确认描边/饱和度/等角角度后再批量；每 3 张抽检 1 张。</li>
+<li><strong>交付三件套</strong>：PNG 文件 + 更新 <code>assets/manifest.json</code> 的 <code>status</code> + 填写 <code>assets/art-params.md</code> 参数存档，缺一不算交付完成。</li>
+<li><strong>文件名 = 编号-内部代号-状态.png</strong>，例如 <code>B-05-krusty_krab-right.png</code>、<code>E-02-register-open.png</code>；纯色底版本加 <code>-solid</code>。</li>
+<li><strong>交付前跑自检</strong>：<code>python3 tools/validate-assets.py</code>，输出 PASS 再把 <code>status</code> 改成 <code>delivered</code>。</li>
+</ol>
+<hr />
+<h2 id="1-项目是什么">1. 项目是什么</h2>
+<p>一个可连续探索的 2.5D 轻等角海底小镇网页体验（单文件 HTML Demo）：六栋建筑错落散布在<strong>同一个连通世界</strong>里，可进入共 14 个子房间；有 NPC 作息、分支对话、点餐动线、翻找/旋转/开关交互、27 件彩蛋，以及水母田 / 泡泡摊 / 空手道场三处世界内小玩法。</p>
+<p>目前 Demo 里的所有视觉都是 <strong>CSS 几何 + 色块 + 文字占位</strong>。你的产出会按编号替换这些占位，因此规范的核心是：<strong>尺寸比例对得上、抠图干净、风格统一、不把动态效果画进静态图</strong>。</p>
+<h3 id="合规红线">合规红线</h3>
+<ul>
+<li>提示词里<strong>禁止</strong>出现角色专有名词、作品名、商标、招牌文字；中文资产名（如「蟹堡王」）只用于本清单的人类索引，<strong>不进提示词</strong>。</li>
+<li>只描述形体、色块、圆润比例与构图气质；招牌只画轮廓、不写字，文字全部由 HTML 渲染。</li>
+<li>不描摹原作赛璐璐描线与精确造型（负面词里已逐字排除）。</li>
+</ul>
+<hr />
+<h2 id="2-美术风格结论">2. 美术风格结论</h2>
+<table>
+<thead>
+<tr>
+<th>候选</th>
+<th>结论</th>
+<th>原因</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>2.5D 轻等角微缩手绘</strong></td>
+<td>✅ <strong>采用</strong></td>
+<td>与「连通世界 + 多房间 + 可点物件」最契合；DOM/CSS 分层可直接挂载；单张透明底素材即可复用</td>
+</tr>
+<tr>
+<td>全 3D 建模渲染</td>
+<td>❌ 否决</td>
+<td>与现有 DOM 世界引擎不兼容，成本与集成风险高</td>
+</tr>
+<tr>
+<td>原作赛璐璐 2D</td>
+<td>❌ 否决</td>
+<td>合规风险 + 与轻等角景深冲突</td>
+</tr>
+<tr>
+<td>像素 / 体素</td>
+<td>❌ 否决</td>
+<td>与「微缩沙盘手绘质感」目标不符</td>
+</tr>
+</tbody>
+</table>
+<p>一句话：<strong>儿童绘本般的圆润比例 + 厚而柔和的深蓝描边 + 明快平涂高饱和海底色 + 统一左上方柔光</strong>。</p>
+<hr />
+<h2 id="3-设计基线逐字复用--不得改写">3. 设计基线（逐字复用 · 不得改写）</h2>
+<blockquote>
+<p>本节与《美术资产规格与提示词包.md》§3 / §4 / §6、方案文档 §8.2 <strong>逐字一致</strong>。任一侧改动必须双向同步，否则跨批次素材会风格漂移。</p>
+</blockquote>
+<h3 id="31-中文风格锚点原样复制">3.1 中文风格锚点（原样复制）</h3>
+<pre><code>轻等角 2.5D 微缩沙盘插画，厚而柔和的深蓝描边，明快平涂色块，高饱和海底色（菠萝黄 / 珊瑚红 / 海水青 / 暖沙金），统一左上方柔光源，边缘干净便于抠图，透明或单一纯色背景，主体朝右、基线齐平、互不重叠，儿童绘本般的圆润比例，无文字、无 logo、无水印、无投影。
+</code></pre>
+<h3 id="32-EN-风格锚点原样复制">3.2 EN 风格锚点（原样复制）</h3>
+<pre><code>light isometric 2.5D miniature diorama illustration, thick soft navy outlines, flat bright color blocking, high-saturation underwater palette, consistent soft top-left light, clean edges for cutout, plain solid background, subject facing right, aligned baseline, no overlap, rounded storybook proportions, no text, no logo, no watermark, no shadow.
+</code></pre>
+<h3 id="33-色板单图用色--6">3.3 色板（单图用色 ≤ 6）</h3>
+<table>
+<thead>
+<tr>
+<th>命名色</th>
+<th>HEX</th>
+<th>色块</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>海水青</td>
+<td><code>#1AA3C4</code></td>
+<td>■</td>
+<td>世界 / 水体质感、门框主色</td>
+</tr>
+<tr>
+<td>深海底蓝</td>
+<td><code>#062338</code></td>
+<td>■</td>
+<td><strong>描边固定色</strong>（所有主体统一）</td>
+</tr>
+<tr>
+<td>菠萝黄</td>
+<td><code>#F2C14E</code></td>
+<td>■</td>
+<td>凤梨屋、暖光主体</td>
+</tr>
+<tr>
+<td>珊瑚红</td>
+<td><code>#E74C3C</code></td>
+<td>■</td>
+<td>船形餐厅、重点主体</td>
+</tr>
+<tr>
+<td>暖沙金</td>
+<td><code>#CAA86A</code></td>
+<td>■</td>
+<td>沙地、木质、贴纸质感</td>
+</tr>
+<tr>
+<td>泡沫白</td>
+<td><code>#F7FBFE</code></td>
+<td>■</td>
+<td>高光、纯色底版本</td>
+</tr>
+</tbody>
+</table>
+<p>补充专用色（仅在要手绘替换对应主体时使用，仍受 ≤6 色约束）：</p>
+<ul>
+<li>三型水母：粉 <code>#FF8FC7</code> / 电蓝 <code>#5BC8FF</code> / 金 <code>#FFD23F</code></li>
+<li>三处场地地面：水母田青绿 <code>#7ED3A0</code>–<code>#348C66</code>、泡泡摊淡蓝 <code>#96D2FF</code>–<code>#3C82C3</code>、空手道沙地暖橙 <code>#E2AC5C</code>–<code>#8C5C2E</code></li>
+<li>6 套房间主题色板：蓝木 / 菠萝黄 / 冷灰 / 沙褐 / 树绿 / 暗橄榄绿；<strong>同栋子房间共用色板</strong>，仅局部小改</li>
+</ul>
+<blockquote>
+<p><strong>交互高亮金 <code>#FFD23F</code> 一律由代码叠加，绝不入图</strong>（否则做不了呼吸/发光，也污染抠图）。作为水母主体色时是「平涂色」，不是「发光」。</p>
+</blockquote>
+<h3 id="34-负面提示词逐字复用">3.4 负面提示词（逐字复用）</h3>
+<p><strong>中文</strong></p>
+<pre><code>投影，落地阴影，接触阴影，环境光遮蔽，发光特效，金色高亮，呼吸光晕，碎星光，粒子特效，文字，字母，数字，招牌字样，logo，商标，水印，签名，日期，多个主体重叠，前后遮挡，透视畸变，写实材质，金属反射，玻璃高光，噪点，脏边，灰边，原作描线，赛璐璐动画线，精确角色复刻，知名卡通角色，三维渲染光影，景深虚化，地面，背景杂物
+</code></pre>
+<p><strong>EN</strong></p>
+<pre><code>shadow, cast shadow, contact shadow, ambient occlusion, glow effect, golden highlight, breathing halo, sparkle particles, text, letters, numbers, signage lettering, logo, trademark, watermark, signature, date, overlapping subjects, foreground occlusion, perspective distortion, photorealistic material, metallic reflection, glass specular, noise, dirty edges, gray fringe, original animation outlines, cel-shading lines, exact character replica, known cartoon character, 3D render lighting, depth of field blur, ground plane, background clutter
+</code></pre>
+<h3 id="35-提示词拼装公式与起手样板">3.5 提示词拼装公式与起手样板</h3>
+<pre><code>完整提示词 = §3.1 或 §3.2 锚点（原样） + 《美术资产规格与提示词包.md》§5 对应类别模板（只换【】槽位） + §3.4 负面词（原样）
+</code></pre>
+<p>模板索引：<code>A</code> 世界全景 / <code>B</code> 建筑外观 / <code>C</code> 子房间背景 / <code>D</code> 角色与 bot / <code>E</code> 可点物件（含双态）/ <code>F</code> UI 贴纸面板 / <code>G</code> 门与楼梯 / <code>H</code> 彩蛋图标 / <code>I</code> 水母·鱼网·小蜗 / <code>J</code> 玩法场地·泡泡·木桩。<strong>同一批次固定用一种语言，不要中英混用。</strong></p>
+<p><strong>起手样板（步骤 1 锁风格用，可直接粘贴）</strong></p>
+<pre><code>light isometric 2.5D miniature diorama illustration, thick soft navy outlines, flat bright color blocking, high-saturation underwater palette, consistent soft top-left light, clean edges for cutout, plain solid background, subject facing right, aligned baseline, no overlap, rounded storybook proportions, no text, no logo, no watermark, no shadow. A single red boat-shaped wooden seaside restaurant with a curved hull outline, two slanted masts and an anchor-shaped sign frame on the roof with no lettering on it; rounded storybook proportions, coral red #E74C3C body, deep navy #062338 outlines, 3/4 isometric view facing right, centered with 10% transparent margin, only the building itself, no ground, no furniture, no characters. shadow, cast shadow, contact shadow, ambient occlusion, glow effect, golden highlight, breathing halo, sparkle particles, text, letters, numbers, signage lettering, logo, trademark, watermark, signature, date, overlapping subjects, perspective distortion, photorealistic material, metallic reflection, glass specular, noise, dirty edges, gray fringe, original animation outlines, exact character replica, known cartoon character, 3D render lighting, depth of field blur, ground plane, background clutter
+</code></pre>
+<blockquote>
+<p>扩批时<strong>只改</strong>「A single …」句中的主体描述与色值，锚点句与负面词句一个字不动。完整提示词包见 <code>docs/美术资产规格与提示词包.md</code>。</p>
+</blockquote>
+<hr />
+<h2 id="4-需要的美术资源全量清单">4. 需要的美术资源（全量清单）</h2>
+<h3 id="40-尺寸规格总表-本次新增交付前必读">4.0 尺寸规格总表（★ 本次新增，交付前必读）</h3>
+<table>
+<thead>
+<tr>
+<th>类别</th>
+<th>标准画布 (px)</th>
+<th>代码里的显示基准</th>
+<th>宽高比</th>
+<th>底色</th>
+<th>交付要求</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A-01 世界全景</td>
+<td><strong>2600 × 1370</strong></td>
+<td>世界 <code>WORLD_W×WORLD_H</code> = 2600×1370</td>
+<td>1.898 : 1</td>
+<td>纯色 <code>#1AA3C4</code></td>
+<td>建议出 2×（5200×2740）供高分屏；六栋错落、<strong>S 形弯曲小路</strong>、建筑互不重叠</td>
+</tr>
+<tr>
+<td>A-02 远景天际线</td>
+<td>2600 × 400</td>
+<td>视差远层</td>
+<td>6.5 : 1</td>
+<td>透明</td>
+<td>长条、左右可平铺</td>
+</tr>
+<tr>
+<td>A-03 近景海草</td>
+<td>1024 × 256</td>
+<td>视差近层</td>
+<td>4 : 1</td>
+<td>透明</td>
+<td>左右无缝平铺</td>
+</tr>
+<tr>
+<td>B 建筑外观</td>
+<td><strong>512 × 512</strong></td>
+<td>84–190 × 84–170（按建筑）</td>
+<td>1 : 1 画布</td>
+<td>透明</td>
+<td>单个建筑居中，四周 8–12% 透明边距；<strong>代码按容器 <code>contain</code> 缩放</strong>，不要为了凑显示尺寸裁掉边距</td>
+</tr>
+<tr>
+<td>C / G-01 子房间背景</td>
+<td><strong>1200 × 760</strong></td>
+<td><code>#room</code> = 1200×760</td>
+<td>1.579 : 1</td>
+<td>纯色主题色</td>
+<td>一面后墙 + 45° 菱形地砖 + 局部拱门；<strong>预留大面积空白地面</strong>给代码摆可点物件</td>
+</tr>
+<tr>
+<td>D 角色立绘</td>
+<td>512 × 768</td>
+<td>对话面板约 220×330</td>
+<td>2 : 3</td>
+<td>透明</td>
+<td>朝右站姿、基线齐平</td>
+</tr>
+<tr>
+<td>D 世界小 token</td>
+<td>128 × 128</td>
+<td>48–64</td>
+<td>1 : 1</td>
+<td>透明</td>
+<td>Q 版仅头肩、简化到 3 色，须与立绘像同一角色</td>
+</tr>
+<tr>
+<td>D 行走帧</td>
+<td>512 × 768 × 4 帧</td>
+<td>—</td>
+<td>2 : 3 / 帧</td>
+<td>透明</td>
+<td>或 2048×768 横向 sprite sheet；可选</td>
+</tr>
+<tr>
+<td>E 道具 / G-03 双态</td>
+<td><strong>256 × 256</strong></td>
+<td>56 × 52（<code>.obj</code>）</td>
+<td>1 : 1</td>
+<td>透明</td>
+<td>同组所有物件尺寸一致；双态两张同尺寸</td>
+</tr>
+<tr>
+<td>G-02 门 / 楼梯</td>
+<td>256 × 256</td>
+<td>约 90 × 120</td>
+<td>1 : 1</td>
+<td>透明</td>
+<td>朝右、基线齐平</td>
+</tr>
+<tr>
+<td>F UI 贴纸面板</td>
+<td>按条目标注</td>
+<td>—</td>
+<td>—</td>
+<td>透明</td>
+<td>正视无透视、<strong>面板内不写任何文字</strong></td>
+</tr>
+<tr>
+<td>G-05 彩蛋图标</td>
+<td>128 × 128</td>
+<td>44</td>
+<td>1 : 1</td>
+<td>透明</td>
+<td>≤3 色、单一符号、圆底可选</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>绝对像素不是硬约束，比例与边距才是</strong>。集成侧统一用 <code>object-fit: contain</code> / <code>background-size: contain</code> 挂载，会按容器缩放；硬约束是：<strong>宽高比一致、透明底、8–12% 边距、基线齐平、统一朝右、单图 ≤6 色、描边 <code>#062338</code></strong>。
+所有素材建议同时出 <strong>2× 高清版</strong>（文件名加 <code>@2x</code> 后缀，如 <code>B-05-krusty_krab-right@2x.png</code>），代码优先用 2×；1× 为必需、2× 为可选。</p>
+</blockquote>
+<h3 id="41-assetsworld--A-类-世界层">4.1 <code>assets/world/</code> — A 类 世界层</h3>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>内部代号</th>
+<th>内容</th>
+<th>状态</th>
+<th>必交</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A-01</td>
+<td><code>world_panorama</code></td>
+<td>轻等角海底小镇全景：六栋建筑沿 S 形浅色小路错落散布、前后高低错位、远景圆筒楼与气泡、近景海草</td>
+<td><code>pending</code></td>
+<td>✅</td>
+</tr>
+<tr>
+<td>A-02</td>
+<td><code>skyline_far</code></td>
+<td>灰色圆筒楼 / 大锚 / 灯塔剪影，长条视差层</td>
+<td><code>pending</code></td>
+<td>可选</td>
+</tr>
+<tr>
+<td>A-03</td>
+<td><code>foreground_seaweed</code></td>
+<td>海草 / 珊瑚，可平铺近景层</td>
+<td><code>pending</code></td>
+<td>可选</td>
+</tr>
+</tbody>
+</table>
+<p><strong>空间锚点（比「画 6 栋房子」可靠，务必照抄进 A 类提示词）</strong>：画面从左到右依次是【左下角黄色圆果形小屋】、【其右后方灰色石雕人头像小屋】、【更右侧半圆褐色石头小屋】、【画面上方绿色半球树屋】、【右上方红色船形木屋餐厅】、【其对面暗橄榄绿锈桶小屋】；一条 S 形浅色沙路自右下弯向左侧贯穿六栋建筑。<strong>禁止一字排开</strong>。</p>
+<h3 id="42-assetsbuildings--B-类-建筑外观7-张">4.2 <code>assets/buildings/</code> — B 类 建筑外观（7 张）</h3>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>内部代号</th>
+<th>形体 / 剪影线索</th>
+<th>主色</th>
+<th>必交</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>B-01</td>
+<td><code>pineapple_house</code></td>
+<td>圆润黄色果形小屋，菱形格纹果皮 + 顶部三片叶冠 + 圆窗</td>
+<td>菠萝黄</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>B-02</td>
+<td><code>moai_house</code></td>
+<td>灰色石雕人头像小屋，长鼻方脸 + 眉骨凸起</td>
+<td>冷灰</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>B-03</td>
+<td><code>rock_house</code></td>
+<td>半圆褐色石头小屋，圆顶 + 顶部一根斜天线</td>
+<td>沙褐</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>B-04</td>
+<td><code>treedome</code></td>
+<td>绿色透明半球圆顶树屋，罩内一段棕色树干</td>
+<td>树绿</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>B-05</td>
+<td><code>krusty_krab</code></td>
+<td>红色船形木屋餐厅，弧线船身 + 两根斜桅 + 屋顶锚形招牌<strong>轮廓（不写字）</strong></td>
+<td>珊瑚红</td>
+<td>✅ <strong>（锁风格首张）</strong></td>
+</tr>
+<tr>
+<td>B-06</td>
+<td><code>chum_bucket</code></td>
+<td>暗橄榄绿锈桶小屋，上宽下窄桶身 + 横向铆钉带</td>
+<td>暗橄榄绿</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>B-07</td>
+<td><code>anchor_house</code></td>
+<td>远景船锚形小屋</td>
+<td>暖沙金</td>
+<td>可选（扩展）</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>每张可另出<strong>纯色底版本</strong>：<code>B-05-krusty_krab-right-solid.png</code>（底 <code>#F7FBFE</code>），用于验证抠图边缘是否干净。</p>
+</blockquote>
+<h3 id="43-assetsrooms--C--G-01-类-子房间背景14-张">4.3 <code>assets/rooms/</code> — C / G-01 类 子房间背景（14 张）</h3>
+<p><strong>同一栋的子房间复用同一条提示词，只改【主题】与【主题纹样】两个槽位</strong>，保证像同一栋楼里的不同空间。</p>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>内部代号（= 代码 roomKey）</th>
+<th>空间</th>
+<th>主题色板</th>
+<th>必交</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G-01-krusty_hall</td>
+<td><code>krusty_hall</code></td>
+<td>船形餐厅 · 前厅</td>
+<td>蓝木</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>G-01-krusty_kitchen</td>
+<td><code>krusty_kitchen</code></td>
+<td>船形餐厅 · 后厨</td>
+<td>蓝木</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>G-01-krusty_office</td>
+<td><code>krusty_office</code></td>
+<td>船形餐厅 · 办公室</td>
+<td>蓝木</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>G-01-moai_f1</td>
+<td><code>moai_f1</code></td>
+<td>石像屋 · 1F 客厅</td>
+<td>冷灰</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>G-01-moai_f2</td>
+<td><code>moai_f2</code></td>
+<td>石像屋 · 2F 画室</td>
+<td>冷灰</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>G-01-moai_f3</td>
+<td><code>moai_f3</code></td>
+<td>石像屋 · 3F 阁楼卧室</td>
+<td>冷灰</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>G-01-pineapple_main</td>
+<td><code>pineapple_main</code></td>
+<td>果形屋 · 客厅</td>
+<td>菠萝黄</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>G-01-pineapple_kitchen</td>
+<td><code>pineapple_kitchen</code></td>
+<td>果形屋 · 厨房与卧室</td>
+<td>菠萝黄</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>G-01-rock_main</td>
+<td><code>rock_main</code></td>
+<td>石头屋 · 沙地客厅</td>
+<td>沙褐</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>G-01-rock_under</td>
+<td><code>rock_under</code></td>
+<td>石头屋 · 石头底下</td>
+<td>沙褐</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>G-01-treedome_main</td>
+<td><code>treedome_main</code></td>
+<td>圆顶树屋 · 实验室</td>
+<td>树绿</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>G-01-treedome_airlock</td>
+<td><code>treedome_airlock</code></td>
+<td>圆顶树屋 · 气闸与健身区</td>
+<td>树绿</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>G-01-chum_counter</td>
+<td><code>chum_counter</code></td>
+<td>锈桶餐厅 · 点餐台</td>
+<td>暗橄榄绿</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>G-01-chum_lab</td>
+<td><code>chum_lab</code></td>
+<td>锈桶餐厅 · 后厨与控制室</td>
+<td>暗橄榄绿</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>房间图里<strong>不画家具、不画角色、不画文字、不画投影</strong>；可点物件全部由代码以 <code>.obj</code> 叠加在空白地面上。后厨蒸汽、门牌、号码、导航条均由代码叠加。
+可选：<code>G-06-*-motif.png</code> 六套后墙主题纹样（锚形木纹 / 石雕眉纹 / 沙纹 / 树叶纹 / 锈桶铆钉 / 菠萝菱格），供集成侧叠到房间后墙；不交则沿用房间图自带纹样。</p>
+</blockquote>
+<h3 id="44-assetscharacters--D-类-角色与-bot">4.4 <code>assets/characters/</code> — D 类 角色与 bot</h3>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>内部代号</th>
+<th>需交文件</th>
+<th>必交</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>D-01</td>
+<td><code>player</code></td>
+<td><code>portrait</code> <code>token</code> <code>walk</code> <code>sit</code>（4 个文件）</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>D-02</td>
+<td><code>sponge</code></td>
+<td><code>portrait</code> <code>token</code></td>
+<td>✅</td>
+</tr>
+<tr>
+<td>D-03</td>
+<td><code>squid</code></td>
+<td><code>portrait</code> <code>token</code></td>
+<td>✅</td>
+</tr>
+<tr>
+<td>D-04</td>
+<td><code>star</code></td>
+<td><code>portrait</code> <code>token</code></td>
+<td>✅</td>
+</tr>
+<tr>
+<td>D-05</td>
+<td><code>krabs</code></td>
+<td><code>portrait</code> <code>token</code></td>
+<td>✅</td>
+</tr>
+<tr>
+<td>D-06</td>
+<td><code>sandy</code></td>
+<td><code>portrait</code> <code>token</code></td>
+<td>✅</td>
+</tr>
+<tr>
+<td>D-07</td>
+<td><code>plankton</code></td>
+<td><code>portrait</code> <code>token</code></td>
+<td>✅</td>
+</tr>
+<tr>
+<td>D-08</td>
+<td><code>pearl</code></td>
+<td><code>portrait</code> <code>token</code></td>
+<td>✅</td>
+</tr>
+<tr>
+<td>D-09</td>
+<td><code>gary</code></td>
+<td><code>portrait</code> <code>token</code>（小蜗，圆壳螺旋纹）</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>D-10</td>
+<td><code>bot_fish</code></td>
+<td>6 款小鱼各 1 张（圆 / 条纹 / 扁 / 刺球 / 石头 / 海胆）</td>
+<td>建议（当前为彩色圆盘占位）</td>
+</tr>
+<tr>
+<td>D-11</td>
+<td><code>player_sit</code></td>
+<td>坐姿 1 张（可并入 D-01）</td>
+<td>可选</td>
+</tr>
+</tbody>
+</table>
+<p>命名示例：<code>D-02-sponge-portrait.png</code>、<code>D-02-sponge-token.png</code>、<code>D-01-player-walk.png</code>。</p>
+<ul>
+<li><strong>每个角色给「一条颜色线索 + 一条剪影线索，互不重复」</strong>（见提示词包 §2 变量槽位表）：例如方形多孔 / 长鼻方脸 / 五角星 / 圆壳螺旋…… 只用形体与色块，不写专有名词。</li>
+<li><strong>朝右单一方向</strong>；左向由代码 <code>scaleX(-1)</code> 镜像，<strong>不要另出左向图</strong>。</li>
+<li><strong>D-10 bot 小鱼</strong>：着色区必须<strong>单一纯色平涂</strong>且注明色值、<strong>描边层独立</strong>，代码只替换一个色值即可出变体，避免出 6 套不同风格。</li>
+<li>立绘与 token 必须看起来像同一角色。</li>
+</ul>
+<h3 id="45-assetsprops--E--G-02--G-03--G-04-类-道具与交互物件">4.5 <code>assets/props/</code> — E / G-02 / G-03 / G-04 类 道具与交互物件</h3>
+<blockquote>
+<p><strong>双态规则</strong>：抽屉开/合、灯亮/灭、竖笛/锅铲/自画像正反面刻字等，需<strong>成对生成</strong>，文件名 <code>-open/-closed</code>、<code>-on/-off</code>、<code>-front/-back</code>；除【状态】槽位外提示词逐字一致。<strong>「亮」「发光」态只改色块明度，绝不画光晕</strong>。</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>组</th>
+<th>内部代号</th>
+<th>包含物件（括号为双态）</th>
+<th>必交</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>E-02</td>
+<td>前厅</td>
+<td><code>register</code>（closed/open）、<code>menu</code>、<code>tip_jar</code></td>
+<td>✅</td>
+</tr>
+<tr>
+<td>E-03</td>
+<td>后厨</td>
+<td><code>grill</code>（off/on）、<code>spatula</code>（front/back）、<code>sauce</code>、<code>drink</code>、<code>bin</code>（closed/open）</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>E-04</td>
+<td>办公室</td>
+<td><code>safe</code>（closed/open）、<code>ledger</code>（front/back）、<code>portrait</code></td>
+<td>✅</td>
+</tr>
+<tr>
+<td>E-05</td>
+<td>环境</td>
+<td><code>anchor</code>、<code>lifebuoy</code>、<code>salt</code>、<code>cup</code>、<code>fries</code>、<code>bucket</code>、<code>mop</code></td>
+<td>✅</td>
+</tr>
+<tr>
+<td>E-06</td>
+<td>点餐</td>
+<td><code>ticket_machine</code>、<code>number_board</code>（<strong>屏内不写数字</strong>）</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>E-07</td>
+<td>私人物品</td>
+<td><code>clarinet</code>（front/back）、<code>gadget</code>、<code>snail_bowl</code></td>
+<td>✅</td>
+</tr>
+<tr>
+<td>E-08</td>
+<td>居住区小物</td>
+<td><code>alarm_clock</code>、<code>record_player</code>、<code>fridge</code>、<code>pineapple_bed</code>、<code>round_window</code>、<code>jar</code>、<code>easel</code>、<code>paint</code>、<code>sofa</code>、<code>lamp</code>（off/on）、<code>stone_tv</code>、<code>candy_jar</code>、<code>air_helmet</code>、<code>microscope</code>、<code>barbell</code>、<code>karen_screen</code>、<code>chum_bucket_prop</code></td>
+<td>第二批（可选）</td>
+</tr>
+<tr>
+<td>G-02</td>
+<td>portal</td>
+<td><code>portal_door</code>（蓝拱门框，<strong>不含门牌文字/发光</strong>）、<code>portal_stairs</code>（金色三级等角阶梯）</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>G-04</td>
+<td>翻找容器</td>
+<td><code>drawer</code> <code>safe</code> <code>fridge</code> <code>crate</code> <code>toolbox</code> 各 closed/open</td>
+<td>✅（与 E 组同名物件可共用图）</td>
+</tr>
+</tbody>
+</table>
+<p>命名示例：<code>E-02-register-closed.png</code> / <code>E-02-register-open.png</code> / <code>G-02-portal_door.png</code>。</p>
+<h3 id="46-assetsui--F-类-UI-贴纸面板可选默认已由-CSS-实现">4.6 <code>assets/ui/</code> — F 类 UI 贴纸面板（<strong>可选</strong>，默认已由 CSS 实现）</h3>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>内容</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>F-16</td>
+<td>翻找面板</td>
+<td>米黄圆角卡片 + 四角胶带 + 3×3 空格子，<strong>格内不写文字</strong></td>
+</tr>
+<tr>
+<td>F-17</td>
+<td>旋转检视卡片</td>
+<td>正 / 反两面静态图，翻转动画由代码做</td>
+</tr>
+<tr>
+<td>F-18</td>
+<td>彩蛋藏品册面板</td>
+<td>27 格虚线空框底板，<strong>图标另见 icons/</strong></td>
+</tr>
+<tr>
+<td>F-19</td>
+<td>房间 / 楼层导航贴纸</td>
+<td>与 portal 门牌同一视觉语言</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>其余 F 类全部不要交</strong>：气泡框、邻近提示、检视边框、时钟、纸质点单条、进度条、悬停高亮、世界内引导元件、分支对话面板、座位态、号码屏滚动、名字牌、出口门、捉水母计数板、鱼网光标、小蜗色盘、玩法场地木牌、开场横幅、玩法 HUD / 结算卡 / 蓄力条 / 招式卡 / 方向钮 —— <strong>均为纯 CSS/SVG/HTML 绘制</strong>。</p>
+</blockquote>
+<h3 id="47-assetsicons--G-05-类-彩蛋藏品图标可选27-枚">4.7 <code>assets/icons/</code> — G-05 类 彩蛋藏品图标（<strong>可选</strong>，27 枚）</h3>
+<p><code>G-05-egg-01.png</code> … <code>G-05-egg-27.png</code>：秘方纸条 / 第一枚金币 / 竖笛刻字 / 小蜗印记 / 独处时刻…… 每枚 ≤3 色、单一符号、正视、透明底。<strong>默认由 CSS 圆底 + 文字兜底，不交也能跑</strong>（见 <code>docs/交付产物清单.md</code> G-05 行）。</p>
+<h3 id="48-assetsfx-与-assetsworld--可选手绘替换默认纯-CSS非必生图">4.8 <code>assets/fx/</code> 与 <code>assets/world/</code> — 可选手绘替换（<strong>默认纯 CSS，非必生图</strong>）</h3>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>内容</th>
+<th>落盘目录</th>
+<th>默认</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G-07</td>
+<td>三型水母（粉 / 电蓝 / 金），半圆伞盖 + 4 触须 + 眼睛</td>
+<td><code>fx/</code></td>
+<td>CSS 已绘制；<strong>玩法开局后才显示</strong></td>
+</tr>
+<tr>
+<td>G-09</td>
+<td>小蜗造型（世界 token + 圆形立绘）</td>
+<td><code>characters/</code></td>
+<td>中文色盘兜底</td>
+</tr>
+<tr>
+<td>G-10</td>
+<td>三处玩法场地地面（草地椭圆 / 圆角地台 / 沙地椭圆）</td>
+<td><code>world/</code></td>
+<td>CSS 已绘制；<strong>图内不含木牌文字、不含发光</strong></td>
+</tr>
+<tr>
+<td>G-11</td>
+<td>五段泡泡形态（圆泡 / 大圆泡 / 蟹黄堡 / 小船 / 大象）</td>
+<td><code>fx/</code></td>
+<td>CSS 已绘制</td>
+</tr>
+<tr>
+<td>G-12</td>
+<td>木桩 / 沙袋</td>
+<td><code>fx/</code></td>
+<td>CSS 棕色圆角矩形</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>G-08 鱼网光标永远不生图</strong>（SVG data-URI + CSS 动画）；<strong>G-13 会话 UI 永远不生图</strong>。</p>
+</blockquote>
+<h3 id="49-不进图清单-严禁排产生图">4.9 不进图清单（★ 严禁排产生图）</h3>
+<p>以下全部由代码绘制，画进 PNG 既做不了动画、又会污染色板与抠图：</p>
+<p>蟹黄堡 5 层与 5 级咬痕（CSS + SVG <code>clipPath evenodd</code> 挖洞）、金色光圈 / 虚线光路 / 物件气泡、进度条、号码屏数字与翻滚动画、门牌文字、方向箭头、彩蛋计数、交互高亮与呼吸发光、海草摆动 / 气泡上浮 / 煎炉蒸汽、三型水母与触须摆动、鱼网光标与网挥动扩散、<code>+N</code> 浮字、捉水母计数板、小蜗文字色盘、三处场地地面与虚线围栏 / 木牌、开场横幅 / 玩法 HUD / 结算卡 / 蓄力条 / 招式卡 / 方向钮、五段泡泡与飘动、木桩沙袋、限时条、金色呼吸光圈。</p>
+<hr />
+<h2 id="5-设计规范硬约束">5. 设计规范（硬约束）</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>约束</th>
+<th>违反后果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>透明底 PNG、sRGB；主体四周 8–12% 透明边距</td>
+<td>叠到房间背景上出现白框 / 裁切</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>基线齐平</strong>：同批所有素材的主体底边对齐同一水平线</td>
+<td>摆进同一房间时高低乱跳</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>统一朝右</strong>；左向由代码镜像</td>
+<td>需要额外出图、风格易串</td>
+</tr>
+<tr>
+<td>4</td>
+<td>单图用色 ≤ 6，描边统一 <code>#062338</code></td>
+<td>与既有色板脱节</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>纯色底 / 主体互不重叠</strong>（多主体只用于 A-01 全景）</td>
+<td>抠图无法分离单体</td>
+</tr>
+<tr>
+<td>6</td>
+<td>负面词逐字排除 <code>投影 / 落地阴影 / 接触阴影 / 环境光遮蔽</code></td>
+<td>透明底抠完留灰黑毛边</td>
+</tr>
+<tr>
+<td>7</td>
+<td>图内<strong>零文字、零数字、零 logo、零招牌字样</strong></td>
+<td>与 HTML 文字层重复、合规风险</td>
+</tr>
+<tr>
+<td>8</td>
+<td>图内<strong>零金色高亮 / 呼吸发光 / 碎星光</strong></td>
+<td>无法做动画、污染色板</td>
+</tr>
+<tr>
+<td>9</td>
+<td>双态物件成对、除状态槽位外逐字一致</td>
+<td>看起来不像同一个物件</td>
+</tr>
+<tr>
+<td>10</td>
+<td>换色主体单一纯色平涂 + 描边层独立</td>
+<td>代码无法一键出变体</td>
+</tr>
+<tr>
+<td>11</td>
+<td>6 套房间主题共用色板，同栋子房间像同一栋楼</td>
+<td>房间之间割裂</td>
+</tr>
+<tr>
+<td>12</td>
+<td>位置锚定代替数量词（见 §4.1）</td>
+<td>建筑数量 / 排布失控</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="6-交付规范与交付形式-重点">6. 交付规范与交付形式（★ 重点）</h2>
+<h3 id="61-交付三件套缺一不算完成">6.1 交付三件套（缺一不算完成）</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>交付物</th>
+<th>位置</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>PNG 资源文件</strong></td>
+<td><code>assets/&lt;子目录&gt;/</code></td>
+<td>按 §6.3 命名、按 §6.4 规格</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong><code>assets/manifest.json</code> 状态更新</strong></td>
+<td>仓库根 <code>assets/</code></td>
+<td>把已交付条目的 <code>status</code> 从 <code>pending</code> 改成 <code>delivered</code>，填写 <code>files</code>（实际文件名）、<code>generated_by</code>、<code>params_ref</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong><code>assets/art-params.md</code> 参数存档</strong></td>
+<td><code>assets/</code></td>
+<td>平台 / 模型版本 / 种子 / 步数 / 尺寸 / 采样器 / 完整提示词全文 / 负面词版本 / 首批验证图 / 抽检记录</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>参数存档是<strong>复现与补图的唯一依据</strong>。没有它，后续补一张同风格素材只能重猜，必然漂移。</p>
+</blockquote>
+<h3 id="62-目录归属谁写哪里--协作不冲突的关键">6.2 目录归属（谁写哪里 —— 协作不冲突的关键）</h3>
+<table>
+<thead>
+<tr>
+<th>目录</th>
+<th>归属</th>
+<th>允许操作</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>assets/**</code></td>
+<td><strong>美术 AI（你）</strong></td>
+<td>新增 PNG、更新 <code>manifest.json</code> 的 <code>status</code>/<code>files</code>/<code>generated_by</code>/<code>params_ref</code>、写 <code>art-params.md</code>、往 <code>_review/</code> 放废弃稿</td>
+</tr>
+<tr>
+<td><code>assets/_review/</code></td>
+<td>美术 AI</td>
+<td>待验收稿、被退回稿；<strong>不删除</strong>，文件头加 <code>⚠️ 本版已废弃（日期）：原因 → 请使用 xxx</code></td>
+</tr>
+<tr>
+<td><code>src/**</code>、<code>integration/**</code>、<code>tools/**</code></td>
+<td><strong>集成 AI</strong></td>
+<td>你<strong>只读</strong>，不要改</td>
+</tr>
+<tr>
+<td><code>docs/**</code></td>
+<td>集成 AI 维护</td>
+<td>你只读；若发现规范有错，在 <code>assets/_review/</code> 写 <code>规范异议.md</code>，由集成 AI 统一改</td>
+</tr>
+<tr>
+<td><code>previews/**</code></td>
+<td>集成 AI</td>
+<td>浏览器实图，供你核对效果</td>
+</tr>
+</tbody>
+</table>
+<p><strong>一句话</strong>：你只往 <code>assets/</code> 里放文件 + 改 <code>manifest.json</code>，其余一律不碰。</p>
+<h3 id="63-文件命名">6.3 文件命名</h3>
+<pre><code>&lt;编号&gt;-&lt;内部代号&gt;-&lt;状态&gt;.png          例：B-05-krusty_krab-right.png
+&lt;编号&gt;-&lt;内部代号&gt;-&lt;状态&gt;-solid.png    纯色底版本（可选）
+&lt;编号&gt;-&lt;内部代号&gt;-&lt;状态&gt;@2x.png       2× 高清版（可选）
+</code></pre>
+<ul>
+<li><strong>无状态变体的资产可省略 <code>&lt;状态&gt;</code> 段</strong>：如房间背景 <code>G-01-krusty_hall.png</code>、portal <code>G-02-portal_door.png</code>、图标 <code>G-05-egg-01.png</code>。建筑统一用 <code>-right</code> 表示朝右（不要省略）。<code>manifest.json</code> 的 <code>files</code> 字段是文件名的<strong>权威清单</strong>，与其逐字一致即可。</li>
+<li>编号一套到底：<code>A</code> 世界 / <code>B</code> 建筑 / <code>C·G-01</code> 房间 / <code>D</code> 角色 / <code>E·G-02·G-03·G-04</code> 道具 / <code>F</code> UI / <code>G-05</code> 图标 / <code>G-06~G-13</code> 扩展，与 <code>docs/交付产物清单.md</code> 完全一致。</li>
+<li><strong>中文资产名只用于清单索引，不进文件名、不进提示词</strong>；文件名一律用 <code>manifest.json</code> 里的 <code>code</code>（内部代号）。</li>
+<li>状态后缀：<code>-right</code>（朝右）/ <code>-closed</code> <code>-open</code> / <code>-off</code> <code>-on</code> / <code>-front</code> <code>-back</code> / <code>-portrait</code> <code>-token</code> <code>-walk</code> <code>-sit</code>。</li>
+<li><strong>禁止</strong>空格、中文、大写混排、无编号文件、随意的 <code>final_v2_新.png</code>。</li>
+</ul>
+<h3 id="64-格式与技术参数">6.4 格式与技术参数</h3>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>要求</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>格式</td>
+<td>PNG（<strong>不要 JPG / WebP / GIF / SVG 位图替代</strong>）、sRGB、含 alpha 通道</td>
+</tr>
+<tr>
+<td>背景</td>
+<td>透明底（A-01 与房间背景为单一纯色底）</td>
+</tr>
+<tr>
+<td>尺寸</td>
+<td>见 §4.0；1× 必需，2× 可选</td>
+</tr>
+<tr>
+<td>边距</td>
+<td>主体四周 8–12% 透明像素</td>
+</tr>
+<tr>
+<td>对齐</td>
+<td>同批基线齐平、主体居中</td>
+</tr>
+<tr>
+<td>色彩</td>
+<td>单图 ≤6 色，描边 <code>#062338</code></td>
+</tr>
+<tr>
+<td>方向</td>
+<td>统一朝右</td>
+</tr>
+<tr>
+<td>双态</td>
+<td>成对、同尺寸、同构图，仅状态槽位不同</td>
+</tr>
+<tr>
+<td>元信息</td>
+<td>不强制；若平台自动写入 EXIF/文本块请保留，不要塞提示词进 PNG 文本块</td>
+</tr>
+</tbody>
+</table>
+<h3 id="65-manifestjson-状态机协作握手协议">6.5 <code>manifest.json</code> 状态机（协作握手协议）</h3>
+<p><code>assets/manifest.json</code> 是<strong>双方唯一的机器可读契约</strong>。字段说明：</p>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>谁改</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>集成 AI 预置</td>
+<td>资产编号，唯一，不要改</td>
+</tr>
+<tr>
+<td><code>slot</code></td>
+<td>集成 AI 预置</td>
+<td>对应 <code>integration/asset-slots.json</code> 的代码插槽 key</td>
+</tr>
+<tr>
+<td><code>files</code></td>
+<td><strong>美术 AI</strong></td>
+<td>实际交付的文件名数组，相对 <code>assets/&lt;dir&gt;/</code></td>
+</tr>
+<tr>
+<td><code>status</code></td>
+<td><strong>美术 AI</strong>（<code>pending→delivered</code>）/ <strong>集成 AI</strong>（<code>delivered→accepted</code> 或 <code>rejected</code>）</td>
+<td>见下方状态机</td>
+</tr>
+<tr>
+<td><code>generated_by</code></td>
+<td>美术 AI</td>
+<td>平台 / 模型版本，便于追溯</td>
+</tr>
+<tr>
+<td><code>params_ref</code></td>
+<td>美术 AI</td>
+<td>指向 <code>art-params.md</code> 里的批次编号</td>
+</tr>
+<tr>
+<td><code>code_only</code></td>
+<td>集成 AI 预置</td>
+<td><code>true</code> = 由代码绘制，<strong>不需要交付</strong></td>
+</tr>
+<tr>
+<td><code>required</code></td>
+<td>集成 AI 预置</td>
+<td><code>true</code> = 必交；<code>false</code> = 可选 / 默认 CSS 已实现</td>
+</tr>
+</tbody>
+</table>
+<pre><code>pending  ──美术 AI 放好文件 + 自检 PASS──▶  delivered
+                                              │
+                        ┌─────────────────────┴─────────────────────┐
+                        ▼                                           ▼
+                    accepted（集成 AI 已挂载并验收）            rejected（退回，附原因）
+                                                                    │
+                                                          美术 AI 重做 → delivered
+</code></pre>
+<ul>
+<li><strong>每次交付只改 <code>files</code> / <code>status</code> / <code>generated_by</code> / <code>params_ref</code> 四个字段</strong>，不要重排 JSON、不要改别人的字段，否则合并冲突。</li>
+<li>分批交付即可，不必一次交齐；<code>manifest.json</code> 里未交付的条目保持 <code>pending</code>。</li>
+<li>被退回的条目：集成 AI 把 <code>status</code> 设回 <code>rejected</code> 并在 <code>assets/_review/退回说明.md</code> 写原因；原文件移到 <code>_review/</code>，<strong>不要删除</strong>。</li>
+</ul>
+<h3 id="66-三种交付形式按优先级">6.6 三种交付形式（按优先级）</h3>
+<table>
+<thead>
+<tr>
+<th>形式</th>
+<th>做法</th>
+<th>适用</th>
+<th>推荐度</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>① Git 仓库直交（首选）</strong></td>
+<td>把 PNG 放进 <code>assets/&lt;子目录&gt;/</code>，更新 <code>manifest.json</code> 与 <code>art-params.md</code>，按 §7.4 约定 commit 并推到共享仓库</td>
+<td>你与集成 AI 都能访问同一仓库</td>
+<td>⭐⭐⭐ <strong>首选</strong></td>
+</tr>
+<tr>
+<td><strong>② 打包 zip（备选）</strong></td>
+<td>保持 <code>assets/</code> 完整目录结构 + <code>manifest.json</code> + <code>art-params.md</code>，打包为 <code>assets-交付-YYYYMMDD-batchN.zip</code> 发给人类，由人类或集成 AI 解压合并进仓库</td>
+<td>你不能 push、或需要先离线验收</td>
+<td>⭐⭐</td>
+</tr>
+<tr>
+<td><strong>③ 单张散图（兜底，不推荐）</strong></td>
+<td>按 §6.3 命名逐张发送</td>
+<td>只补 1–3 张</td>
+<td>⭐ 容易漏编号 / 漏状态，仅在补图时用</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>无论哪种形式，<code>manifest.json</code> 都要一起给</strong>。它是集成 AI 判断「哪些图该挂到哪个插槽」的唯一依据，没有它就得靠猜文件名，必然错挂。
+若走形式 ②，zip 内<strong>顶层必须是 <code>assets/</code> 目录</strong>，不要套一层多余的文件夹，也不要带 <code>_review/</code> 之外的临时文件。</p>
+</blockquote>
+<h3 id="67-拒收清单会被直接-rejected">6.7 拒收清单（会被直接 <code>rejected</code>）</h3>
+<ul>
+<li>JPG / WebP / 非透明底 / 带白底或灰底</li>
+<li>图里有文字、数字、logo、招牌字样、门牌、号码屏内容</li>
+<li>图里有金色高亮、呼吸发光、碎星光、粒子、投影 / 落地阴影 / 接触阴影</li>
+<li>一张图里挤了多个主体（A-01 全景除外）</li>
+<li>无编号、中文文件名、大小写混乱、缺状态后缀的双态图</li>
+<li>与 <code>manifest.json</code> 对不上、或没更新 <code>manifest.json</code></li>
+<li>未填 <code>art-params.md</code> 参数存档</li>
+<li>改了 <code>src/</code> / <code>integration/</code> / <code>docs/</code> / <code>tools/</code> 里的文件</li>
+<li>未跑 <code>tools/validate-assets.py</code> 就标 <code>delivered</code></li>
+</ul>
+<h3 id="68-验收脚本">6.8 验收脚本</h3>
+<pre><code class="language-bash">python3 tools/validate-assets.py
+</code></pre>
+<p>自动检查：<code>manifest.json</code> 结构合法 / 编号唯一 / <code>status=delivered</code> 的条目文件是否齐全 / 扩展名与命名正则 / PNG 可解码且含 alpha / 尺寸与宽高比在容差内 / 四角是否透明 / 透明边距是否 ≥8%。输出 <code>PASS</code> 或逐条 <code>FAIL</code> 原因，并把报告写到 <code>assets/_review/validation-report.md</code>。</p>
+<hr />
+<h2 id="7-协作与集成两个-AI-怎么在同一个仓库里干活">7. 协作与集成（两个 AI 怎么在同一个仓库里干活）</h2>
+<h3 id="71-仓库目录树-已预留请按此结构落盘">7.1 仓库目录树（★ 已预留，请按此结构落盘）</h3>
+<pre><code>bikini-bottom/                         ← Git 仓库根
+├── README.md                          项目总览 + 三方协作入口（第一个读）
+├── CONTRIBUTING.md                    协作与提交约定精简版
+├── .gitignore
+├── docs/                              ← 集成 AI 维护（双方共读）
+│   ├── 美术资源需求与交付规范.md       ★ 本文（主交付，给美术 AI）
+│   ├── index.html                     ★ 本文的网页版（自包含，可直接发人/发 AI）
+│   ├── 美术资产规格与提示词包.md       完整提示词模板 / 参数存档 / L1-L3
+│   ├── 交付产物清单.md                资产编号 A~G 与代码模块 K 的全量状态
+│   ├── 开发日志.md                    版本进度
+│   ├── 比奇堡沉浸场景方案-v2.html     方案 v2.8（含 §8 风格与成本评估）
+│   └── reference/                    早期概念参考图（仅风格参考，非交付物）
+├── assets/                            ★★ 美术 AI 唯一写入区
+│   ├── README.md                      交付规则速查
+│   ├── manifest.json                  ★ 机器可读资产清单 / 协作契约
+│   ├── art-params.md                  ★ 生成参数存档（锁风格后填）
+│   ├── world/                         A 类 世界全景 / 视差层 / 场地地面
+│   ├── buildings/                     B 类 建筑外观
+│   ├── rooms/                         C·G-01 类 14 张子房间背景 + G-06 纹样
+│   ├── characters/                    D 类 角色立绘 / token / 行走帧 / 小蜗
+│   ├── props/                         E·G-02·G-03·G-04 类 道具 / 双态 / 容器 / portal
+│   ├── ui/                            F 类 可选贴纸面板
+│   ├── icons/                         G-05 类 27 枚彩蛋图标
+│   ├── fx/                            G-07 / G-11 / G-12 可选手绘替换
+│   └── _review/                       待验收稿 / 废弃稿 / 退回说明 / 校验报告
+├── src/                               ★ 集成 AI 写入区
+│   └── index.html                     当前可运行 Demo v1.0（视觉参考，勿改）
+├── integration/                       ★ 集成 AI 写入区
+│   ├── asset-slots.json               资产编号 → 代码插槽映射（集成权威）
+│   └── INTEGRATION.md                 集成回填手册
+├── tools/
+│   └── validate-assets.py             交付自检脚本（美术 AI 跑，集成 AI 维护）
+└── previews/                          浏览器实图（集成 AI 上传，供美术 AI 核对）
+</code></pre>
+<h3 id="72-写入边界表">7.2 写入边界表</h3>
+<table>
+<thead>
+<tr>
+<th>角色</th>
+<th>可写</th>
+<th>只读</th>
+<th>禁止</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>美术 AI（你）</strong></td>
+<td><code>assets/**</code>（含 <code>manifest.json</code> 的 4 个字段、<code>art-params.md</code>）</td>
+<td><code>docs/</code>、<code>src/</code>、<code>integration/</code>、<code>previews/</code></td>
+<td>改 <code>src/</code>、<code>integration/</code>、<code>docs/</code>、<code>tools/</code>；删除已交付文件</td>
+</tr>
+<tr>
+<td><strong>集成 AI</strong></td>
+<td><code>src/</code>、<code>integration/</code>、<code>tools/</code>、<code>docs/</code>、<code>previews/</code>；<code>manifest.json</code> 的 <code>status→accepted/rejected</code></td>
+<td><code>assets/</code> 里的 PNG</td>
+<td>改 PNG 内容；改 <code>art-params.md</code>；替美术 AI 补图</td>
+</tr>
+<tr>
+<td><strong>人类（你）</strong></td>
+<td>全部；负责授权仓库、解决冲突、拍板风格</td>
+<td>—</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<h3 id="73-协作时序">7.3 协作时序</h3>
+<pre><code>① 集成 AI 建仓：目录骨架 + manifest.json（全部 pending）+ 本文 + 插槽表
+        │
+② 美术 AI：跑 1 张锁风格（B-05）→ 填 art-params.md → 批量出图 → 自检 PASS
+        │  放 assets/&lt;子目录&gt;/，改 manifest.json 对应条目为 delivered，commit + push
+        ▼
+③ 集成 AI：pull → 跑 validate-assets.py → 按 integration/asset-slots.json 挂载 PNG
+        │  替换占位几何 → 浏览器实图验收（无错位 / 无脏边 / 风格统一）
+        ├── 通过 → manifest.json 标 accepted，截图存 previews/
+        └── 不通过 → 标 rejected + 在 assets/_review/退回说明.md 写原因 → 回到 ②
+        ▼
+④ 循环按批次推进：L1（全景 + 6 建筑 + 6 主题房间）→ L2（核心道具 + 角色）→ L3（全量）
+</code></pre>
+<p><strong>关键点</strong>：<code>assets/</code> 与 <code>src/</code> 物理隔离，两边同时提交<strong>不会产生文件级冲突</strong>；唯一可能冲突的是 <code>manifest.json</code>，所以约定「<strong>美术 AI 只改 4 个字段、集成 AI 只改 status</strong>」，且双方提交前先 <code>git pull --rebase</code>。</p>
+<h3 id="74-commit--分支约定">7.4 commit / 分支约定</h3>
+<ul>
+<li>分支：小批次直接推 <code>main</code>；大批量（&gt;20 张）建议 <code>art/batch-N</code>，交付后由集成 AI 合并。</li>
+<li>美术 AI 的 commit message：
+  <code>assets: deliver B-01..B-06 building exteriors (batch 1)
+  assets: deliver E-02..E-04 prop pairs (batch 2)
+  assets: params lock B-05 seed/model/steps</code></li>
+<li>集成 AI 的 commit message：
+  <code>feat(integration): bind B-* building sprites
+  chore(manifest): accept batch 1 / reject E-03-grill (glow painted into PNG)</code></li>
+<li><strong>不要</strong>把 <code>assets/_review/</code> 里的废弃稿删掉再 commit；不要 force push；不要重写已 pushed 的历史。</li>
+</ul>
+<h3 id="75-集成回填流程集成-AI-这边做什么供你理解交付为何要这么规范">7.5 集成回填流程（集成 AI 这边做什么，供你理解交付为何要这么规范）</h3>
+<ol>
+<li>读取 <code>assets/manifest.json</code>，筛出 <code>status=delivered</code> 且 <code>code_only=false</code> 的条目。</li>
+<li>用 <code>tools/validate-assets.py</code> 校验文件齐全、命名、alpha、尺寸比例、透明边距。</li>
+<li>按 <code>integration/asset-slots.json</code> 的 <code>slot</code> 把 PNG 挂到 Demo 对应位置：
+   - <code>building.&lt;id&gt;</code> → <code>buildings[]</code> 生成的 <code>.building</code> 元素，替换纯色 <code>background</code> 为 <code>background-image</code>
+   - <code>room.&lt;roomKey&gt;</code> → <code>#room</code> 背景层，替换 <code>THEME</code> 渐变
+   - <code>npc.&lt;id&gt;</code> / <code>obj.&lt;id&gt;</code> / <code>portal.*</code> → 把 <code>.ic</code> 里的文字占位换成 <code>&lt;img&gt;</code>，<code>object-fit: contain</code>
+   - 朝右素材保持原样，左向用 CSS <code>transform: scaleX(-1)</code></li>
+<li>浏览器实图验收：与 <code>previews/</code> 对照，确认无错位、无脏边、无风格串味、交互热点未被图层遮挡。</li>
+<li>通过则 <code>status=accepted</code>；不通过则 <code>rejected</code> + 写明原因。</li>
+</ol>
+<blockquote>
+<p><strong>所以你交的不是「一堆好看的图」，而是「能按编号自动挂进代码的一套资产」</strong>。编号、文件名、目录、manifest 状态，缺一个环节就得人工猜，协作就退化了。</p>
+</blockquote>
+<h3 id="76-冲突与异议处理">7.6 冲突与异议处理</h3>
+<ul>
+<li><code>manifest.json</code> 出现冲突：以「同一条目保留双方字段」为原则手工合并，不要整文件覆盖。</li>
+<li>对规范有异议：在 <code>assets/_review/规范异议.md</code> 写清楚（哪条、为什么、建议改成什么），由集成 AI 统一改 <code>docs/</code> 并同步方案文档，避免两处规范不一致。</li>
+<li>风格锚点或负面词<strong>任何改动都必须双向同步</strong> <code>docs/美术资产规格与提示词包.md</code> §3/§6 与方案文档 §8.2，否则跨批次必漂移。</li>
+</ul>
+<hr />
+<h2 id="8-验收自检清单逐条勾选后再标-delivered">8. 验收自检清单（逐条勾选后再标 <code>delivered</code>）</h2>
+<ul>
+<li>[ ] 所有批次使用了<strong>同一段风格锚点</strong>（逐字比对 §3.1 / §3.2，未改写 / 未精简）</li>
+<li>[ ] 每条提示词 = 锚点 + 模板 + 负面词，只替换了【】槽位</li>
+<li>[ ] 素材图<strong>纯色或透明底</strong>、主体互不重叠、基线齐平</li>
+<li>[ ] 抠图边缘<strong>无灰黑脏边</strong>（负面词已排除投影 / 接触阴影 / AO）</li>
+<li>[ ] 图里<strong>没有任何文字、数字、logo、招牌字样</strong></li>
+<li>[ ] 图里<strong>没有金色高亮 / 呼吸发光 / 碎星光</strong>（这些是代码层）</li>
+<li>[ ] 所有主体<strong>统一朝右</strong>，左向由代码镜像</li>
+<li>[ ] 单图用色 ≤6，描边统一 <code>#062338</code></li>
+<li>[ ] 双态物件成对生成、除状态槽位外逐字一致</li>
+<li>[ ] 6 套房间主题共用色板，同栋子房间看起来像同一栋楼</li>
+<li>[ ] 命名与 <code>manifest.json</code> 编号一一对应，废弃稿已标注未删除</li>
+<li>[ ] 每 3 张抽检 1 张的记录已留档，参数已写入 <code>art-params.md</code></li>
+<li>[ ] <code>manifest.json</code> 已把本批条目标为 <code>delivered</code> 并填好 <code>files</code> / <code>generated_by</code> / <code>params_ref</code></li>
+<li>[ ] <code>python3 tools/validate-assets.py</code> 输出 <strong>PASS</strong></li>
+<li>[ ] 只改动了 <code>assets/**</code>，未碰 <code>src/</code> / <code>integration/</code> / <code>docs/</code> / <code>tools/</code></li>
+<li>[ ] 合规：未 1:1 复刻受版权保护的精确造型 / 商标，提示词未出现角色专有名词</li>
+</ul>
+<hr />
+<h2 id="9-批量执行顺序严格按序别跳步">9. 批量执行顺序（严格按序，别跳步）</h2>
+<table>
+<thead>
+<tr>
+<th>步</th>
+<th>动作</th>
+<th>通过标准</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>只生成 1 主体 · 1 状态</strong>（推荐 <code>B-05</code> 船形餐厅外观）</td>
+<td>描边粗细、饱和度、等角角度符合锚点；否则调提示词，不要往下走</td>
+</tr>
+<tr>
+<td>2</td>
+<td>出该主体的<strong>其余状态 / 双态</strong></td>
+<td>看起来仍是同一个主体，没有串味</td>
+</tr>
+<tr>
+<td>3</td>
+<td>出<strong>双版本</strong>（透明底 / 纯色底 <code>-solid</code>）</td>
+<td>抠图边缘干净、无灰黑脏边</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>锁定参数</strong>：种子 / 模型版本 / 步数 / 尺寸 / 采样器 / 完整提示词全文 / 负面词全文 → 填入 <code>assets/art-params.md</code></td>
+<td>参数已书面存档，可复现；<strong>未填不得批量</strong></td>
+</tr>
+<tr>
+<td>5</td>
+<td>才按变量槽位表<strong>批量替换</strong>（每次只改【】列）</td>
+<td>每批沿用同一锚点 + 同一负面词</td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong>每生成 3 张抽检 1 张</strong>，防风格漂移；发现漂移立即回到步骤 4 重锁</td>
+<td>抽检记录留档</td>
+</tr>
+<tr>
+<td>7</td>
+<td>按 §6.3 命名归档，放入 <code>assets/&lt;子目录&gt;/</code></td>
+<td>文件名与 <code>manifest.json</code> 一一对应</td>
+</tr>
+<tr>
+<td>8</td>
+<td>更新 <code>manifest.json</code> → 跑 <code>validate-assets.py</code> → commit + push</td>
+<td>输出 PASS</td>
+</tr>
+<tr>
+<td>9</td>
+<td>集成 AI 挂载实图验收，反馈 <code>accepted</code> / <code>rejected</code></td>
+<td>浏览器实图确认无错位、无脏边</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>手感/风格未验证就批量，等于把返工成本乘以主体数量。</p>
+</blockquote>
+<h3 id="建议批次对应-10-的-L1--L2--L3">建议批次（对应 §10 的 L1 / L2 / L3）</h3>
+<ul>
+<li><strong>批次 1（L1）</strong>：<code>B-05</code> 锁风格 → <code>B-01..B-06</code> 六栋建筑 → <code>A-01</code> 全景 → <code>G-01</code> 六套主题房间模板（先各 1 张验证）。</li>
+<li><strong>批次 2（L2）</strong>：补齐全 14 张房间 → <code>D-01..D-09</code> 角色立绘 + token → <code>E-02..E-07</code> 核心道具与双态 → <code>G-02</code> portal。</li>
+<li><strong>批次 3（L3）</strong>：<code>E-08</code> 居住区小物、<code>D-10</code> bot、<code>G-05</code> 图标、<code>F-16..F-19</code> 贴纸、可选手绘替换。</li>
+</ul>
+<hr />
+<h2 id="10-成本口径不假定单价">10. 成本口径（不假定单价）</h2>
+<p>AI 生图按「调用次数」计费（1 张成图 ≈ 1 次调用），不同平台 / 模型 / 分辨率单价差异极大，<strong>本文件不假定任何具体单价</strong>，只给可复算的调用次数 <code>C</code>：<code>总消耗 = C × P</code>（P = 账号实际单次单价）。</p>
+<table>
+<thead>
+<tr>
+<th>档位</th>
+<th>覆盖范围</th>
+<th>成图张数</th>
+<th>含试错重抽 ×1.35</th>
+<th>≈ 调用次数 C</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>L1 降级</strong>（推荐起点）</td>
+<td>世界全景 + 6 建筑外观 + 6 主题房间模板</td>
+<td>~20</td>
+<td>×1.35</td>
+<td><strong>≈ 27</strong></td>
+</tr>
+<tr>
+<td><strong>L2 推荐</strong></td>
+<td>L1 + 核心 40 物件 + 7 立绘 + 13 token</td>
+<td>~95</td>
+<td>×1.35</td>
+<td><strong>≈ 130</strong></td>
+</tr>
+<tr>
+<td><strong>L3 完整</strong></td>
+<td>14 房间 + 60 物件双态 + 全角色 + 27 彩蛋 + UI</td>
+<td>~220</td>
+<td>×1.35</td>
+<td><strong>≈ 300</strong></td>
+</tr>
+<tr>
+<td>首批「锁风格」</td>
+<td>1 主体 × 1 状态</td>
+<td>1–3</td>
+<td>—</td>
+<td><strong>1–3</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>降本策略</strong>：① 先跑 1 张锁风格；② 朝右单一方向 + 代码镜像省一半；③ 换色主体单一纯色平涂，代码替换色值出变体；④ 动态效果一律代码叠加；⑤ 蟹黄堡 / 门框 / 光圈 / 进度条等几何件继续 CSS/SVG；⑥ 每 3 张抽检 1 张防漂移。</p>
+<blockquote>
+<p>可选手绘替换（G-07 / G-09 / G-10 / G-11 / G-12）最多 <strong>+8～11 次</strong>调用，L1/L2/L3 估算不变；G-08 鱼网与 G-13 会话 UI <strong>永远不生图</strong>。
+<strong>开工前请先向人类确认风格、档位与生图账号</strong>，不要擅自批量生成。</p>
+</blockquote>
+<hr />
+<h2 id="11-FAQ">11. FAQ</h2>
+<p><strong>Q：尺寸必须精确到像素吗？</strong>
+A：不必。代码按容器 <code>contain</code> 缩放，硬约束是<strong>宽高比、透明底、8–12% 边距、基线齐平</strong>。若你只能出 1024×1024 的建筑图，只要比例 1:1 且边距合规即可，在 <code>art-params.md</code> 注明实际尺寸。</p>
+<p><strong>Q：能不能只交一部分？</strong>
+A：可以，按批次交。<code>manifest.json</code> 里未交的保持 <code>pending</code>，集成 AI 会保留 CSS 占位，不会出现破图。</p>
+<p><strong>Q：为什么这么多东西「不要交」？</strong>
+A：它们已经由 CSS/SVG 实现且需要动画（呼吸发光、数字翻滚、泡泡飘动、水母触须摆动）。静态 PNG 做不了动画，画进去反而会和代码层重复、污染色板与抠图。</p>
+<p><strong>Q：我改不了 <code>docs/</code>，发现规范有错怎么办？</strong>
+A：写 <code>assets/_review/规范异议.md</code>，集成 AI 会统一改并同步到方案文档，保证全仓只有一份权威口径。</p>
+<p><strong>Q：另一个 AI（集成 AI）怎么知道哪张图挂哪里？</strong>
+A：靠 <code>manifest.json</code> 的 <code>id</code> + <code>slot</code>，以及 <code>integration/asset-slots.json</code> 的映射表。所以<strong>文件名和编号不能错</strong>。</p>
+<p><strong>Q：我不能直接 push 到 Git 仓库怎么办？</strong>
+A：走 §6.6 形式 ②：打包 <code>assets-交付-YYYYMMDD-batchN.zip</code>（顶层必须是 <code>assets/</code>，含 <code>manifest.json</code> 与 <code>art-params.md</code>），交给人类放进仓库即可，集成流程完全一样。</p>
+<hr />
+<h2 id="附录--与其他文档的关系">附录 · 与其他文档的关系</h2>
+<table>
+<thead>
+<tr>
+<th>文档</th>
+<th>作用</th>
+<th>权威范围</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>本文</strong> <code>docs/美术资源需求与交付规范.md</code></td>
+<td><strong>给美术 AI 的主交付</strong>：需求清单 + 设计规范 + 交付规范 + 协作约定</td>
+<td>交付流程 / 尺寸 / 目录归属 / manifest 状态机</td>
+</tr>
+<tr>
+<td><code>docs/美术资产规格与提示词包.md</code></td>
+<td>完整提示词模板 A~J、变量槽位表、参数存档表、L1/L2/L3</td>
+<td><strong>风格锚点 §3 / 负面词 §6 / 模板 §5</strong></td>
+</tr>
+<tr>
+<td><code>docs/交付产物清单.md</code></td>
+<td>资产编号 A~G 与代码模块 K 的全量状态</td>
+<td>编号体系</td>
+</tr>
+<tr>
+<td><code>docs/比奇堡沉浸场景方案-v2.html</code></td>
+<td>方案 v2.8，§8 风格评估与 token 估算</td>
+<td>风格结论 §8.2（与提示词包 §3 逐字一致）</td>
+</tr>
+<tr>
+<td><code>integration/asset-slots.json</code> + <code>INTEGRATION.md</code></td>
+<td>集成 AI 的插槽映射与回填手册</td>
+<td>代码挂载方式</td>
+</tr>
+<tr>
+<td><code>assets/manifest.json</code></td>
+<td>双方协作的机器可读契约</td>
+<td>交付状态</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>交接一句话</strong>：按 §9 从 <code>B-05</code> 锁风格起步 → 按 §3 逐字复用锚点与负面词 → 按 §4 清单出图 → 按 §6 命名归档并更新 <code>manifest.json</code> → 跑 <code>validate-assets.py</code> 出 PASS → 推到 <code>assets/</code>。剩下的挂载与验收交给集成 AI。</p>
+</blockquote><div class="foot">本页由 docs/美术资源需求与交付规范.md 自动生成，两份内容同源一致 · 2026-11-10</div></div></main>
+</div>
+<script>
+(function(){
+  // 复制按钮
+  document.querySelectorAll('pre').forEach(function(p){
+    var b=document.createElement('button');b.className='copy';b.textContent='复制';
+    b.onclick=function(){var t=p.querySelector('code')?p.querySelector('code').innerText:p.innerText;
+      navigator.clipboard.writeText(t).then(function(){b.textContent='已复制';b.classList.add('ok');setTimeout(function(){b.textContent='复制';b.classList.remove('ok');},1600);});};
+    p.appendChild(b);
+  });
+  // 色板色块：把 HEX 前的 ■ 换成真实色块
+  document.querySelectorAll('td,th,li,p').forEach(function(el){
+    var html=el.innerHTML;
+    if(!/#[0-9A-Fa-f]{6}/.test(html))return;
+    el.innerHTML=html.replace(/(#[0-9A-Fa-f]{6})/g,function(m){return '<i class="sw" style="background:'+m+'"></i>'+m;});
+  });
+})();
+</script>
+</body></html>

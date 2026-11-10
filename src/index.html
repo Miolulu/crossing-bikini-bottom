@@ -1,0 +1,3024 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>比奇堡 · 沉浸 Demo v1.0（三处小玩法场地 · 水母田 / 泡泡摊 / 空手道场）</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;overflow:hidden;background:#062338;
+    font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+    -webkit-user-select:none;user-select:none;touch-action:none;}
+  #viewport{position:fixed;inset:0;overflow:hidden;background:
+    radial-gradient(120% 120% at 50% 0%, #1aa3c4 0%, #0B5E86 45%, #062338 100%);}
+  #world{position:absolute;left:0;top:0;transform:translate(0,0);will-change:transform;}
+  #ground{position:absolute;left:0;top:470px;width:2600px;height:900px;
+    background:linear-gradient(#caa86a,#9c7b4f);border-top:6px solid #d8c089;}
+  #paths{position:absolute;left:0;top:0;pointer-events:none;}
+  .deco{position:absolute;color:rgba(255,255,255,.55);font-size:30px;pointer-events:none;}
+
+  .building{position:absolute;border-radius:12px;box-shadow:0 14px 28px rgba(0,0,0,.28);
+    display:flex;align-items:flex-end;justify-content:center;}
+  .building .label{position:absolute;top:-26px;left:50%;transform:translateX(-50%);
+    background:rgba(6,35,56,.82);color:#fff;font-size:13px;padding:2px 8px;border-radius:8px;white-space:nowrap;}
+  .door{position:absolute;width:54px;height:64px;background:#3a2a16;border-radius:8px 8px 0 0;
+    border:3px solid rgba(0,0,0,.35);}
+
+  .actor{position:absolute;width:46px;height:46px;transform:translate(-50%,-100%);
+    transition:left 1.4s linear,top 1.4s linear;}
+  .actor .disc{position:absolute;left:50%;top:6px;transform:translateX(-50%);
+    width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:22px;box-shadow:0 4px 10px rgba(0,0,0,.3);border:2px solid rgba(255,255,255,.7);}
+  .actor .nm{position:absolute;top:-18px;left:50%;transform:translateX(-50%);
+    font-size:11px;color:#fff;background:rgba(6,35,56,.7);padding:0 5px;border-radius:6px;white-space:nowrap;}
+  .actor .bub{position:absolute;bottom:46px;left:50%;transform:translateX(-50%);
+    background:#fff;color:#0E1B24;font-size:12px;padding:6px 10px;border-radius:12px;
+    width:max-content;min-width:140px;max-width:230px;white-space:normal;text-align:center;
+    box-shadow:0 4px 10px rgba(0,0,0,.25);
+    opacity:0;transition:opacity .2s;pointer-events:none;z-index:60;}
+  .actor .bub:after{content:"";position:absolute;left:50%;bottom:-7px;transform:translateX(-50%);
+    border:7px solid transparent;border-top-color:#fff;}
+  .actor.show .bub{opacity:1;}
+  .actor.bot .disc{opacity:.92;border-style:dashed;}
+  .actor.bot .nm{font-size:10px;background:rgba(6,35,56,.5);}
+
+  #player{position:absolute;width:50px;height:50px;transform:translate(-50%,-100%);z-index:50;}
+  #player .disc{position:absolute;left:50%;top:6px;transform:translateX(-50%);
+    width:42px;height:42px;border-radius:50%;background:#3FD0D8;display:flex;align-items:center;
+    justify-content:center;font-size:22px;box-shadow:0 4px 12px rgba(0,0,0,.4);border:3px solid #fff;}
+  #player .nm{position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:11px;
+    color:#062338;background:#fff;padding:0 5px;border-radius:6px;font-weight:700;white-space:nowrap;}
+
+  #hud{position:fixed;left:12px;top:12px;z-index:260;pointer-events:none;color:#fff;font-size:13px;line-height:1.5;
+    background:rgba(6,35,56,.6);padding:8px 12px;border-radius:12px;backdrop-filter:blur(4px);max-width:46vw;}
+  #hud b{color:#FFD23F;}
+  #controls{position:fixed;right:12px;top:12px;z-index:260;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;}
+  .btn{background:rgba(255,255,255,.92);color:#062338;border:none;border-radius:10px;
+    padding:8px 12px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,.2);}
+  .btn:active{transform:scale(.95);}
+  #prompt{position:fixed;left:50%;bottom:118px;transform:translateX(-50%);z-index:265;pointer-events:none;
+    background:rgba(255,210,63,.95);color:#062338;padding:10px 18px;border-radius:14px;
+    font-weight:700;display:none;box-shadow:0 6px 16px rgba(0,0,0,.3);}
+  #toast{position:fixed;left:50%;top:76px;transform:translateX(-50%) translateY(-12px);z-index:375;
+    background:rgba(6,35,56,.94);color:#fff;padding:10px 18px;border-radius:12px;font-size:14px;
+    opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;box-shadow:0 6px 16px rgba(0,0,0,.3);}
+  #toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
+  #legend{position:fixed;left:12px;bottom:12px;z-index:260;pointer-events:none;color:#fff;font-size:11px;
+    background:rgba(6,35,56,.55);padding:6px 10px;border-radius:10px;line-height:1.5;}
+
+  /* 世界内交互：目标光圈 / 光路 / 物件气泡 / 环境动效 */
+  .goal-ring{position:absolute;border-radius:50%;border:3px solid rgba(255,210,63,.9);
+    box-shadow:0 0 20px rgba(255,210,63,.65),inset 0 0 14px rgba(255,210,63,.35);
+    animation:ringPulse 1.7s ease-in-out infinite;pointer-events:none;z-index:20;}
+  @keyframes ringPulse{0%,100%{transform:scale(1);opacity:.95}50%{transform:scale(1.14);opacity:.5}}
+  #guideLine{position:absolute;left:0;top:0;width:1200px;height:760px;z-index:4;pointer-events:none;}
+  #guideLine path{fill:none;stroke:rgba(255,210,63,.6);stroke-width:5;stroke-linecap:round;
+    stroke-dasharray:2 18;animation:dashFlow 1.1s linear infinite;}
+  @keyframes dashFlow{to{stroke-dashoffset:-40}}
+  .nearTip{position:fixed;transform:translate(-50%,-100%);background:#FFD23F;color:#062338;
+    padding:5px 10px;border-radius:11px;font-size:11px;font-weight:800;white-space:nowrap;
+    box-shadow:0 5px 12px rgba(0,0,0,.32);pointer-events:none;z-index:270;
+    animation:tipFloat 1.5s ease-in-out infinite;}
+  .nearTip:after{content:"";position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);
+    border:6px solid transparent;border-top-color:#FFD23F;}
+  @keyframes tipFloat{0%,100%{transform:translate(-50%,-100%)}50%{transform:translate(-50%,-114%)}}
+  .obj.dim{opacity:.6;filter:saturate(.65);}
+  .obj.pop{animation:objPop .44s cubic-bezier(.2,1.6,.4,1);}
+  @keyframes objPop{0%{transform:scale(1)}45%{transform:scale(1.3) rotate(-4deg)}100%{transform:scale(1)}}
+  .spark{position:fixed;pointer-events:none;font-size:15px;z-index:275;
+    animation:sparkUp .82s ease-out forwards;}
+  @keyframes sparkUp{0%{opacity:1;transform:translate(0,0) scale(.7)}
+    100%{opacity:0;transform:translate(var(--dx),-54px) scale(1.3)}}
+
+  #caustic{position:absolute;inset:0;pointer-events:none;z-index:2;border-radius:18px;
+    background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.10) 48%,transparent 66%);
+    background-size:250% 100%;animation:cauDrift 9s linear infinite;}
+  @keyframes cauDrift{0%{background-position:120% 0}100%{background-position:-120% 0}}
+  .amb-bub{position:absolute;border-radius:50%;background:rgba(255,255,255,.16);
+    border:1px solid rgba(255,255,255,.35);pointer-events:none;z-index:5;
+    animation:bubRise linear infinite;}
+  @keyframes bubRise{0%{transform:translateY(0);opacity:0}
+    12%{opacity:.7}88%{opacity:.55}100%{transform:translateY(-520px);opacity:0}}
+  .steam{position:absolute;pointer-events:none;z-index:6;font-size:16px;opacity:0;
+    animation:steamUp 3.2s ease-in-out infinite;}
+  @keyframes steamUp{0%{transform:translateY(0) scale(.7);opacity:0}
+    30%{opacity:.55}100%{transform:translateY(-46px) scale(1.25);opacity:0}}
+
+  #interior{transition:opacity .4s ease;}
+  @keyframes roomIn{from{opacity:0}to{opacity:1}}
+  #room.roomIn{animation:roomIn .5s ease both;}
+  #focus{background:rgba(6,35,56,.6);backdrop-filter:blur(5px);transition:opacity .35s ease;}
+  #focus.zoom .stage{animation:zoomIn .55s cubic-bezier(.2,1.15,.35,1) both;}
+  @keyframes zoomIn{from{transform:scale(.55);opacity:0}to{transform:scale(1);opacity:1}}
+
+  #dpad{position:fixed;left:18px;bottom:18px;z-index:260;width:140px;height:140px;
+    border-radius:50%;background:rgba(6,35,56,.45);display:none;}
+  #dpad .stick{position:absolute;left:50%;top:50%;width:56px;height:56px;border-radius:50%;
+    background:rgba(255,255,255,.85);transform:translate(-50%,-50%);box-shadow:0 4px 10px rgba(0,0,0,.3);}
+  #dpad .ring{position:absolute;left:50%;top:50%;width:120px;height:120px;border-radius:50%;
+    transform:translate(-50%,-50%);border:2px dashed rgba(255,255,255,.3);}
+
+  /* ===== 通用室内房间（6 间共用画布，按主题换肤）===== */
+  #interior{position:fixed;inset:0;z-index:200;display:none;background:#0B3a52;overflow:hidden;}
+  #interior .topbar{position:absolute;top:0;left:0;right:0;padding:12px 18px;display:flex;
+    justify-content:space-between;align-items:center;background:rgba(6,35,56,.55);z-index:80;}
+  #interior h2{font-size:19px;color:#fff;}
+  #room{position:absolute;left:50%;top:52%;width:1200px;height:760px;
+    transform:translate(-50%,-50%) scale(1);transform-origin:center center;
+    --w1:#3f7fb5;--w2:#356fa3;--f1:#d8b878;--f2:#b8965a;}
+  #room .floor{position:absolute;inset:0;border-radius:18px;
+    background:
+      repeating-linear-gradient(45deg, rgba(255,255,255,.06) 0 2px, transparent 2px 46px),
+      repeating-linear-gradient(-45deg, rgba(0,0,0,.06) 0 2px, transparent 2px 46px),
+      linear-gradient(var(--f1),var(--f2));
+    box-shadow:inset 0 0 60px rgba(0,0,0,.25);}
+  #room .wall{position:absolute;left:0;right:0;top:0;height:118px;border-radius:18px 18px 0 0;
+    background:repeating-linear-gradient(90deg,var(--w1) 0 46px,var(--w2) 46px 50px);
+    box-shadow:inset 0 -8px 18px rgba(0,0,0,.2);border-bottom:6px solid #8a6a3a;}
+  .zoneTag{position:absolute;font-size:12px;font-weight:700;color:#fff;
+    background:rgba(6,35,56,.5);padding:3px 10px;border-radius:8px;z-index:2;pointer-events:none;}
+  .counterBar{position:absolute;height:56px;border-radius:8px;
+    background:linear-gradient(#b5793f,#8a5a2c);border:4px solid #6b4420;
+    box-shadow:0 8px 16px rgba(0,0,0,.3);z-index:3;}
+  .archDoor{position:absolute;border-radius:40px 40px 0 0;
+    background:#123a52;border:6px solid #d8e6ee;z-index:2;}
+  .archDoor span{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    writing-mode:vertical-rl;font-size:12px;color:#cfe6f2;}
+  .table{position:absolute;width:76px;height:76px;border-radius:50%;
+    background:repeating-conic-gradient(#e74c3c 0 25%, #fff 0 50%) 50% / 22px 22px;
+    border:3px solid #fff;box-shadow:0 5px 10px rgba(0,0,0,.25);}
+  .rug{position:absolute;border-radius:14px;background:
+    repeating-linear-gradient(45deg,rgba(231,76,60,.55) 0 18px,rgba(255,255,255,.35) 18px 36px);
+    border:4px solid rgba(255,255,255,.5);z-index:1;}
+  .shelf{position:absolute;border-radius:6px;background:linear-gradient(#8a5a2c,#6b4420);
+    border:3px solid #4d3016;z-index:2;}
+
+  /* 可点物件 */
+  .obj{position:absolute;z-index:30;pointer-events:auto;cursor:pointer;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:2px;border-radius:10px;
+    background:rgba(255,255,255,.14);border:2px solid rgba(255,255,255,.35);
+    box-shadow:0 4px 9px rgba(0,0,0,.28);transition:transform .15s,box-shadow .15s,border-color .15s;}
+  .obj:hover{transform:translateY(-3px) scale(1.06);border-color:#FFD23F;
+    box-shadow:0 8px 18px rgba(0,0,0,.4),0 0 0 3px rgba(255,210,63,.45);}
+  .obj .ic{font-size:24px;line-height:1;}
+  .obj .tx{font-size:10px;color:#fff;background:rgba(6,35,56,.65);padding:0 5px;border-radius:5px;white-space:nowrap;}
+  .obj.active{border-color:#FFD23F;box-shadow:0 0 0 3px rgba(255,210,63,.6),0 6px 14px rgba(0,0,0,.4);}
+  .obj.ready{animation:pulse 1.1s infinite;}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 3px rgba(255,210,63,.6),0 6px 14px rgba(0,0,0,.4);}
+    50%{box-shadow:0 0 0 9px rgba(255,210,63,.15),0 6px 14px rgba(0,0,0,.4);}}
+
+  /* 可坐家具（v0.7 新增） */
+  .seat{position:absolute;z-index:32;width:34px;height:34px;border-radius:50%;
+    background:#cfae6f;border:2px solid #8a6a3a;box-shadow:0 3px 6px rgba(0,0,0,.2);
+    cursor:pointer;pointer-events:auto;display:flex;align-items:center;justify-content:center;
+    font-size:15px;transition:transform .16s,box-shadow .16s;}
+  .seat:hover{transform:translateY(-3px) scale(1.1);border-color:#FFD23F;
+    box-shadow:0 0 0 4px rgba(255,210,63,.4),0 6px 12px rgba(0,0,0,.35);}
+  .seat.occupied{background:#FFD23F;border-color:#fff;}
+  #iplayer{position:absolute;width:48px;height:48px;transform:translate(-50%,-100%);z-index:40;
+    transition:left .28s ease,top .28s ease;}
+  #iplayer .disc{position:absolute;left:50%;top:6px;transform:translateX(-50%);
+    width:40px;height:40px;border-radius:50%;background:#3FD0D8;display:flex;align-items:center;
+    justify-content:center;font-size:20px;box-shadow:0 4px 12px rgba(0,0,0,.4);border:3px solid #fff;
+    transition:transform .28s ease;}
+  #iplayer.sitting .disc{transform:translateX(-50%) scale(.82) translateY(7px);}
+  #iplayer.sitting:after{content:"🪑";position:absolute;left:50%;bottom:-2px;transform:translateX(-50%);font-size:16px;}
+
+  /* 号码屏 / 制作进度 */
+  #ticketNr{position:absolute;left:250px;top:150px;font-size:14px;font-weight:700;color:#062338;
+    background:#fff;padding:6px 12px;border-radius:10px;z-index:6;box-shadow:0 4px 10px rgba(0,0,0,.25);
+    min-width:236px;text-align:center;}
+  #ticketNr b{color:#c0392b;}
+  #ticketNr.rolling{background:#FFF3C4;}
+  #ticketNr.rolling b{display:inline-block;animation:nrRoll .11s linear infinite;}
+  @keyframes nrRoll{0%{transform:translateY(-7px);opacity:.25;filter:blur(1px)}
+    100%{transform:translateY(7px);opacity:1;filter:blur(0)}}
+  #makeBar{position:absolute;left:250px;top:196px;width:270px;height:16px;border-radius:10px;
+    background:rgba(6,35,56,.5);z-index:6;display:none;overflow:hidden;}
+  #makeFill{height:100%;width:0;background:linear-gradient(90deg,#FFD23F,#ff8c42);transition:width .2s;}
+  #makeTxt{position:absolute;left:250px;top:216px;font-size:12px;color:#fff;z-index:6;display:none;
+    text-shadow:0 1px 3px rgba(0,0,0,.6);}
+  #burgerReady{position:absolute;left:790px;top:246px;width:82px;height:70px;display:none;
+    z-index:35;cursor:pointer;flex-direction:column;align-items:center;justify-content:center;
+    border-radius:12px;background:rgba(255,210,63,.3);border:3px solid #FFD23F;
+    box-shadow:0 0 18px rgba(255,210,63,.7);animation:pulse 1.1s infinite;}
+  #burgerReady .ic{font-size:34px;}
+  #burgerReady .tx{font-size:10px;color:#fff;background:rgba(6,35,56,.7);padding:0 5px;border-radius:5px;}
+  /* 非交互装饰层一律点击穿透 */
+  #room .floor,#room .wall,#room .zoneTag,#room .counterBar,#room .archDoor,
+  #room .table,#room .rug,#room .shelf,#room .actor,#iplayer,
+  #ticketNr,#makeBar,#makeTxt,#makeFill,#roomFx{pointer-events:none;}
+  #objLayer,#seatLayer,#roomNpcs,#roomDecor{pointer-events:none;}
+  #room .obj,#room .seat,#burgerReady,#photoSpot{pointer-events:auto;}
+
+  /* ===== v0.7.1 场景内出口门（六间房共用，右下角） ===== */
+  #exitDoor{position:absolute;left:1030px;top:565px;width:112px;height:172px;
+    z-index:34;pointer-events:auto;cursor:pointer;border-radius:14px 14px 6px 6px;
+    background:linear-gradient(160deg,#2c6280,#123a52);border:7px solid #FFD23F;
+    box-shadow:0 0 0 3px rgba(6,35,56,.55),0 0 20px rgba(255,210,63,.55),inset 0 -26px 34px rgba(0,0,0,.38);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;
+    animation:doorGlow 2.2s ease-in-out infinite;transition:transform .18s;}
+  #exitDoor:hover{transform:translateY(-4px) scale(1.03);}
+  @keyframes doorGlow{
+    0%,100%{box-shadow:0 0 0 3px rgba(6,35,56,.55),0 0 15px rgba(255,210,63,.45),inset 0 -26px 34px rgba(0,0,0,.38)}
+    50%{box-shadow:0 0 0 3px rgba(6,35,56,.55),0 0 32px rgba(255,210,63,.9),inset 0 -26px 34px rgba(0,0,0,.38)}}
+  /* 门形用纯 CSS 绘制，不依赖 emoji 字体（沙箱/部分浏览器缺字体也能看清） */
+  #exitDoor .dIc{width:46px;height:64px;border:5px solid #cfe6f2;border-bottom:none;
+    border-radius:23px 23px 0 0;background:rgba(255,255,255,.07);position:relative;
+    box-shadow:inset 0 0 12px rgba(0,0,0,.25);}
+  #exitDoor .dIc:after{content:"";position:absolute;right:9px;top:36px;width:8px;height:8px;
+    border-radius:50%;background:#FFD23F;box-shadow:0 0 7px rgba(255,210,63,.9);}
+  #exitDoor .dTx{font-size:13px;font-weight:800;color:#062338;background:#FFD23F;
+    padding:4px 10px;border-radius:9px;white-space:nowrap;}
+  #exitDoor .dSub{font-size:10px;color:#cfe6f2;white-space:nowrap;}
+
+  /* 进室内：世界层 HUD 让位，顶栏独占屏幕顶部，避免盖住「离开」 */
+  body.in-room #hud,body.in-room #controls,body.in-room #legend{display:none;}
+  #interior .topbar .roomHint{flex:1;text-align:center;font-size:11px;color:#cfe6f2;opacity:.9;
+    margin:0 14px;line-height:1.4;}
+  #interior .topbar .barBtns{display:flex;gap:8px;flex-shrink:0;}
+  @media (max-width:820px){#interior .topbar .roomHint{display:none;}}
+
+  /* 莉娜式点单条 */
+  #questHud{position:fixed;right:12px;top:64px;z-index:260;width:212px;display:none;pointer-events:none;
+    background:linear-gradient(#fff8e6,#f0ddb4);border:1px solid #c9ae78;border-radius:4px;
+    padding:13px 14px 14px;color:#5a4322;box-shadow:0 8px 20px rgba(0,0,0,.35);transform:rotate(1.1deg);}
+  #questHud:before{content:"";position:absolute;left:50%;top:-9px;
+    transform:translateX(-50%) rotate(-3deg);width:54px;height:16px;
+    background:rgba(255,210,63,.55);border:1px solid rgba(180,150,90,.5);}
+  #questHud h3{font-size:14px;margin-bottom:8px;color:#8a6530;border-bottom:1px dashed #c9ae78;padding-bottom:6px;}
+  #questHud .qi{font-size:12px;line-height:1.9;display:flex;align-items:center;gap:7px;}
+  #questHud .dot{width:15px;height:15px;border-radius:50%;border:2px solid #b89a68;
+    display:inline-flex;align-items:center;justify-content:center;font-size:10px;flex:none;}
+  #questHud .done .dot{background:#5fbf5f;border-color:#5fbf5f;}
+  #questHud .now{color:#b26a12;font-weight:700;}
+  #questHud .hint{margin-top:8px;font-size:10.5px;opacity:.85;line-height:1.5;color:#7a6038;}
+  @media (max-width:820px){
+    #questHud{top:auto;bottom:120px;right:8px;width:180px;padding:9px 10px;}
+    #questHud .qi{font-size:11px;line-height:1.7;}
+    #objTip .card{width:270px;}
+  }
+  #photoSpot{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);
+    width:120px;height:120px;border-radius:50%;border:3px dashed #FFD23F;z-index:6;
+    display:flex;align-items:center;justify-content:center;font-size:13px;color:#062338;
+    background:rgba(255,210,63,.25);font-weight:700;text-align:center;cursor:pointer;}
+
+  /* 物品检视小卡 */
+  #objTip{position:fixed;inset:0;z-index:310;display:none;background:rgba(6,35,56,.6);
+    backdrop-filter:blur(3px);align-items:center;justify-content:center;}
+  #objTip .card{width:300px;background:#fff;color:#062338;border-radius:16px;padding:20px 22px;
+    box-shadow:0 12px 34px rgba(0,0,0,.4);text-align:center;}
+  #objTip .card .big{font-size:44px;margin-bottom:8px;}
+  #objTip .card h3{font-size:17px;margin-bottom:8px;}
+  #objTip .card p{font-size:13px;line-height:1.7;color:#444;}
+  #objTip .card .secret{margin-top:10px;font-size:12px;color:#b8860b;background:#fff8e1;
+    padding:8px 10px;border-radius:8px;display:none;}
+  #objTip .card .secret.on{display:block;}
+
+  /* ===== 橙光式分支对话面板（v0.7 新增）===== */
+  #dlg{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:360;
+    width:min(680px,92vw);display:none;align-items:flex-end;gap:12px;}
+  #dlg .portrait{width:88px;height:88px;flex:none;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;font-size:46px;
+    background:#fff;border:4px solid #FFD23F;box-shadow:0 0 0 6px rgba(255,210,63,.25),0 8px 20px rgba(0,0,0,.4);}
+  #dlg .box{flex:1;background:rgba(9,32,48,.94);border:2px solid rgba(255,210,63,.55);
+    border-radius:16px;padding:14px 16px 15px;box-shadow:0 10px 30px rgba(0,0,0,.45);color:#fff;}
+  #dlg .who{font-size:13px;font-weight:800;color:#FFD23F;margin-bottom:7px;letter-spacing:1px;}
+  #dlg .who small{color:#9fc6d8;font-weight:400;margin-left:8px;letter-spacing:0;}
+  #dlg .text{font-size:15px;line-height:1.75;min-height:50px;margin-bottom:12px;}
+  #dlg .opts{display:flex;flex-direction:column;gap:7px;}
+  #dlg .opt{text-align:left;background:rgba(255,255,255,.09);color:#fff;border:1px solid rgba(255,255,255,.25);
+    border-radius:10px;padding:9px 12px;font-size:13.5px;cursor:pointer;line-height:1.5;
+    transition:background .15s,border-color .15s,transform .12s;}
+  #dlg .opt:hover{background:rgba(255,210,63,.22);border-color:#FFD23F;transform:translateX(4px);}
+  #dlg .opt .k{display:inline-block;width:19px;height:19px;line-height:19px;text-align:center;
+    border-radius:5px;background:rgba(255,210,63,.3);color:#FFD23F;font-size:11px;font-weight:800;margin-right:8px;}
+  #dlg .opt.end{background:rgba(255,210,63,.9);color:#062338;font-weight:800;border-color:#FFD23F;text-align:center;}
+  #dlg .opt.end:hover{background:#FFE07A;transform:none;}
+  #dlg .fx{margin-top:9px;font-size:11.5px;color:#FFDCA0;min-height:0;}
+  @media (max-width:640px){
+    #dlg{bottom:12px;gap:8px;}
+    #dlg .portrait{width:58px;height:58px;font-size:30px;border-width:3px;}
+    #dlg .box{padding:10px 12px;}
+    #dlg .text{font-size:13.5px;min-height:42px;}
+    #dlg .opt{font-size:12.5px;padding:8px 10px;}
+  }
+
+  /* ===== 聚焦检视（放大 / 旋转 / 咬 / 隐藏彩蛋）===== */
+  #focus{position:fixed;inset:0;z-index:330;display:none;background:rgba(6,35,56,.86);
+    backdrop-filter:blur(8px);color:#fff;flex-direction:column;align-items:center;justify-content:center;}
+  #focus .stage{width:320px;height:280px;perspective:1000px;margin-bottom:6px;
+    display:flex;align-items:center;justify-content:center;}
+  #burgerClip{width:200px;height:160px;clip-path:url(#biteClip);-webkit-clip-path:url(#biteClip);}
+  #focusBurger{position:relative;width:200px;height:160px;margin:0 auto;transform-style:preserve-3d;
+    transform:rotateX(15deg) rotateY(-25deg);}
+  .layer{position:absolute;left:50%;transform:translateX(-50%);width:168px;height:26px;
+    border-radius:40% 40% 45% 45%/60% 60% 40% 40%;box-shadow:0 3px 6px rgba(0,0,0,.3);
+    display:flex;align-items:center;justify-content:center;}
+  .l-top{background:linear-gradient(#F7C65B,#E0A23F);top:14px;height:40px;width:176px;
+    border-radius:50% 50% 30% 30%/70% 70% 30% 30%;}
+  .l-lettuce{background:#5fbf5f;top:50px;height:18px;width:182px;}
+  .l-cheese{background:#FFC23F;top:66px;height:16px;}
+  .l-patty{background:linear-gradient(#8a5433,#6b3f26);top:80px;height:28px;width:174px;}
+  .l-bottom{background:linear-gradient(#E0A23F,#c98b2f);top:106px;height:30px;}
+  .layer span{font-size:11px;color:#062338;font-weight:700;opacity:.75;}
+  #crumbLayer{position:fixed;inset:0;pointer-events:none;z-index:335;}
+  .crumb{position:absolute;width:8px;height:8px;border-radius:2px;background:#F2B84B;}
+  #secretSauce{display:none;text-align:center;}
+  #secretSauce .pool{font-size:56px;}
+  #secretSauce p{font-size:13px;line-height:1.7;margin-top:8px;}
+  #focusInfo{max-width:440px;text-align:center;font-size:14px;line-height:1.7;margin:6px 16px;}
+  #focusOps{font-size:11px;opacity:.75;margin-bottom:8px;text-align:center;}
+  #focusBtns{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;justify-content:center;}
+  #photo{position:fixed;inset:0;z-index:340;display:none;background:rgba(6,35,56,.92);
+    align-items:center;justify-content:center;flex-direction:column;gap:14px;color:#fff;}
+  #photo .card{background:#fff;color:#062338;padding:20px 26px;border-radius:16px;text-align:center;
+    box-shadow:0 10px 30px rgba(0,0,0,.4);}
+  #photo .card .row{font-size:40px;letter-spacing:6px;margin:8px 0;}
+  #photo .card .cap{font-size:13px;color:#555;}
+
+  /* ===== v0.8 房间图：门 / 楼梯连接点 ===== */
+  #portalLayer{position:absolute;inset:0;pointer-events:none;z-index:33;}
+  .portal{position:absolute;width:96px;height:92px;border-radius:12px;pointer-events:auto;cursor:pointer;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
+    background:linear-gradient(160deg,#2c6280,#123a52);border:4px solid #7fe3ff;
+    box-shadow:0 0 16px rgba(127,227,255,.55),inset 0 -14px 22px rgba(0,0,0,.35);
+    transition:transform .16s,box-shadow .16s;animation:portalGlow 2.1s ease-in-out infinite;}
+  .portal.stair{background:linear-gradient(160deg,#7a5a35,#4d3618);border-color:#FFD23F;
+    box-shadow:0 0 16px rgba(255,210,63,.55),inset 0 -14px 22px rgba(0,0,0,.35);}
+  .portal:hover{transform:translateY(-4px) scale(1.05);}
+  @keyframes portalGlow{0%,100%{filter:brightness(1)}50%{filter:brightness(1.25)}}
+  .portal .pIc{font-size:27px;line-height:1;}
+  .portal .pTx{font-size:11px;font-weight:800;color:#062338;background:#FFD23F;padding:3px 7px;
+    border-radius:7px;white-space:nowrap;}
+  .portal.stair .pTx{background:#fff2c4;}
+  .portal.ready{outline:3px solid #fff;outline-offset:2px;}
+
+  /* 顶栏房间 / 楼层导航（指示器 + 无障碍辅助；主通道仍是场景内门/楼梯） */
+  #roomNav{flex:1;display:flex;align-items:center;gap:6px;margin:0 12px;overflow-x:auto;
+    scrollbar-width:none;white-space:nowrap;}
+  #roomNav::-webkit-scrollbar{display:none;}
+  #roomNav .navLabel{font-size:11px;color:#cfe6f2;opacity:.85;flex:none;}
+  #roomNav .navChip{font-size:11px;padding:4px 9px;border-radius:9px;border:1px solid rgba(255,255,255,.3);
+    background:rgba(255,255,255,.1);color:#fff;cursor:pointer;flex:none;font-weight:700;}
+  #roomNav .navChip.on{background:#FFD23F;color:#062338;border-color:#FFD23F;}
+  @media (max-width:820px){#roomNav{display:none;}}
+
+  /* 彩蛋计数按钮（世界/室内常驻） */
+  #colBtn{position:fixed;right:12px;bottom:12px;z-index:400;cursor:pointer;pointer-events:auto;
+    background:linear-gradient(#fff8e6,#f0ddb4);color:#5a4322;border:1px solid #c9ae78;
+    border-radius:12px;padding:8px 13px;font-size:13px;font-weight:800;
+    box-shadow:0 5px 14px rgba(0,0,0,.35);}
+  #colBtn b{color:#c0392b;font-size:15px;}
+  #colBtn:active{transform:scale(.95);}
+
+  /* 物件交互态 */
+  .obj.on{border-color:#7fe3ff;box-shadow:0 0 0 3px rgba(127,227,255,.55),0 0 16px rgba(127,227,255,.5);}
+  .obj.taken{opacity:.32;filter:grayscale(.85);}
+  .obj.kind-rummage:before,.obj.kind-toggle:before,.obj.kind-spin:before,
+  .obj.kind-collect:before,.obj.kind-egg:before{content:"✦";position:absolute;right:-6px;top:-8px;
+    font-size:13px;color:#FFD23F;text-shadow:0 1px 3px rgba(0,0,0,.6);}
+
+  /* 通用模态（翻找 / 旋转 / 藏品册） */
+  #rummage,#spin,#collection{position:fixed;inset:0;z-index:355;display:none;
+    background:rgba(6,35,56,.72);backdrop-filter:blur(5px);align-items:center;justify-content:center;}
+  #rummage .card,#spin .card,#collection .card{background:#fff;color:#062338;border-radius:18px;
+    padding:20px 22px;box-shadow:0 14px 40px rgba(0,0,0,.45);text-align:center;max-width:92vw;}
+  #collection .card.wide{width:min(680px,94vw);max-height:86vh;overflow:auto;}
+  #rummage .card,#spin .card{width:min(430px,92vw);}
+  #rummage h3,#spin h3,#collection h3{font-size:18px;margin-bottom:6px;}
+  #rummage .sub,#spin .sub{font-size:12px;color:#777;margin-bottom:14px;line-height:1.6;}
+  #rumGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:6px;}
+  #rumGrid .slot{min-height:86px;border-radius:12px;border:2px dashed #c9ae78;background:#fff8e6;
+    cursor:pointer;padding:9px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    transition:transform .14s,background .14s,border-color .14s;}
+  #rumGrid .slot:hover{transform:translateY(-3px);border-color:#e0a93b;}
+  #rumGrid .slot.opened{border-style:solid;background:#f3f7fb;border-color:#7fb0cc;}
+  #rumGrid .slot.deep{border-color:#FFD23F;background:#fffbe8;animation:pulse 1.2s infinite;}
+  #rumGrid .sIc{font-size:26px;line-height:1.2;}
+  #rumGrid .sTx{font-size:13px;font-weight:800;margin-top:3px;}
+  #rumGrid .sDs{font-size:10.5px;color:#888;margin-top:3px;line-height:1.45;}
+  .spinStage{perspective:900px;height:190px;display:flex;align-items:center;justify-content:center;margin:8px 0;}
+  #spinCard{width:150px;height:170px;position:relative;transform-style:preserve-3d;
+    transition:transform .6s cubic-bezier(.2,.9,.3,1);cursor:pointer;}
+  #spinCard.flipped{transform:rotateY(180deg);}
+  #spinCard .spFace{position:absolute;inset:0;backface-visibility:hidden;border-radius:16px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px;
+    border:3px solid #e0a93b;box-shadow:0 8px 20px rgba(0,0,0,.2);}
+  #spinCard .front{background:linear-gradient(#fff3cd,#ffe1a0);font-size:70px;}
+  #spinCard .back{background:linear-gradient(#e8f4fb,#cfe6f2);transform:rotateY(180deg);}
+  #spinCard .bkTx{font-size:12.5px;line-height:1.65;color:#0E1B24;font-weight:600;}
+  #spinCard .bkHint{font-size:11px;color:#b26a12;margin-top:8px;}
+  .rowBtns{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;}
+  #colGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px;margin:12px 0 6px;}
+  #colGrid .colItem{border-radius:12px;border:2px dashed #d6d6d6;background:#f7f7f7;
+    padding:10px 6px;min-height:92px;display:flex;flex-direction:column;align-items:center;gap:3px;}
+  #colGrid .colItem.got{border-style:solid;border-color:#e0a93b;background:#fff8e6;}
+  #colGrid .cIc{font-size:24px;width:34px;height:34px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;background:rgba(224,169,59,.16);
+    border:1px solid rgba(224,169,59,.35);}
+  #colGrid .cTx{font-size:11px;font-weight:800;line-height:1.3;}
+  #colGrid .cDs{font-size:9.5px;color:#888;line-height:1.4;}
+  @media (max-width:640px){#rumGrid{grid-template-columns:repeat(2,1fr);}#spinCard{width:120px;height:150px;}}
+
+  /* ===== v0.9：捉水母（打地鼠式）+ 鱼网光标 + 小蜗 ===== */
+  body.net-mode #world,body.net-mode #world *,body.net-mode #jellyLayer,body.net-mode .jelly{
+    cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Ccircle cx='14' cy='12' r='9' fill='%23ffffff' fill-opacity='.2' stroke='%23FFD23F' stroke-width='2'/%3E%3Cpath d='M5 12h18M14 3v18M7 6l14 12M21 6L7 18' stroke='%23FFD23F' stroke-width='1' opacity='.8'/%3E%3Cpath d='M22 19l7 10' stroke='%23CAA86A' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E") 14 12,crosshair !important;}
+  #jellyLayer{position:fixed;inset:0;z-index:250;pointer-events:none;}
+  .jelly{position:absolute;width:72px;height:82px;pointer-events:auto;transform:translate(-50%,-100%);
+    animation:jellyPop .34s cubic-bezier(.2,1.3,.4,1) both;}
+  @keyframes jellyPop{from{opacity:0;transform:translate(-50%,-40%) scale(.35)}
+    to{opacity:1;transform:translate(-50%,-100%) scale(1)}}
+  .jelly .hole{position:absolute;left:6px;bottom:0;width:60px;height:12px;border-radius:50%;
+    background:rgba(6,35,56,.35);}
+  .jelly .body{position:absolute;left:0;bottom:8px;width:72px;height:70px;
+    animation:jellyBob 1.5s ease-in-out infinite;}
+  @keyframes jellyBob{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-7px) rotate(3deg)}}
+  .jelly .cap{position:absolute;left:8px;top:0;width:56px;height:42px;border-radius:50% 50% 38% 38%;
+    background:var(--jc);box-shadow:inset -6px -8px 0 rgba(6,35,56,.16),0 0 18px var(--jg);
+    border:2px solid rgba(255,255,255,.75);}
+  .jelly .eye{position:absolute;top:16px;width:6px;height:6px;border-radius:50%;background:#062338;}
+  .jelly .eye.l{left:22px}.jelly .eye.r{right:22px}
+  .jelly .tent{position:absolute;top:40px;width:5px;height:26px;border-radius:0 0 4px 4px;
+    background:var(--jc);opacity:.9;transform-origin:top center;animation:tentSway 1.1s ease-in-out infinite;}
+  .jelly .t1{left:16px}.jelly .t2{left:30px;animation-delay:.15s}
+  .jelly .t3{left:44px;animation-delay:.3s}.jelly .t4{left:56px;animation-delay:.45s}
+  @keyframes tentSway{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg)}}
+  .jelly .tag{position:absolute;left:50%;top:-16px;transform:translateX(-50%);font-size:10px;
+    color:#fff;background:rgba(6,35,56,.8);padding:1px 6px;border-radius:6px;white-space:nowrap;}
+  .jelly.j-pink{--jc:#FF8FC7;--jg:rgba(255,143,199,.55)}
+  .jelly.j-blue{--jc:#5BC8FF;--jg:rgba(91,200,255,.7)}
+  .jelly.j-gold{--jc:#FFD23F;--jg:rgba(255,210,63,.85)}
+  .jelly.j-blue .cap{box-shadow:inset -6px -8px 0 rgba(6,35,56,.16),0 0 22px #5BC8FF,0 0 6px #fff;}
+  .jelly.gone{animation:jellyGone .28s ease-in both;pointer-events:none;}
+  @keyframes jellyGone{to{opacity:0;transform:translate(-50%,-30%) scale(.3)}}
+  .jelly.caught{animation:jellyCaught .34s ease-out both;pointer-events:none;}
+  @keyframes jellyCaught{to{opacity:0;transform:translate(-50%,-100%) scale(1.6)}}
+  .netSwing{position:fixed;width:76px;height:76px;border:3px solid #FFD23F;border-radius:50%;
+    pointer-events:none;z-index:251;animation:netSwing .45s ease-out both;}
+  @keyframes netSwing{from{opacity:.9;transform:translate(-50%,-50%) scale(.3)}
+    to{opacity:0;transform:translate(-50%,-50%) scale(1.25)}}
+  .jellyScore{position:fixed;z-index:252;font-weight:800;font-size:19px;pointer-events:none;
+    color:#FFD23F;text-shadow:0 2px 6px rgba(6,35,56,.9);animation:scoreUp .8s ease-out both;}
+  @keyframes scoreUp{to{opacity:0;transform:translateY(-46px)}}
+  body.stung #viewport{animation:stungFlash .35s ease-out;}
+  @keyframes stungFlash{0%,100%{filter:none}50%{filter:brightness(1.5) hue-rotate(20deg)}}
+  #jellyHud{position:fixed;right:12px;bottom:58px;z-index:265;pointer-events:none;
+    background:rgba(6,35,56,.72);color:#fff;font-size:12px;line-height:1.6;
+    padding:7px 11px;border-radius:10px;backdrop-filter:blur(4px);}
+  #jellyHud b{color:#FFD23F;font-size:15px;}
+  #garyWorld{cursor:pointer;z-index:52;}
+  #garyWorld .disc{background:#CAA86A;color:#062338;font-weight:800;font-size:16px;}
+  body.in-room #jellyHud,body.in-room #jellyLayer{display:none;}
+
+  /* ============ v1.0：三处玩法场地 + 小游戏会话 UI ============ */
+  .playspot{position:absolute;width:0;height:0;z-index:30;cursor:pointer;}
+  .playspot .psArea{position:absolute;left:0;top:0;transform:translate(-50%,-50%);
+    border:3px dashed rgba(255,255,255,.7);pointer-events:auto;
+    box-shadow:0 0 0 6px rgba(255,210,63,.10),inset 0 0 46px rgba(255,255,255,.14);
+    transition:transform .25s,box-shadow .25s;}
+  .playspot .psArea:after{content:"";position:absolute;inset:10px;border:1px solid rgba(255,255,255,.22);}
+  .playspot.ps-jelly .psArea{border-radius:50%;
+    background:radial-gradient(ellipse at 50% 38%,rgba(126,211,160,.62),rgba(48,132,102,.38));}
+  .playspot.ps-jelly .psArea:after{border-radius:50%;}
+  .playspot.ps-bubble .psArea{border-radius:26px;
+    background:radial-gradient(ellipse at 50% 38%,rgba(150,210,255,.42),rgba(60,130,195,.24));}
+  .playspot.ps-bubble .psArea:after{border-radius:18px;}
+  .playspot.ps-karate .psArea{border-radius:50%;
+    background:radial-gradient(ellipse at 50% 38%,rgba(226,172,92,.48),rgba(140,92,46,.30));}
+  .playspot.ps-karate .psArea:after{border-radius:50%;}
+  .playspot .psSign{position:absolute;left:0;transform:translate(-50%,-100%);
+    background:#6b4a26;color:#FFE9B8;border:2px solid #CAA86A;border-radius:11px;
+    padding:5px 13px;font-size:15px;font-weight:800;white-space:nowrap;text-align:center;
+    line-height:1.35;box-shadow:0 5px 12px rgba(0,0,0,.38);pointer-events:auto;
+    transition:background .2s,color .2s;}
+  .playspot .psSign small{display:block;font-size:10px;font-weight:600;color:#E8CFA0;margin-top:1px;}
+  .playspot .psSign:after{content:"";position:absolute;left:50%;bottom:-15px;width:4px;height:15px;
+    background:#6b4a26;transform:translateX(-50%);}
+  .playspot .psRing{position:absolute;left:0;top:0;transform:translate(-50%,-50%);
+    border:4px solid rgba(255,210,63,.9);display:none;pointer-events:none;
+    box-shadow:0 0 26px rgba(255,210,63,.75),inset 0 0 22px rgba(255,210,63,.35);
+    animation:psRingPulse 1.7s ease-in-out infinite;}
+  @keyframes psRingPulse{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.95}
+    50%{transform:translate(-50%,-50%) scale(1.08);opacity:.6}}
+  .playspot.ps-bubble .psRing{border-radius:30px;}
+  .playspot.ps-jelly .psRing,.playspot.ps-karate .psRing{border-radius:50%;}
+  .playspot.near .psRing,.playspot.playing .psRing,.playspot.guide .psRing{display:block;}
+  .playspot.near .psArea{transform:translate(-50%,-50%) scale(1.06);}
+  .playspot.near .psSign,.playspot.playing .psSign,.playspot.guide .psSign{background:#8a5f2c;color:#fff;border-color:#FFD23F;}
+  .psDot{position:absolute;transform:translate(-50%,-50%);pointer-events:none;}
+  .psDot-j{width:20px;height:18px;background:#FF8FC7;border:2px solid rgba(255,255,255,.85);
+    border-radius:50% 50% 42% 42%;box-shadow:0 5px 0 -1px rgba(255,143,199,.9),0 10px 0 -2px rgba(255,143,199,.65);}
+  .psDot-b{width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.30);
+    border:2px solid rgba(255,255,255,.85);box-shadow:inset -4px -4px 0 rgba(140,205,255,.55);}
+  .psDot-k{width:24px;height:36px;border-radius:7px;background:#8a5f2c;border:2px solid #5c3d18;}
+
+  /* 进入玩法的视口氛围（很淡，只做感知，不遮挡） */
+  body.mg-jelly #viewport:after,body.mg-bubble #viewport:after,body.mg-karate #viewport:after{
+    content:"";position:absolute;inset:0;pointer-events:none;z-index:1;}
+  body.mg-jelly #viewport:after{box-shadow:inset 0 0 130px rgba(126,211,160,.30);}
+  body.mg-bubble #viewport:after{box-shadow:inset 0 0 130px rgba(140,205,255,.28);}
+  body.mg-karate #viewport:after{box-shadow:inset 0 0 130px rgba(226,172,92,.28);}
+
+  /* 会话 UI 默认全隐藏，由 body class 精确放行 */
+  .mgUI{display:none;}
+  body.in-room .mgUI,body.in-room #mgBanner,body.in-room #jellyHud{display:none !important;}
+  #jellyHud{display:none;}
+  body.mg-active.mg-jelly #jellyHud{display:block;}
+  body.mg-active #mgHud.mgUI,body.mg-active #mgExit.mgUI{display:block;}
+  body.mg-active #toast{top:126px;}
+  body.mg-active.mg-bubble #mgBlow.mgUI{display:flex;}
+  body.mg-active.mg-karate #mgKarate.mgUI{display:flex;}
+  body.mg-result #mgResult.mgUI{display:flex;}
+
+  #mgBanner{position:fixed;left:50%;top:34%;transform:translate(-50%,-50%) scale(.86);
+    z-index:330;text-align:center;pointer-events:none;opacity:0;
+    background:rgba(6,35,56,.90);border:3px solid #FFD23F;border-radius:20px;
+    padding:20px 38px;box-shadow:0 12px 40px rgba(0,0,0,.5);transition:opacity .3s,transform .3s;}
+  #mgBanner.on{opacity:1;transform:translate(-50%,-50%) scale(1);}
+  #mgBanner .mgBTitle{font-size:30px;font-weight:900;color:#FFD23F;letter-spacing:2px;}
+  #mgBanner .mgBSub{font-size:13px;color:#fff;margin-top:8px;opacity:.9;}
+
+  #mgHud{position:fixed;left:50%;top:12px;transform:translateX(-50%);z-index:305;
+    min-width:250px;max-width:88vw;text-align:center;color:#fff;
+    background:rgba(6,35,56,.84);border:2px solid rgba(255,210,63,.7);border-radius:14px;
+    padding:8px 16px;backdrop-filter:blur(4px);box-shadow:0 6px 18px rgba(0,0,0,.35);}
+  #mgHud .mgHName{font-size:16px;font-weight:900;color:#FFD23F;letter-spacing:1px;}
+  #mgHud .mgHRow{display:flex;gap:16px;justify-content:center;font-size:12px;margin:4px 0 6px;}
+  #mgHud .mgHRow b{color:#FFD23F;font-size:15px;}
+  #mgHud .mgHBar{height:7px;border-radius:5px;background:rgba(255,255,255,.18);overflow:hidden;}
+  #mgHud .mgHBar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#FFD23F,#FF8FC7);
+    transition:width .3s;}
+  #mgHud .mgHScore{font-size:11px;margin-top:5px;opacity:.9;}
+  #mgExit{position:fixed;right:12px;top:56px;z-index:310;background:#c0392b;color:#fff;
+    border:2px solid #fff;border-radius:10px;padding:8px 12px;font-size:13px;font-weight:800;
+    cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,.3);}
+  #mgExit:active{transform:scale(.95);}
+
+  #mgBlow{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:320;
+    flex-direction:column;align-items:center;gap:8px;width:min(92vw,420px);
+    background:rgba(6,35,56,.80);border:2px solid rgba(140,205,255,.7);border-radius:18px;
+    padding:12px 16px 14px;color:#fff;box-shadow:0 8px 24px rgba(0,0,0,.4);}
+  #mgBlow .blowStage{height:150px;width:100%;display:flex;align-items:center;justify-content:center;}
+  #mgBlow .bubblePreview{width:62px;height:62px;border-radius:50%;display:flex;align-items:center;
+    justify-content:center;font-size:12px;font-weight:800;color:#062338;text-align:center;
+    background:radial-gradient(circle at 32% 26%,rgba(255,255,255,.9),rgba(140,205,255,.4) 48%,rgba(255,143,199,.5));
+    border:2px solid rgba(255,255,255,.85);box-shadow:0 0 22px rgba(140,205,255,.5);
+    transition:width .08s linear,height .08s linear,background .2s;}
+  #mgBlow .bubblePreview.sh-krabby{background:radial-gradient(circle at 32% 26%,#FFE9A8,#E0A93B 60%,#b5792a);border-radius:42%;}
+  #mgBlow .bubblePreview.sh-boat{background:radial-gradient(circle at 32% 26%,#F0D2A0,#a9743c 65%,#6b4a26);border-radius:46% 46% 14% 14%;}
+  #mgBlow .bubblePreview.sh-elephant{background:radial-gradient(circle at 32% 26%,#D9C7E8,#9b7fb8 60%,#6b5585);}
+  #mgBlow .bubblePreview.over{animation:overShake .3s ease-in-out infinite;}
+  @keyframes overShake{0%,100%{transform:translateX(-2px)}50%{transform:translateX(2px)}}
+  #mgBlow .blowBar{position:relative;width:100%;height:14px;border-radius:8px;
+    background:rgba(255,255,255,.18);overflow:hidden;}
+  #mgBlow .blowBar i{display:block;height:100%;width:0;
+    background:linear-gradient(90deg,#5BC8FF,#FF8FC7,#FFD23F);}
+  #mgBlow .blowBar .bm{position:absolute;top:0;width:2px;height:100%;background:rgba(6,35,56,.7);}
+  #mgBlow .blowBar .b1{left:22%}#mgBlow .blowBar .b2{left:45%}
+  #mgBlow .blowBar .b3{left:68%}#mgBlow .blowBar .b4{left:90%}
+  #mgBlow .blowHint{font-size:11px;opacity:.9;text-align:center;line-height:1.4;}
+  #mgBlow .blowBtn{width:100%;padding:12px;border:none;border-radius:12px;cursor:pointer;
+    background:#FFD23F;color:#062338;font-size:16px;font-weight:900;letter-spacing:1px;
+    box-shadow:0 4px 0 #b9901f;}
+  #mgBlow .blowBtn.holding{background:#FF8FC7;box-shadow:0 2px 0 #b95d8c;transform:translateY(2px);}
+  #mgBlow .blowFound{font-size:12px;font-weight:800;color:#FFD23F;}
+  .bubbleFloat{position:fixed;z-index:336;border-radius:50%;pointer-events:none;
+    display:flex;align-items:center;justify-content:center;text-align:center;
+    font-size:13px;font-weight:800;color:#062338;border:2px solid rgba(255,255,255,.85);
+    background:radial-gradient(circle at 32% 26%,rgba(255,255,255,.9),rgba(140,205,255,.4) 48%,rgba(255,143,199,.5));
+    box-shadow:0 0 22px rgba(140,205,255,.5);animation:bubbleFly 1.5s ease-out both;}
+  .bubbleFloat.bf-krabby{background:radial-gradient(circle at 32% 26%,#FFE9A8,#E0A93B 60%,#b5792a);border-radius:42%;}
+  .bubbleFloat.bf-boat{background:radial-gradient(circle at 32% 26%,#F0D2A0,#a9743c 65%,#6b4a26);border-radius:46% 46% 14% 14%;}
+  .bubbleFloat.bf-elephant{background:radial-gradient(circle at 32% 26%,#D9C7E8,#9b7fb8 60%,#6b5585);}
+  @keyframes bubbleFly{0%{opacity:0;transform:translate(-50%,0) scale(.5)}
+    18%{opacity:1;transform:translate(-50%,-30px) scale(1)}
+    100%{opacity:0;transform:translate(-50%,-260px) scale(1.15)}}
+
+  #mgKarate{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:320;
+    flex-direction:column;align-items:center;gap:9px;width:min(92vw,420px);
+    background:rgba(6,35,56,.82);border:2px solid rgba(226,172,92,.8);border-radius:18px;
+    padding:12px 16px 14px;color:#fff;box-shadow:0 8px 24px rgba(0,0,0,.4);}
+  #mgKarate .kCombo{font-size:14px;font-weight:800;}#mgKarate .kCombo b{color:#FFD23F;font-size:20px;}
+  #mgKarate .kMove{width:132px;height:112px;border-radius:16px;background:rgba(255,255,255,.10);
+    border:2px solid rgba(255,210,63,.65);display:flex;flex-direction:column;
+    align-items:center;justify-content:center;}
+  #mgKarate .kArrow{font-size:52px;font-weight:900;color:#FFD23F;line-height:1;}
+  #mgKarate .kName{font-size:14px;font-weight:800;margin-top:4px;}
+  #mgKarate .kMove.wrong{animation:kWrong .3s ease-in-out;border-color:#ff6b6b;}
+  #mgKarate .kMove.right{animation:kRight .3s ease-out;border-color:#7ee0a0;}
+  @keyframes kWrong{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+  @keyframes kRight{0%{transform:scale(1)}50%{transform:scale(1.12)}100%{transform:scale(1)}}
+  #mgKarate .kTimer{width:100%;height:8px;border-radius:5px;background:rgba(255,255,255,.18);overflow:hidden;}
+  #mgKarate .kTimer i{display:block;height:100%;width:100%;background:#FFD23F;}
+  @keyframes kDrain{from{width:100%}to{width:0%}}
+  #mgKarate .kHint{font-size:11px;opacity:.9;}
+  #mgKarate .kPad{display:flex;gap:7px;width:100%;}
+  #mgKarate .kPad button{flex:1;padding:9px 2px;border:2px solid rgba(255,255,255,.6);border-radius:10px;
+    background:rgba(255,255,255,.12);color:#fff;font-size:12px;font-weight:800;cursor:pointer;}
+  #mgKarate .kPad button:active{background:#FFD23F;color:#062338;}
+
+  #mgResult{position:fixed;inset:0;z-index:345;align-items:center;justify-content:center;
+    background:rgba(6,35,56,.78);backdrop-filter:blur(3px);}
+  #mgResult .card{width:min(90vw,380px);text-align:center;background:#fff;border-radius:20px;
+    padding:24px 22px;box-shadow:0 16px 46px rgba(0,0,0,.5);}
+  #mgResult .rTitle{font-size:14px;color:#888;font-weight:800;}
+  #mgResult .rRank{font-size:26px;font-weight:900;margin:8px 0 12px;}
+  #mgResult .rRank.gold{color:#D4A017;}#mgResult .rRank.silver{color:#7b8a99;}
+  #mgResult .rRank.bronze{color:#b07a48;}
+  #mgResult .rLine{font-size:16px;font-weight:800;color:#062338;line-height:1.5;}
+  #mgResult .rSub{font-size:12px;color:#777;margin-top:8px;line-height:1.5;}
+  #mgResult .rBtns{display:flex;gap:10px;justify-content:center;margin-top:18px;}
+  #mgResult .rBtns .btn{background:#FFD23F;color:#062338;}
+  #mgResult .rBtns .btn:last-child{background:#e8e8e8;}
+  body.mg-goal #mgHud{box-shadow:0 0 0 4px rgba(255,210,63,.9),0 6px 18px rgba(0,0,0,.35);}
+</style>
+</head>
+<body>
+
+<!-- 咬痕 clipPath：矩形减去若干圆（齿簇），evenodd 挖洞 -->
+<svg width="0" height="0" style="position:absolute;overflow:hidden" aria-hidden="true">
+  <defs>
+    <clipPath id="biteClip" clipPathUnits="userSpaceOnUse">
+      <path id="bitePath" clip-rule="evenodd" d="M0 0 H200 V160 H0 Z"/>
+    </clipPath>
+  </defs>
+</svg>
+
+<div id="viewport">
+  <div id="world">
+    <div id="ground"></div>
+    <svg id="paths" width="2600" height="1370" viewBox="0 0 2600 1370">
+      <path d="M 430 1300 C 430 1150 300 1080 330 980 S 600 860 560 760
+               C 540 680 200 720 200 640 S 600 600 760 600
+               C 1000 600 1300 760 1560 700 C 1720 660 1840 720 1900 700"
+            fill="none" stroke="#e8d6a8" stroke-width="54" stroke-linecap="round" opacity="0.9"/>
+      <path d="M 430 1300 C 430 1150 300 1080 330 980 S 600 860 560 760
+               C 540 680 200 720 200 640 S 600 600 760 600
+               C 1000 600 1300 760 1560 700 C 1720 660 1840 720 1900 700"
+            fill="none" stroke="#d8c089" stroke-width="54" stroke-linecap="round"
+            stroke-dasharray="2 60" opacity="0.5"/>
+    </svg>
+    <div class="deco" style="left:120px;top:480px">🪸</div>
+    <div class="deco" style="left:760px;top:470px">🪸</div>
+    <div class="deco" style="left:520px;top:900px">🌿</div>
+    <div class="deco" style="left:880px;top:760px">🎐</div>
+    <div class="deco" style="left:1100px;top:900px">🪨</div>
+    <div class="deco" style="left:1400px;top:430px">🪸</div>
+    <div class="deco" style="left:2080px;top:520px">🐚</div>
+    <div class="deco" style="left:1700px;top:880px">🌿</div>
+    <div class="deco" style="left:960px;top:300px;font-size:24px">🫧</div>
+    <div class="deco" style="left:1280px;top:380px;font-size:24px">🫧</div>
+    <div class="deco" style="left:2200px;top:420px;font-size:24px">🐠</div>
+    <div id="player"><div class="disc">🐟</div><div class="nm" id="pname">新居民</div></div>
+    <div id="garyWorld" class="actor" style="left:300px;top:950px"><div class="disc" style="background:#CAA86A">蜗</div><div class="nm">小蜗（点我）</div><div class="bub"></div></div>
+  </div>
+</div>
+
+<div id="hud">
+  时段：<b id="clock">白天</b> ｜ 坐标 <span id="coord">0,0</span><br>
+  <span style="opacity:.85">WASD 移动 · 靠近门口 / 居民 / 小蜗按 E<br>
+  屋内：走近 <b>门 / 楼梯</b> 换房间 · 物件可<b>翻找 / 开关 / 旋转 / 拾取</b> · 🚪 出门<br>
+  镇上有 <b>3 处玩法场地</b>：水母田 / 泡泡摊 / 空手道场 · <b>走近按 E 或直接点击</b>开场</span>
+</div>
+<div id="controls">
+  <button class="btn" id="timeBtn">⏩ 快进时间</button>
+  <button class="btn" id="mapBtn">🗺 全景</button>
+  <button class="btn" id="mgGuideBtn">玩法场地</button>
+</div>
+<div id="jellyLayer"></div>
+<div id="jellyHud">捉水母 <b id="jellyTotal">0</b> 只<br>粉 <span id="jPink">0</span> · 电 <span id="jBlue">0</span> · 金 <span id="jGold">0</span></div>
+<!-- ===== v1.0 小游戏会话 UI（默认隐藏，由 body class 放行） ===== -->
+<div id="mgBanner"><div class="mgBTitle" id="mgBTitle">捉水母</div><div class="mgBSub" id="mgBSub"></div></div>
+<div id="mgHud" class="mgUI">
+  <div class="mgHName" id="mgName">捉水母</div>
+  <div class="mgHRow"><span>剩余 <b id="mgTime">30</b> 秒</span><span id="mgGoalTx">目标 12 只</span></div>
+  <div class="mgHBar"><i id="mgProgress"></i></div>
+  <div class="mgHScore" id="mgScore"></div>
+</div>
+<button id="mgExit" class="mgUI">收工 · 退出玩法</button>
+<div id="mgBlow" class="mgUI">
+  <div class="blowStage"><div class="bubblePreview" id="bubblePreview"><span id="bubbleShapeName">圆泡</span></div></div>
+  <div class="blowBar"><i id="blowFill"></i><span class="bm b1"></span><span class="bm b2"></span><span class="bm b3"></span><span class="bm b4"></span></div>
+  <div class="blowHint">按住按钮（或空格）蓄力 · 在想要的形状松手吹出 · 蓄太满会破</div>
+  <button class="blowBtn" id="blowBtn">按住吹</button>
+  <div class="blowFound" id="blowFound">特殊形状 0 / 3</div>
+</div>
+<div id="mgKarate" class="mgUI">
+  <div class="kCombo">连击 <b id="kCombo">0</b> / 10</div>
+  <div class="kMove" id="kMove"><div class="kArrow" id="kArrow">↑</div><div class="kName" id="kName">上劈</div></div>
+  <div class="kTimer"><i id="kFill"></i></div>
+  <div class="kHint">按方向键 / WASD，或点下方方向钮</div>
+  <div class="kPad">
+    <button data-d="left">左勾拳</button><button data-d="up">上劈</button>
+    <button data-d="down">下踢</button><button data-d="right">右勾拳</button>
+  </div>
+</div>
+<div id="mgResult" class="mgUI"><div class="card">
+  <div class="rTitle" id="rTitle">本轮结算</div>
+  <div class="rRank" id="rRank">金牌</div>
+  <div class="rLine" id="rLine"></div>
+  <div class="rSub" id="rSub"></div>
+  <div class="rBtns"><button class="btn" id="rAgain">再来一局</button><button class="btn" id="rBack">回镇上</button></div>
+</div></div>
+<div id="prompt">按 <b>E</b> 进入</div>
+<div id="toast"></div>
+<div id="legend">比奇堡 · 六栋建筑错落连通 · 每栋含多个房间 · 找彩蛋 · 逗小蜗 · 三处玩法场地（点了才开局）</div>
+<div id="dpad"><div class="ring"></div><div class="stick" id="stick"></div></div>
+
+<!-- ===== 通用室内房间（6 间共用） ===== -->
+<div id="interior">
+  <div class="topbar">
+    <h2 id="roomTitle">蟹堡王 · 内部</h2>
+    <div id="roomNav"></div>
+    <div class="barBtns">
+      <button class="btn" id="roomTimeBtn">⏩ 快进</button>
+      <button class="btn" id="exitBtn">← 离开</button>
+    </div>
+  </div>
+  <div id="room">
+    <div class="floor"></div>
+    <div id="caustic"></div>
+    <svg id="guideLine" viewBox="0 0 1200 760" preserveAspectRatio="none"><path id="guidePath" d=""/></svg>
+    <div id="goalRing" class="goal-ring" style="display:none"></div>
+    <div class="wall"></div>
+    <div id="roomDecor"></div>
+    <div id="roomFx"></div>
+
+    <div id="ticketNr">当前叫号 A001 ｜ 你的号码 —</div>
+    <div id="makeBar"><div id="makeFill"></div></div>
+    <div id="makeTxt">海绵宝宝正在准备…</div>
+    <div id="burgerReady"><div class="ic">🍔</div><div class="tx">点击取餐</div></div>
+
+    <div id="roomNpcs"></div>
+    <div id="objLayer"></div>
+    <div id="portalLayer"></div>
+    <div id="seatLayer"></div>
+    <div id="iplayer"><div class="disc">🐟</div></div>
+    <div id="photoSpot">📸 合影点</div>
+    <div id="exitDoor" title="出门 · 返回比奇堡">
+      <div class="dIc"></div>
+      <div class="dTx">← 出去</div>
+      <div class="dSub">回比奇堡</div>
+    </div>
+  </div>
+</div>
+
+<div id="questHud">
+  <h3>🧾 你的点单条</h3>
+  <div id="questList"></div>
+  <div class="hint">跟着地上的<b>金色光圈</b>走到物件前，按 E 或点它。<br>这张纸条只记进度，不用点它。</div>
+</div>
+<div id="nearTip" class="nearTip" style="display:none">按 E 交互</div>
+
+<!-- 物品检视小卡 -->
+<div id="objTip"><div class="card">
+  <div class="big" id="tipIcon">📦</div>
+  <h3 id="tipTitle">物件</h3>
+  <p id="tipDesc">介绍</p>
+  <div class="secret" id="tipSecret"></div>
+  <button class="btn" id="tipMore" style="margin-top:12px;display:none;background:#FFD23F">🔎 多看一眼</button>
+  <button class="btn" id="tipClose" style="margin-top:14px">✕ 收起</button>
+</div></div>
+
+<!-- 橙光式分支对话 -->
+<div id="dlg">
+  <div class="portrait" id="dlgPortrait">🐙</div>
+  <div class="box">
+    <div class="who" id="dlgName">章鱼哥</div>
+    <div class="text" id="dlgText"></div>
+    <div class="opts" id="dlgOpts"></div>
+    <div class="fx" id="dlgFx"></div>
+  </div>
+</div>
+
+<!-- 聚焦检视 -->
+<div id="focus">
+  <h2 style="margin-bottom:2px">🔍 聚焦检视 · 蟹黄堡</h2>
+  <div id="focusOps">方向键 / WASD 旋转 · 鼠标拖拽旋转 · E / ESC 返回</div>
+  <div class="stage">
+    <div id="burgerClip"><div id="focusBurger">
+      <div class="layer l-top"><span>面包</span></div>
+      <div class="layer l-lettuce"><span>生菜</span></div>
+      <div class="layer l-cheese"><span>芝士</span></div>
+      <div class="layer l-patty"><span>肉饼</span></div>
+      <div class="layer l-bottom"><span>面包</span></div>
+    </div></div>
+    <div id="secretSauce"><div class="pool">🫙✨</div><p></p></div>
+  </div>
+  <div id="focusInfo">刚出锅的蟹黄堡。仔细看看，也许藏着什么。</div>
+  <div id="focusBtns">
+    <button class="btn" id="biteBtn">😋 咬一口</button>
+    <button class="btn" id="flipBtn">🔄 翻面</button>
+    <button class="btn" id="rotL">↺ 左转</button>
+    <button class="btn" id="rotR">↻ 右转</button>
+    <button class="btn" id="closeFocus">✕ 返回（E）</button>
+  </div>
+</div>
+<div id="crumbLayer"></div>
+
+<div id="photo">
+  <div class="card">
+    <div style="font-size:13px;color:#555">比奇堡·蟹堡王合影点</div>
+    <div class="row">🐟🦀🧽</div>
+    <div class="cap" id="photoCap">你和蟹老板、海绵宝宝在蟹堡王门口合影！</div>
+  </div>
+  <button class="btn" id="closePhoto">收起</button>
+</div>
+
+<!-- ===== v0.8 交互类型系统面板 ===== -->
+<div id="colBtn">🥚 <b id="colCount">0</b> / 27</div>
+
+<div id="rummage"><div class="card">
+  <h3 id="rumTitle">🔎 翻找</h3>
+  <p class="sub" id="rumSub"></p>
+  <div id="rumGrid"></div>
+  <button class="btn" id="rumClose" style="margin-top:14px">✕ 收起</button>
+</div></div>
+
+<div id="spin"><div class="card">
+  <h3 id="spinTitle">🔄 转着看</h3>
+  <div class="spinStage"><div id="spinCard">
+    <div class="spFace front" id="spinFront">📦</div>
+    <div class="spFace back"><div class="bkTx" id="spinBackTx"></div><div class="bkHint" id="spinEgg"></div></div>
+  </div></div>
+  <p class="sub">点卡片 / 按 ← → 或 A D 翻到背面，看看藏着什么</p>
+  <div class="rowBtns">
+    <button class="btn" id="spinFlip">↻ 翻到背面</button>
+    <button class="btn" id="spinClose">✕ 收起</button>
+  </div>
+</div></div>
+
+<div id="collection"><div class="card wide">
+  <h3 id="colHead">🥚 藏品册</h3>
+  <div id="colGrid"></div>
+  <button class="btn" id="colClose" style="margin-top:14px">✕ 收起</button>
+</div></div>
+
+<script>
+(function(){
+  "use strict";
+  var WORLD_W=2600, WORLD_H=1370;
+  var viewport=document.getElementById('viewport');
+  var world=document.getElementById('world');
+  var player=document.getElementById('player');
+  var promptEl=document.getElementById('prompt');
+  var toastEl=document.getElementById('toast');
+  var coordEl=document.getElementById('coord');
+  var clockEl=document.getElementById('clock');
+  var P={x:430,y:1180,spd:3.4};
+  world.style.width=WORLD_W+'px';world.style.height=WORLD_H+'px';
+
+  function toast(msg){
+    toastEl.textContent=msg;toastEl.classList.add('on');
+    clearTimeout(toast._t);toast._t=setTimeout(function(){toastEl.classList.remove('on');},2400);
+  }
+
+  /* ============ 世界：错落建筑 + 弯曲小路 ============ */
+  var buildings=[
+    {id:'moai',name:'摩艾屋',x:140,y:560,w:96,h:170,color:'#9c7b4f',doorX:188,doorY:730},
+    {id:'pineapple',name:'凤梨屋',x:300,y:620,w:104,h:150,color:'#FFD23F',doorX:352,doorY:770},
+    {id:'treedome',name:'圆顶树屋',x:600,y:540,w:130,h:130,color:'#bfeaf2',doorX:665,doorY:670,round:true},
+    {id:'rock',name:'石头屋',x:470,y:790,w:84,h:84,color:'#8a8f96',doorX:512,doorY:874},
+    {id:'krusty',name:'蟹堡王',x:1560,y:520,w:190,h:160,color:'#c0392b',doorX:1655,doorY:680},
+    {id:'chum',name:'海之霸',x:1860,y:600,w:130,h:130,color:'#5b6e57',doorX:1925,doorY:730}
+  ];
+  var bById={};
+  buildings.forEach(function(b){
+    var el=document.createElement('div');el.className='building';
+    el.style.left=b.x+'px';el.style.top=b.y+'px';
+    el.style.width=b.w+'px';el.style.height=b.h+'px';
+    el.style.background=b.color;el.style.zIndex=String(1000-b.y);
+    if(b.round) el.style.borderRadius='50% 50% 14px 14px';
+    el.innerHTML='<div class="label">'+b.name+'</div>';
+    var d=document.createElement('div');d.className='door';
+    d.style.left=(b.doorX-b.x-27)+'px';d.style.top=(b.doorY-b.y-64)+'px';
+    el.appendChild(d);world.appendChild(el);b.el=el;bById[b.id]=b;
+  });
+
+  /* ============ 房间主题与数据（6 间共用渲染器） ============ */
+  var THEME={
+    krusty:{w1:'#3f7fb5',w2:'#356fa3',f1:'#d8b878',f2:'#b8965a'},
+    pineapple:{w1:'#F2C14E',w2:'#E0A93B',f1:'#f7e3ad',f2:'#dfc281'},
+    moai:{w1:'#8d8f93',w2:'#72757a',f1:'#d2ccbf',f2:'#ada697'},
+    rock:{w1:'#a38c72',w2:'#8b775e',f1:'#e8d2aa',f2:'#cbb083'},
+    treedome:{w1:'#7fb98f',w2:'#68a87a',f1:'#dcebc4',f2:'#b9d29a'},
+    chum:{w1:'#4c6157',w2:'#3d5047',f1:'#a3b19e',f2:'#80907c'}
+  };
+
+  // 小工具：批量生成「可点物件」
+  /* ===== v0.8 数据层：房间图(Room Graph) + 交互类型系统 ===== */
+  /* 物件 OB 字段：id,x,y,ic,tx,w,h,desc,secret,act,kind,data
+     kind: peek(检视) / rummage(翻找) / toggle(开关) / spin(旋转检视)
+           collect(拾取) / egg(彩蛋点击) / act(点餐动线) ；data 为各类型的载荷 */
+  function OB(list){return list.map(function(a){
+    var o={id:a[0],x:a[1],y:a[2],ic:a[3],tx:a[4],w:a[5]||56,h:a[6]||52,
+      desc:a[7]||'',secret:a[8]||'',act:'',kind:'peek',data:null};
+    var ACTS={ticket:1,register:1,window:1,pickup:1,eat:1};
+    var KINDS={peek:1,rummage:1,toggle:1,spin:1,collect:1,egg:1};
+    a.slice(9).forEach(function(v){
+      if(typeof v==='string'&&ACTS[v])o.act=v;
+      else if(typeof v==='string'&&KINDS[v])o.kind=v;
+      else if(v&&typeof v==='object')o.data=v;
+    });
+    return o;
+  });}
+  function SEAT(list){return list.map(function(a,i){
+    return {id:'seat'+i,x:a[0],y:a[1],ic:a[2]||'🪑',label:a[3],sit:a[4]};
+  });}
+  /* 房间连接点：门 / 楼梯，走近按 E 或点击切换子房间 */
+  function PT(list){return list.map(function(a){
+    return {x:a[0],y:a[1],to:a[2],ic:a[3]||'🚪',tx:a[4],kind:a[5]||'door',
+      cx:a[0]+48,cy:a[1]+38};
+  });}
+
+  /* 彩蛋 / 藏品字典：不同交互形式各自通向这里，藏品册统一收拢 */
+  var EGGS={
+    e1_recipe:{ic:'📜',tx:'秘方纸条',desc:'保险柜最深处：「绝对不能告诉任何人，包括海绵宝宝」。'},
+    e2_photo:{ic:'🖼️',tx:'年轻蟹老板的旧照',desc:'一间小船屋前，他笑得比现在松快。'},
+    e3_coin:{ic:'🪙',tx:'第一枚金币',desc:'蟹老板赚到的第一个铜板，被擦得发亮。'},
+    e4_draft:{ic:'🧾',tx:'配方草稿',desc:'后厨冰箱里冻着的一张纸，字迹被油渍晕开。'},
+    e5_spatula:{ic:'🥄',tx:'锅铲背面的刻字',desc:'「给最靠谱的厨师」——落款是一个歪歪的菠萝。'},
+    e6_sesame:{ic:'⚪',tx:'一粒芝麻',desc:'从面包上掉下来的，你郑重地收进了口袋。'},
+    e7_tip:{ic:'✉️',tx:'小费罐里的纸条',desc:'「给章鱼哥：今天也辛苦了。」——没人知道是谁放的。'},
+    e8_menu:{ic:'📋',tx:'被涂改的菜单',desc:'蟹黄堡原价 $1.99，被蟹老板一笔改成了 $2.99。'},
+    e9_clarinet:{ic:'🎷',tx:'竖笛内侧刻字',desc:'「献给无人知晓的艺术家」——他自己刻的。'},
+    e10_joy:{ic:'🌈',tx:'欢乐色颜料',desc:'章鱼哥偷偷买的一管亮色，藏在十二种灰的最底下。'},
+    e11_resign:{ic:'📄',tx:'没写完的辞职信',desc:'落款被反复涂掉，最后一行只写了「也许明天」。'},
+    e12_vinyl:{ic:'💿',tx:'无封套黑胶',desc:'标签写着「我自己吹的」，只有三道划痕。'},
+    e13_gary:{ic:'🐌',tx:'小蜗开口',desc:'它忽然说：「喵。」然后装作什么都没发生。'},
+    e14_pinedraft:{ic:'🍍',tx:'配方第一版草稿',desc:'凤梨屋冰箱里的一张涂鸦，画着一只歪歪的蟹黄堡。'},
+    e15_quiz:{ic:'🍬',tx:'智力测验答案',desc:'糖罐底压着一张纸：「答案：不填」。'},
+    e16_doodle:{ic:'🪨',tx:'石缝里的涂鸦',desc:'「我和海绵宝宝是永远的好朋友」，旁边两个歪扭的小人。'},
+    e17_sandnote:{ic:'🔬',tx:'沙子成分笔记',desc:'「成分异常，疑似含大量欢乐。」——珊迪的字。'},
+    e18_log:{ic:'💻',tx:'终端最后一条日志',desc:'「来访者情绪指数 +1，原因未知。」'},
+    e19_fail:{ic:'🖥️',tx:'失败 1,204 次',desc:'凯伦屏幕角落弹出的计数，痞老板假装没看见。'},
+    e20_lonely:{ic:'🗺️',tx:'计划图背面',desc:'「其实我只是想有人来吃一顿饭。」'},
+    e21_night:{ic:'🌙',tx:'独处时刻',desc:'关掉台灯、放上唱片——章鱼哥难得没赶你走。'},
+    e22_bubble:{ic:'🫙',tx:'第一只水母的气泡',desc:'玻璃罐里那一点荧光，海绵宝宝留了很久。'},
+    e23_flag:{ic:'🚩',tx:'派大星国王的小旗',desc:'沙堡顶上那面旗，写着「国王」。'},
+    e24_cookie:{ic:'🍪',tx:'忘了哪年的饼干',desc:'咬了一口就放在那儿，谁也没舍得扔。'},
+    e25_helmet:{ic:'🪖',tx:'珊迪借你的头盔',desc:'「你戴上会像个会走路的玻璃罐。」'},
+    e26_acorn:{ic:'🌰',tx:'德州特产橡果',desc:'标签写着「勿动」，你还是收下了。'},
+    e27_weapon:{ic:'🧪',tx:'空空的秘密武器',desc:'试剂瓶标签很唬人，里面什么也没有。'}
+  };
+  var PORTALS=[],rummageState={},toggleState={},found={},curBid=null,eggTries={};
+
+  /* 建筑 → 房间图：每栋含多个子房间，靠 portal 互相连通 */
+  var GRAPH={
+    krusty:{name:'蟹堡王',theme:'krusty',start:'hall',
+      rooms:['krusty_hall','krusty_kitchen','krusty_office']},
+    moai:{name:'摩艾石像屋',theme:'moai',start:'f1',
+      rooms:['moai_f1','moai_f2','moai_f3']},
+    pineapple:{name:'凤梨屋',theme:'pineapple',start:'main',
+      rooms:['pineapple_main','pineapple_kitchen']},
+    rock:{name:'石头屋',theme:'rock',start:'main',
+      rooms:['rock_main','rock_under']},
+    treedome:{name:'圆顶树屋',theme:'treedome',start:'main',
+      rooms:['treedome_main','treedome_airlock']},
+    chum:{name:'海之霸',theme:'chum',start:'counter',
+      rooms:['chum_counter','chum_lab']}
+  };
+
+  /* 扁平房间表：沿用既有 ROOMS[curRoom].xxx 全部引用，key = 建筑_房间 */
+  var ROOMS={
+    /* ============ 蟹堡王：前厅 / 后厨 / 办公室 ============ */
+    krusty_hall:{bid:'krusty',title:'蟹堡王 · 前厅（点餐区）',
+      intro:'前厅飘着煎肉饼的香味，章鱼哥在收银台后头叹气。',
+      decor:[
+        {t:'counter',x:60,y:296,w:820,h:56},
+        {t:'tag',x:70,y:126,label:'🎫 取号 / 点餐'},{t:'tag',x:474,y:126,label:'💵 收银台'},
+        {t:'tag',x:900,y:126,label:'🍽 就餐区'},{t:'tag',x:70,y:366,label:'红白格餐桌'},
+        {t:'table',x:150,y:430},{t:'table',x:400,y:470},{t:'table',x:680,y:430}
+      ],
+      objects:OB([
+        ['ticket',470,640,'🎫','取号机',70,64,'一台咔哒作响的取号机，吐出皱巴巴的号码条。','','ticket'],
+        ['register',600,210,'💵','收银台',74,64,'章鱼哥的收银机，旁边贴着「ORDER HERE」。','','register'],
+        ['window',320,236,'🪟','出餐窗口',76,64,'通往后厨的出餐窗口，能闻到煎肉饼的香味。','','window'],
+        ['pickup',790,236,'🍽️','取餐台',76,64,'做好的蟹黄堡会摆在这里等你来拿。','','pickup'],
+        ['tip',690,340,'🪙','小费罐',58,52,'空空的小费罐，章鱼哥说「别指望」。','','rummage',
+          {title:'小费罐里',slots:[
+            {ic:'🪙',tx:'两枚硬币',desc:'一枚是比奇堡的，一枚不知道哪来的。'},
+            {ic:'🧾',tx:'一张小票',desc:'字迹被水泡得有点糊。'},
+            {ic:'✉️',tx:'罐底压着东西',desc:'好像还有夹层……',deep:true,egg:'e7_tip'}]}],
+        ['jukebox',150,340,'🎵','点唱机',58,54,'投币就能放《F.U.N. Song》，章鱼哥禁止播放。','','toggle',
+          {on:'♪ 点唱机响起来了，章鱼哥的眉头皱得更紧了。',off:'点唱机安静了，收银台后传来一声如释重负的叹气。',fx:'music'}],
+        ['menu',520,140,'📋','菜单牌',58,52,'蟹黄堡 $2.99，加芝士 +$0.50。','','peek',null],
+        ['salt',188,452,'🧂','桌盐',48,44,'瓶口有点结块。'],
+        ['fries',710,452,'🍟','薯条',48,44,'凉掉了，蟹老板说「凉了也要收钱」。']
+      ]),
+      seats:SEAT([
+        [132,510,'🪑','红白格餐桌的椅子','你拉出椅子坐下，桌面还留着上一桌的盐粒。'],
+        [382,550,'🪑','靠窗的椅子','从这儿能看见门口的取号机。'],
+        [662,510,'🪑','中间的椅子','你坐在餐厅正中，章鱼哥远远看了你一眼。']
+      ]),
+      npcs:[{id:'squid',x:540,y:350}],
+      portals:PT([[1090,330,'krusty_kitchen','🚪','→ 后厨','door'],
+                 [1090,440,'krusty_office','🚪','→ 办公室','door']]),
+      quest:true,steam:false},
+
+    krusty_kitchen:{bid:'krusty',title:'蟹堡王 · 后厨（煎炉区）',
+      intro:'后厨热气腾腾，海绵宝宝正哼着歌翻肉饼。',
+      decor:[
+        {t:'counter',x:60,y:296,w:820,h:56},
+        {t:'tag',x:70,y:126,label:'🔥 煎炉'},{t:'tag',x:474,y:126,label:'🧊 冷藏柜'},
+        {t:'tag',x:900,y:126,label:'🗄 储物柜'},{t:'table',x:520,y:470}
+      ],
+      objects:OB([
+        ['grill',150,200,'🍳','煎炉',64,58,'双面煎炉，海绵宝宝说它「有自己的脾气」。','','toggle',
+          {on:'🔥 煎炉点着了，滋滋作响，蒸汽往上冒。',off:'煎炉关了，后厨一下子安静下来。',fx:'steam'}],
+        ['fridge',238,200,'🧊','冰箱',64,60,'门上贴满「记得微笑」的便签。','','rummage',
+          {title:'冰箱里',slots:[
+            {ic:'🥩',tx:'一排肉饼',desc:'码得整整齐齐，每个都一样圆。'},
+            {ic:'🥬',tx:'生菜',desc:'还带着水珠。'},
+            {ic:'🧂',tx:'粉色酱料瓶',desc:'「别让痞老板看见」——标签背面。'},
+            {ic:'🧾',tx:'最里层冻着东西',desc:'好像还有夹层……',deep:true,egg:'e4_draft'}]}],
+        ['cabinet',326,200,'🗄️','储物柜',62,58,'备用围裙和锅铲都塞在这里。','','rummage',
+          {title:'储物柜里',slots:[
+            {ic:'🧑‍🍳',tx:'备用围裙',desc:'洗得发白。'},
+            {ic:'🥄',tx:'备用锅铲',desc:'和外面那把一模一样。'},
+            {ic:'📦',tx:'空盒子',desc:'什么也没有，海绵宝宝大概留着装气泡用的。'}]}],
+        ['spatula',150,270,'🥄','金锅铲',58,54,'擦得能照出人影。','','spin',
+          {back:'背面刻着「给最靠谱的厨师」，落款是一个歪歪的菠萝。',egg:'e5_spatula'}],
+        ['sauce',238,270,'🧂','酱料瓶',58,54,'粉色标签，摇一摇会冒泡。','标签背面手写：别让痞老板看见。'],
+        ['sesame',326,270,'⚪','一粒芝麻',52,48,'从面包上掉下来的。','','collect',{egg:'e6_sesame'}],
+        ['drink',470,200,'🥤','饮料机',58,52,'第三格永远写着「维修中」。','','toggle',
+          {on:'🥤 饮料机咕噜咕噜冒起了泡。',off:'饮料机停了。',fx:'bubble'}],
+        ['bin',470,270,'🗑️','垃圾桶',54,50,'盖子上贴着「请勿投放海霸糊」。','','rummage',
+          {title:'垃圾桶里',slots:[
+            {ic:'🧾',tx:'一张废订单',desc:'写错了一个字就被揉掉了。'},
+            {ic:'🈳',tx:'……',desc:'除此之外什么也没有。'}]}]
+      ]),
+      seats:SEAT([[520,550,'🪑','后厨小凳','坐在灶台边，能闻到面包烤焦一点点边的香味。']]),
+      npcs:[{id:'sponge',x:660,y:330}],
+      portals:PT([[1090,330,'krusty_hall','🚪','← 前厅','door'],
+                 [1090,440,'krusty_office','🚪','→ 办公室','door']]),
+      steam:true},
+
+    krusty_office:{bid:'krusty',title:'蟹堡王 · 蟹老板办公室',
+      intro:'墙上挂满船锚与画像，蟹老板正把账本按得死死的。',
+      decor:[
+        {t:'rug',x:180,y:430,w:320,h:190},{t:'shelf',x:920,y:250,w:200,h:22},
+        {t:'tag',x:70,y:126,label:'💰 保险柜'},{t:'tag',x:474,y:126,label:'📒 账本'},
+        {t:'tag',x:900,y:126,label:'🖼 画像'},{t:'table',x:520,y:470}
+      ],
+      objects:OB([
+        ['safe',150,200,'💰','保险柜',64,58,'锁孔有被人反复撬过的痕迹。','','rummage',
+          {title:'保险柜里',slots:[
+            {ic:'💰',tx:'一袋钱',desc:'蟹老板数了三遍，还是不放心。'},
+            {ic:'🖼️',tx:'一张旧照片',desc:'年轻的蟹老板站在一间小船屋前。',egg:'e2_photo'},
+            {ic:'📜',tx:'柜门内侧贴着东西',desc:'好像还有夹层……',deep:true,egg:'e1_recipe'}]}],
+        ['ledger',238,200,'📒','账本',58,54,'密密麻麻的营业额，每一页都写着「钱」。','','rummage',
+          {title:'账本里',slots:[
+            {ic:'📈',tx:'今日营业额',desc:'末尾画了个小小的笑脸，又划掉了。'},
+            {ic:'📄',tx:'夹着的一页',desc:'是张旧收据，字迹很潦草。'}]}],
+        ['portrait',326,200,'🖼️','画像',58,52,'船长制服，眼神格外得意。','','spin',
+          {back:'画布背面写着：「第一枚金币，别弄丢。」'}],
+        ['coin1',150,270,'🪙','第一枚金币',52,48,'被单独摆在绒布上。','','collect',{egg:'e3_coin'}],
+        ['desklamp',238,270,'💡','台灯',52,48,'照亮账本的一小圈。','','toggle',
+          {on:'💡 台灯亮了，账本上的数字更刺眼了。',off:'台灯灭了，办公室暗下来。',fx:'lamp'}],
+        ['anchor',326,270,'⚓','旧船锚',54,50,'据说是开张那年挂上的。']
+      ]),
+      seats:SEAT([[520,550,'🪑','办公椅','你刚坐下，蟹老板就抬眼看了看你手里的账本。']]),
+      npcs:[{id:'krabs',x:600,y:290}],
+      portals:PT([[1090,330,'krusty_hall','🚪','← 前厅','door']]),
+      steam:false},
+
+    /* ============ 章鱼哥家：三层 + 楼梯 ============ */
+    moai_f1:{bid:'moai',title:'章鱼哥家 · 1F 客厅',
+      intro:'一楼冷冷清清，只有一盏台灯亮着。楼梯口通向画室。',
+      decor:[
+        {t:'rug',x:160,y:440,w:260,h:170},{t:'tag',x:70,y:126,label:'🛋 客厅'},
+        {t:'tag',x:474,y:126,label:'🎷 竖笛角'},{t:'tag',x:900,y:126,label:'🪜 楼梯口'}
+      ],
+      objects:OB([
+        ['clarinet',150,200,'🎷','竖笛',62,58,'擦得锃亮，是章鱼哥唯一肯天天碰的东西。','','spin',
+          {back:'笛身内侧刻着：献给「无人知晓的艺术家」。',egg:'e9_clarinet'}],
+        ['lamp',238,200,'💡','台灯',52,48,'暖黄的光，是这屋里唯一暖的东西。','','toggle',
+          {on:'💡 台灯亮了。',off:'台灯灭了，屋里只剩窗外的微光。',fx:'lamp'}],
+        ['gramophone',326,200,'🎵','唱片机',58,54,'一张没有封套的黑胶。','','toggle',
+          {on:'🎵 唱片转起来了，是一段很慢的竖笛独奏。',off:'唱片停了。',fx:'music'}],
+        ['cushion',150,280,'🛋️','沙发垫',58,52,'凹陷刚好是一个人形的深度。','','rummage',
+          {title:'沙发垫底下',slots:[
+            {ic:'📺',tx:'遥控器',desc:'电池盖用胶带缠着。'},
+            {ic:'🎟️',tx:'一张旧票根',desc:'很多年前的音乐会，座位很差。'},
+            {ic:'🪙',tx:'一枚硬币',desc:'不知道滚进去多久了。'}]}],
+        ['selfportrait',238,280,'🖼️','自画像',60,56,'画里的人比本人帅了大概三倍。','画布背面还有一张写了一半的纸。','peek'],
+        ['coffee',326,280,'☕','咖啡杯',52,48,'杯底一圈旧渍，早就凉了。']
+      ]),
+      seats:SEAT([
+        [230,560,'🛋','旧沙发','你坐下去，沙发发出一声疲惫的「噗」。'],
+        [500,560,'🪑','窗边椅','椅子对着拉上的窗帘，安静得能听见钟摆。']
+      ]),
+      npcs:[{id:'squid',x:600,y:330}],
+      portals:PT([[1090,330,'moai_f2','🪜','↑ 上二楼','stair']]),
+      steam:false},
+
+    moai_f2:{bid:'moai',title:'章鱼哥家 · 2F 画室',
+      intro:'二楼全是灰蓝色的画，画架旁边堆着十二种灰。',
+      decor:[
+        {t:'rug',x:160,y:440,w:260,h:170},{t:'shelf',x:920,y:250,w:210,h:22},
+        {t:'tag',x:70,y:126,label:'🎨 画架'},{t:'tag',x:474,y:126,label:'🪟 窗帘'},
+        {t:'tag',x:900,y:126,label:'🪜 楼梯'}
+      ],
+      objects:OB([
+        ['paintbox',150,200,'🎨','画具箱',62,58,'十二种灰，他管这叫「情绪色阶」。','','rummage',
+          {title:'画具箱里',slots:[
+            {ic:'🎨',tx:'十二管灰',desc:'从「Monday」到「Sunday」，全是灰。'},
+            {ic:'🖼️',tx:'一张没寄出的画',desc:'画的是凤梨屋，颜色意外地亮。'},
+            {ic:'🌈',tx:'最底下压着一管',desc:'好像还有夹层……',deep:true,egg:'e10_joy'}]}],
+        ['easel',238,200,'🖌️','画架',62,58,'夹着一幅「阴天的比奇堡」。','','spin',
+          {back:'画架背面有个小小的签名：S.Q.，写得格外认真。'}],
+        ['curtain',326,200,'🪟','窗帘',58,54,'拉得严严实实。','','toggle',
+          {on:'🪟 窗帘拉开了，正对着海绵宝宝的凤梨屋。',off:'窗帘又拉上了，他大概松了口气。',fx:'curtain'}],
+        ['record',150,280,'💿','唱片',54,50,'标签写着「我自己吹的」。'],
+        ['calendar',238,280,'📅','日历',52,48,'每过一个休息日就划掉一格，划得很用力。'],
+        ['paint',326,280,'🖌️','画笔',52,48,'笔尖洗得很干净，只有一支沾过亮色。']
+      ]),
+      seats:SEAT([[500,560,'🪑','画凳','坐在画凳上，那幅灰蓝色的画忽然顺眼了一点。']]),
+      npcs:[],
+      portals:PT([[1090,330,'moai_f3','🪜','↑ 上三楼','stair'],
+                 [1090,440,'moai_f1','🪜','↓ 下一楼','stair']]),
+      steam:false},
+
+    moai_f3:{bid:'moai',title:'章鱼哥家 · 3F 阁楼卧室',
+      intro:'阁楼很矮，一扇天窗斜斜地漏下光，床头柜没关严。',
+      decor:[
+        {t:'rug',x:160,y:440,w:260,h:170},{t:'arch',x:1080,y:24,w:76,h:230,label:'摩艾 · 阁楼天窗'},
+        {t:'tag',x:70,y:126,label:'🛏 床'},{t:'tag',x:474,y:126,label:'🗄 床头柜'},
+        {t:'tag',x:900,y:126,label:'🪜 楼梯'}
+      ],
+      objects:OB([
+        ['nightstand',150,200,'🗄️','床头柜',62,58,'抽屉没关严，露出一点纸角。','','rummage',
+          {title:'床头柜里',slots:[
+            {ic:'👓',tx:'一副老花镜',desc:'其实他从不戴。'},
+            {ic:'🛢️',tx:'竖笛保养油',desc:'用小布包着。'},
+            {ic:'📄',tx:'抽屉最底一层',desc:'好像还有夹层……',deep:true,egg:'e11_resign'}]}],
+        ['vinyl',238,200,'💿','黑胶唱片',54,50,'没有封套，只有三道划痕。','','collect',{egg:'e12_vinyl'}],
+        ['statue',326,200,'🗿','小摩艾',54,50,'屋子的迷你模型，表情和主人一模一样。','','spin',
+          {back:'底座刻着一行小字：「无人知晓，也无妨。」'}],
+        ['window',150,280,'🪟','天窗',58,54,'斜斜地漏下一道光，能看见水母飘过。'],
+        ['magazine',238,280,'📖','艺术杂志',58,52,'翻到「如何忍受喧闹的邻居」那一页。'],
+        ['coffee',326,280,'☕','凉咖啡',52,48,'和楼下那杯是同一时间泡的。']
+      ]),
+      seats:SEAT([[930,460,'🛏','床沿','坐在床沿，天窗正好落下一小块光。']]),
+      npcs:[],
+      portals:PT([[1090,330,'moai_f2','🪜','↓ 下二楼','stair']]),
+      steam:false},
+
+    /* ============ 凤梨屋：客厅 / 厨房卧室 ============ */
+    pineapple_main:{bid:'pineapple',title:'凤梨屋 · 客厅',
+      intro:'圆圆的菠萝客厅，墙上挂满水母照片，闹钟在滴答响。',
+      decor:[
+        {t:'tag',x:70,y:126,label:'🍍 客厅'},{t:'tag',x:474,y:126,label:'⏰ 闹钟'},
+        {t:'tag',x:900,y:126,label:'🖼 水母照片墙'},{t:'rug',x:180,y:430,w:320,h:190},
+        {t:'arch',x:1080,y:24,w:76,h:230,label:'菠萝顶 · 天窗'}
+      ],
+      objects:OB([
+        ['clock',150,200,'⏰','闹钟',62,58,'每天 5:59 准时炸响，海绵宝宝说这是「最好的朋友」。','背面贴着一张小纸条：今天也要比昨天更开心。','peek'],
+        ['garyl',238,200,'🐌','小蜗',62,58,'壳上有一圈彩虹贴纸，正慢慢地啃墙皮。','','egg',
+          {egg:'e13_gary',tries:3,hint:'（逗一逗它）……它慢慢转过头。'}],
+        ['jellynet',326,200,'🥅','水母网',58,54,'杆子上还挂着一点荧光粉。','','spin',
+          {back:'网柄上刻着「Jellyfishing #001」。'}],
+        ['tv',150,280,'📺','贝壳电视',58,52,'正放着《美人鱼战士》重播。','','toggle',
+          {on:'📺 电视亮了：「企鹅男孩与美人鱼战士！」',off:'电视关了，屋里只剩闹钟滴答。',fx:'tv'}],
+        ['hat',238,280,'🧢','蟹堡王帽',58,52,'帽檐被洗得发白，从不摘下。'],
+        ['pine',326,280,'🍍','菠萝摆件',52,48,'「欢迎来到我的菠萝」的小模型。']
+      ]),
+      seats:SEAT([
+        [220,560,'🛋','菠萝沙发','你陷进软软的沙发里，小蜗在旁边慢吞吞地爬。'],
+        [420,560,'🪑','圆凳','坐在圆凳上，圆窗刚好框住章鱼哥家的屋顶。']
+      ]),
+      npcs:[{id:'sponge',x:600,y:330}],
+      portals:PT([[1090,330,'pineapple_kitchen','🚪','→ 厨房 / 卧室','door']]),
+      steam:false},
+
+    pineapple_kitchen:{bid:'pineapple',title:'凤梨屋 · 厨房与卧室',
+      intro:'厨房贴满「记得微笑」的便签，里间是圆圆的菠萝床。',
+      decor:[
+        {t:'tag',x:70,y:126,label:'🧊 冰箱'},{t:'tag',x:474,y:126,label:'🎵 唱片机'},
+        {t:'tag',x:900,y:126,label:'🛏 菠萝床'},{t:'table',x:520,y:470}
+      ],
+      objects:OB([
+        ['fridge',150,200,'🧊','冰箱',64,60,'门上贴满便签。','','rummage',
+          {title:'冰箱里',slots:[
+            {ic:'🥤',tx:'一瓶汽水',desc:'气泡还在冒。'},
+            {ic:'🍍',tx:'半颗菠萝',desc:'切得歪歪扭扭。'},
+            {ic:'🧾',tx:'最里层冻着东西',desc:'好像还有夹层……',deep:true,egg:'e14_pinedraft'}]}],
+        ['record',238,200,'🎵','唱片机',58,54,'放着《F.U.N. Song》，针尖有点跳。','','toggle',
+          {on:'🎵 「F 是朋友，U 是你和我～」',off:'唱片停了。',fx:'music'}],
+        ['bed',326,200,'🛏','菠萝床',80,66,'圆圆的床，被子是菠萝格纹。'],
+        ['jar',150,280,'🫙','玻璃罐',52,48,'装着他抓到的第一只水母留下的气泡。','','collect',{egg:'e22_bubble'}],
+        ['toothbrush',238,280,'🪥','牙刷',52,48,'刷毛被压得平平的，据说一天用八次。'],
+        ['photo',326,280,'🖼️','水母照',58,52,'他笑得眼睛都没了。']
+      ]),
+      seats:SEAT([[930,390,'🛏','菠萝床边','坐在床沿，闹钟正好又响了一次。']]),
+      npcs:[],
+      portals:PT([[1090,330,'pineapple_main','🚪','← 客厅','door']]),
+      steam:false},
+
+    /* ============ 石头屋：沙地客厅 / 石头底下 ============ */
+    rock_main:{bid:'rock',title:'石头屋 · 沙地客厅',
+      intro:'一块大石头掀开就是家，电视开着，没人看。',
+      decor:[
+        {t:'tag',x:70,y:126,label:'🏖 沙地客厅'},{t:'tag',x:474,y:126,label:'🍬 零食角'},
+        {t:'tag',x:900,y:126,label:'🪨 翻石入口'},{t:'rug',x:170,y:450,w:300,h:170}
+      ],
+      objects:OB([
+        ['tv',150,200,'📺','石头电视',64,58,'屏幕只有雪花，派大星说「这集最好看」。','','toggle',
+          {on:'📺 雪花更亮了：「这集最好看！」',off:'电视关了，沙子静悄悄的。',fx:'tv'}],
+        ['chips',238,200,'🍬','糖罐',58,54,'装满了包装纸，糖早吃完了。','','rummage',
+          {title:'糖罐里',slots:[
+            {ic:'🍬',tx:'一堆包装纸',desc:'数了数，一共七张。'},
+            {ic:'🦷',tx:'一颗硬糖',desc:'黏在罐底，拿不下来。'},
+            {ic:'📄',tx:'罐底压着一张纸',desc:'好像还有夹层……',deep:true,egg:'e15_quiz'}]}],
+        ['phone',326,200,'📞','石头电话',58,54,'只有两个键：「喂」和「不喂」。'],
+        ['conch',150,280,'🐚','海螺',56,52,'凑近听，里面像有人打呼噜。','','spin',
+          {back:'螺口贴着标签：「派大星 · 打呼噜录音 · 第一版」。'}],
+        ['sandcastle',238,280,'🏰','沙堡',62,58,'歪歪扭扭，插着一根小旗。','','collect',{egg:'e23_flag'}],
+        ['shovel',326,280,'🥄','铲子',52,48,'派大星说这是「思考工具」。']
+      ]),
+      seats:SEAT([
+        [230,560,'🛋','沙沙发','你一坐下去就陷了半截，沙子从缝里漏出来。'],
+        [520,560,'🪑','零食凳','坐在零食角，顺手捏了捏最后一张包装纸。']
+      ]),
+      npcs:[{id:'patrick',x:600,y:330}],
+      portals:PT([[1090,330,'rock_under','🪨','↓ 石头底下','stair']]),
+      steam:false},
+
+    rock_under:{bid:'rock',title:'石头屋 · 石头底下',
+      intro:'石头底下才是真正的窝，沙冰箱、旧报纸和一盏埋在沙里的灯。',
+      decor:[
+        {t:'tag',x:70,y:126,label:'🪨 石头底下'},{t:'tag',x:474,y:126,label:'🧊 沙冰箱'},
+        {t:'tag',x:900,y:126,label:'💡 沙灯'},{t:'rug',x:170,y:450,w:300,h:170}
+      ],
+      objects:OB([
+        ['fridge',150,200,'🧊','沙冰箱',62,58,'其实是个装沙的木箱，冰着一瓶汽水。','','rummage',
+          {title:'沙冰箱里',slots:[
+            {ic:'🥤',tx:'一瓶汽水',desc:'冰得刚好。'},
+            {ic:'🏖️',tx:'半箱沙',desc:'不知道为什么也在里面。'},
+            {ic:'🍪',tx:'一块饼干',desc:'用纸包着，看起来很旧。'}]}],
+        ['rocktop',238,200,'🪨','石头顶',58,54,'从上面能看见整个康康路。','','spin',
+          {back:'石缝里塞着一张涂鸦，旁边两个歪扭的小人。',egg:'e16_doodle'}],
+        ['paper',326,200,'📰','旧报纸',54,50,'日期是三年前的，被拿来垫桌脚。'],
+        ['cookie',150,280,'🍪','饼干',52,48,'咬了一口就放在那儿，忘了。','','collect',{egg:'e24_cookie'}],
+        ['lamp',238,280,'💡','沙灯',52,48,'灯泡埋在沙里，光是暖的。','','toggle',
+          {on:'💡 沙灯亮了，石头底下暖乎乎的。',off:'沙灯灭了。',fx:'lamp'}],
+        ['star',326,280,'⭐','海星摆件',52,48,'和本人长得一模一样，只是小一点。']
+      ]),
+      seats:SEAT([[900,390,'🪨','石头边','坐在石头边上晃腿，派大星说这样最舒服。']]),
+      npcs:[],
+      portals:PT([[1090,330,'rock_main','🪨','↑ 翻回上面','stair']]),
+      steam:false},
+
+    /* ============ 圆顶树屋：实验室 / 气闸健身区 ============ */
+    treedome_main:{bid:'treedome',title:'圆顶树屋 · 实验室',
+      intro:'玻璃圆顶里是干燥的空气，仪器和橡果摆得整整齐齐。',
+      decor:[
+        {t:'shelf',x:120,y:250,w:220,h:22},{t:'rug',x:520,y:450,w:260,h:170},
+        {t:'tag',x:70,y:126,label:'🔬 显微镜'},{t:'tag',x:474,y:126,label:'📐 白板'},
+        {t:'tag',x:900,y:126,label:'🪖 头盔'}
+      ],
+      objects:OB([
+        ['scope',150,200,'🔬','显微镜',58,54,'载玻片上是一粒比奇堡的沙。','','spin',
+          {back:'旁边笔记写着：这里的沙「成分异常，疑似含大量欢乐」。',egg:'e17_sandnote'}],
+        ['board',238,200,'📐','科学白板',64,58,'画满公式，中间被擦出一小块空白。','空白处留了一行小字：科学也解释不了海绵宝宝为什么这么开心。','peek'],
+        ['helmet',326,200,'🪖','空气头盔',62,58,'面罩擦得一点水痕都没有。','','collect',{egg:'e25_helmet'}],
+        ['nutjar',150,280,'🫙','坚果罐',52,48,'标签写着「实验经费」。','','rummage',
+          {title:'坚果罐里',slots:[
+            {ic:'🌰',tx:'几颗橡果',desc:'贴着「德州特产，勿动」。'},
+            {ic:'🍪',tx:'一包零食',desc:'所谓「实验经费」。'},
+            {ic:'📝',tx:'压在底下的一张便签',desc:'「别告诉海绵宝宝我囤了零食」——珊迪。'}]}],
+        ['gauge',238,280,'🌡️','气压表',56,52,'指针稳稳停在「1 个大气压」。'],
+        ['robotarm',326,280,'🦾','机械臂',56,52,'末端夹着一颗螺丝，一动不动。','','toggle',
+          {on:'🦾 机械臂咔哒一声动了一下，又停住了。',off:'机械臂回到待机。',fx:'robot'}]
+      ]),
+      seats:SEAT([[230,560,'🪑','实验凳','你坐上实验凳，白板上的公式好像忽然亲切了些。']]),
+      npcs:[{id:'sandy',x:600,y:330}],
+      portals:PT([[1090,330,'treedome_airlock','🚪','→ 气闸 / 健身区','door']]),
+      steam:false},
+
+    treedome_airlock:{bid:'treedome',title:'圆顶树屋 · 气闸与健身区',
+      intro:'气闸旁边是杠铃和终端，空调把德州旗吹得轻轻晃。',
+      decor:[
+        {t:'tag',x:70,y:126,label:'🏋 杠铃'},{t:'tag',x:474,y:126,label:'💻 终端'},
+        {t:'tag',x:900,y:126,label:'🚩 德州旗'},{t:'rug',x:520,y:450,w:260,h:170}
+      ],
+      objects:OB([
+        ['barbell',150,200,'🏋️','杠铃',70,58,'两边各挂了三片，珊迪说这是热身。','','spin',
+          {back:'杠片背面写着「热身用 · 别加片了」。'}],
+        ['computer',238,200,'💻','终端',56,52,'屏幕上跑着一行看不懂的数据。','','rummage',
+          {title:'终端日志里',slots:[
+            {ic:'📊',tx:'气压曲线',desc:'平得像一条直线。'},
+            {ic:'🌡️',tx:'空气成分',desc:'干燥，含氧量正常。'},
+            {ic:'📝',tx:'最后一条日志',desc:'好像还有夹层……',deep:true,egg:'e18_log'}]}],
+        ['flag',326,200,'🚩','德州旗',58,52,'挂在圆顶内侧。','','toggle',
+          {on:'🚩 空调开大，旗子哗啦啦地飘。',off:'空调停了，旗子垂下来。',fx:'flag'}],
+        ['flower',150,280,'🌼','花',52,48,'圆顶里唯一一朵真花，被照顾得很好。'],
+        ['treestump',238,280,'🪵','树桩',58,54,'年轮上刻着「比奇堡 · 第二年」。'],
+        ['acorn',326,280,'🌰','橡果',52,48,'贴着「勿动」的标签。','','collect',{egg:'e26_acorn'}]
+      ]),
+      seats:SEAT([[560,560,'🪵','树桩凳','坐在树桩上，能闻到一点橡木味。']]),
+      npcs:[],
+      portals:PT([[1090,330,'treedome_main','🚪','← 实验室','door']]),
+      steam:false},
+
+    /* ============ 海之霸：点餐台 / 控制室 ============ */
+    chum_counter:{bid:'chum',title:'海之霸 · 点餐台',
+      intro:'一个客人也没有，凯伦在角落闪着绿光，海霸糊的桶还开着盖。',
+      decor:[
+        {t:'counter',x:60,y:300,w:400,h:56},{t:'shelf',x:880,y:250,w:220,h:22},
+        {t:'tag',x:70,y:126,label:'🍽 点餐台'},{t:'tag',x:474,y:126,label:'🥣 海霸糊桶'},
+        {t:'tag',x:900,y:126,label:'🖥 凯伦'}
+      ],
+      objects:OB([
+        ['karen',150,200,'🖥️','凯伦',68,58,'一台会翻白眼的电脑，痞老板唯一的下属兼妻子。','','toggle',
+          {on:'🖥️ 凯伦弹出一行：「计划失败次数累计 1,204 次。」',off:'凯伦把屏幕暗下去了。',fx:'karen',egg:'e19_fail'}],
+        ['chum',238,200,'🥣','海霸糊桶',64,58,'绿色的糊状物，盖子开着，味道很执着。','','rummage',
+          {title:'海霸糊桶里',slots:[
+            {ic:'🥣',tx:'绿色的糊',desc:'它轻微地动了一下。'},
+            {ic:'🥄',tx:'一把长勺',desc:'插在糊里，立得很稳。'},
+            {ic:'📝',tx:'桶壁贴着一张纸',desc:'只写了一个字：「呕」。'}]}],
+        ['register',326,200,'💵','收银机',58,54,'抽屉空着，蛛网从出钞口拉到按键。','','rummage',
+          {title:'收银机抽屉里',slots:[
+            {ic:'🕸️',tx:'一层蛛网',desc:'完好无损，看得出来很久没开过。'},
+            {ic:'🪙',tx:'一枚硬币',desc:'不知道是哪一年的顾客留下的。'}]}],
+        ['menu',150,280,'📋','菜单',58,52,'只有一道菜，价格被改了七次，越来越低。','最下面手写：「买一送一，送的也是海霸糊」。','peek'],
+        ['flyer',238,280,'📄','传单',56,52,'「海之霸，第二份半价」——没人领过。'],
+        ['stool',326,280,'🪑','吧台凳',52,48,'凳面积了薄薄一层灰。']
+      ]),
+      seats:SEAT([
+        [110,560,'🪑','空吧台凳','你坐上吧台凳，凯伦抬眼看了你一下，又低下去了。'],
+        [330,560,'🪑','靠墙长凳','长凳吱呀一声，痞老板从后厨探出头又缩回去。']
+      ]),
+      npcs:[{id:'plankton',x:600,y:330}],
+      portals:PT([[1090,330,'chum_lab','🚪','→ 后厨 / 控制室','door']]),
+      steam:false},
+
+    chum_lab:{bid:'chum',title:'海之霸 · 后厨与控制室',
+      intro:'墙上是第 1205 次「偷秘方计划图」，扫描仪对着蟹堡王的方向。',
+      decor:[
+        {t:'tag',x:70,y:126,label:'🔍 扫描仪'},{t:'tag',x:474,y:126,label:'🗺️ 计划图'},
+        {t:'tag',x:900,y:126,label:'🧪 试剂架'},{t:'shelf',x:880,y:250,w:220,h:22}
+      ],
+      objects:OB([
+        ['scanner',150,200,'🔍','秘方扫描仪',64,58,'对准蟹堡王方向的天线，从来没成功过。','','spin',
+          {back:'内部日志：目标距离 320 米，失败原因「海绵宝宝挡住了」。'}],
+        ['plan',238,200,'🗺️','偷秘方计划图',60,54,'画满箭头和叉，最新一张写着「第 1205 次」。','','rummage',
+          {title:'计划图里',slots:[
+            {ic:'➡️',tx:'一堆箭头',desc:'从海之霸指向蟹堡王，又被划掉。'},
+            {ic:'❌',tx:'密密麻麻的叉',desc:'每一张都写着「失败」。'},
+            {ic:'📄',tx:'最新一张的背面',desc:'好像还有夹层……',deep:true,egg:'e20_lonely'}]}],
+        ['jar',326,200,'🧪','试剂瓶',52,48,'标签写着「秘密武器」。','','collect',{egg:'e27_weapon'}],
+        ['bucket',150,280,'🪣','空桶',56,52,'今天一桶都没卖出去。'],
+        ['portrait',238,280,'🖼️','全家福',58,52,'痞老板、凯伦，还有一台更小的电脑。'],
+        ['mop',326,280,'🧹','拖把',52,48,'痞老板拖地时得扛着比自己高两倍的东西。']
+      ]),
+      seats:SEAT([[900,390,'🪑','控制台椅','坐在凯伦旁边，屏幕弹出：「检测到一位顾客（异常）」。']]),
+      npcs:[],
+      portals:PT([[1090,330,'chum_counter','🚪','← 点餐台','door']]),
+      steam:false}
+  };
+
+  /* ============ 橙光式分支对话数据 ============ */
+  // 节点 {t:台词, o:[{t:选项,to:下一节点,fx:后果}]}；o 为空 = 结束
+  var DIALOGS={
+    gary:{name:'小蜗',emoji:'蜗',color:'#CAA86A',
+      nodes:{
+        start:{t:'（小蜗慢吞吞地转过头，壳上的彩虹贴纸闪了一下。）……喵。',o:[
+          {t:'摸摸它的壳',to:'pet'},
+          {t:'问它会不会说话',to:'talk'},
+          {t:'给它一片生菜',to:'feed'},
+          {t:'（悄悄走开）',to:'bye'}]},
+        pet:{t:'它把头缩了一下，又慢慢伸出来。看起来不讨厌。',o:[
+          {t:'再摸一下',to:'pet2'},{t:'好啦，不打扰了',to:'bye'}]},
+        pet2:{t:'「喵。」……它好像笑了一下。',o:[{t:'结束',to:'bye'}]},
+        talk:{t:'「……」它用这辈子最慢的速度眨了一次眼。',o:[
+          {t:'你刚才是不是说了「喵」？',to:'meow'},{t:'算了',to:'bye'}]},
+        meow:{t:'「喵。」然后它装作什么都没发生，继续啃墙皮。',o:[
+          {t:'（果然是小蜗）',to:'bye',fx:'gary_meow'}]},
+        feed:{t:'它用整整十秒爬到生菜旁，然后非常认真地咬了一小口。',o:[{t:'结束',to:'bye'}]},
+        bye:{t:'（小蜗继续慢慢爬，仿佛你从没来过。）',o:[]}
+      }},
+    squid:{name:'章鱼哥',emoji:'🐙',color:'#9b7bd6',
+      nodes:{
+        start:{t:'……排好队，取号，结账，别跟我搭话。',o:[
+          {t:'你今天心情不错吧？',to:'mood'},
+          {t:'能吹一段竖笛吗？',to:'clarinet'},
+          {t:'蟹黄堡为什么这么好吃？',to:'secret'},
+          {t:'（安静地走开）',to:'bye'}]},
+        start2:{t:'……又是你。上次那声「鼓掌」，我到现在还记着。',o:[
+          {t:'再来一段？',to:'clarinet'},
+          {t:'我只是来吃饭的',to:'bye'}]},
+        mood:{t:'「心情不错」？我数着秒针等下班，这叫不错？',o:[
+          {t:'那下班之后做什么？',to:'after'},
+          {t:'……打扰了',to:'bye'}]},
+        after:{t:'回家，关门，画画。没有人，没有蟹黄堡，也没有「嗨章鱼哥」。',o:[
+          {t:'听起来其实挺好',to:'bye',fx:'like'}]},
+        clarinet:{t:'（他缓缓举起竖笛）……你确定要听？这可不是随便给谁演的。',o:[
+          {t:'确定！',to:'play'},
+          {t:'算了算了',to:'bye'}]},
+        play:{t:'🎵……噗——呲！……「这就是艺术，不懂别问。」',o:[
+          {t:'（用力鼓掌）',to:'bye',fx:'clarinet'},
+          {t:'（小声）挺有……特色的',to:'bye'}]},
+        secret:{t:'秘方？我既不知道，也不想知道。我只知道收银机几点会响。',o:[
+          {t:'那去问蟹老板',to:'bye'},
+          {t:'听说保险柜里有线索？',to:'safe',fx:'clue'}]},
+        safe:{t:'（他终于抬了下眼）……办公室那个铁柜？别让我看见你碰它。',o:[
+          {t:'懂了，我只是好奇',to:'bye'}]},
+        bye:{t:'（他转回去，继续盯着门口，像在等一个永远不会来的安静。）',o:[]}
+      }},
+    sponge:{name:'海绵宝宝',emoji:'🧽',color:'#FFD23F',
+      nodes:{
+        start:{t:'嗨——！！欢迎欢迎！今天也要超级开心哦！🎵',o:[
+          {t:'你在做什么呀？',to:'work'},
+          {t:'教我哼你那首歌吧',to:'song'},
+          {t:'小蜗呢？',to:'gary'},
+          {t:'（先忙）',to:'bye'}]},
+        work:{t:'我在煎蟹黄堡！每一片肉饼都要翻得刚刚好，哼哼哼~ 🎵',o:[
+          {t:'秘方到底是什么？',to:'secret'},
+          {t:'加油！',to:'bye',fx:'like'}]},
+        secret:{t:'秘——方——？！（他突然立正）「我准备好了！」……啊，我是说，那是蟹老板的秘密！',o:[
+          {t:'连你也不知道？',to:'bye'},
+          {t:'那酱料瓶呢？',to:'sauce',fx:'clue'}]},
+        sauce:{t:'酱料瓶？「别让痞老板看见」——这可是我每天都要检查的头等大事！',o:[
+          {t:'放心，我不说',to:'bye'}]},
+        song:{t:'好呀！跟我唱：「F 是朋友，U 是你和我，N 是……」啊我忘词了！',o:[
+          {t:'哈哈哈没关系',to:'bye',fx:'like'},
+          {t:'再想一下？',to:'song2'}]},
+        song2:{t:'想起来啦！「N 是任何时候、任何地方，都要一起玩！」🎵',o:[
+          {t:'（跟着哼）',to:'bye',fx:'song'}]},
+        gary:{t:'小蜗在家慢慢啃墙皮呢～它是全世界最有耐心的室友。',o:[
+          {t:'它会不会说话？',to:'gary2'}]},
+        gary2:{t:'「喵。」……咦？你听见了？肯定是你听错啦！',o:[
+          {t:'（点点头，不追问）',to:'bye',fx:'egg'}]},
+        bye:{t:'下次见！记得要保持开心哦——！！',o:[]}
+      }},
+    krabs:{name:'蟹老板',emoji:'🦀',color:'#E74C3C',
+      nodes:{
+        start:{t:'欢迎光临！……带钱了吗？没带钱也可以进来看看菜单嘛。',o:[
+          {t:'生意怎么样？',to:'money'},
+          {t:'蟹黄堡怎么卖这么贵？',to:'price'},
+          {t:'海之霸最近怎么样？',to:'chum'},
+          {t:'（点点头）',to:'bye'}]},
+        money:{t:'「怎么样」？！每一分钱都是我辛辛苦苦、一个一个铜板攒出来的！',o:[
+          {t:'那账本给我看一眼？',to:'ledger',fx:'clue'},
+          {t:'佩服佩服',to:'bye',fx:'like'}]},
+        ledger:{t:'（他立刻把账本按住）看可以，别翻到最后一页。……那页没什么。',o:[
+          {t:'（识趣地合上）',to:'bye'}]},
+        price:{t:'贵？！这叫「品质」！面包、生菜、芝士、肉饼，还有那一勺——咳，总之值！',o:[
+          {t:'那一勺是什么？',to:'secret'},
+          {t:'好吧，来一份',to:'bye'}]},
+        secret:{t:'「那一勺」是……是……（他警觉地压低声音）是商业秘密！问这么多，要不要入股啊你？',o:[
+          {t:'我先去取号',to:'bye'}]},
+        chum:{t:'海之霸？哼，痞老板那小不点儿……（忽然小声）他今天也没客人吧。',o:[
+          {t:'你其实有点担心他？',to:'chum2',fx:'egg'}]},
+        chum2:{t:'……胡说！我只是怕他饿死了就没人衬托我的蟹黄堡有多好吃！……别到处说啊！',o:[
+          {t:'（保证不说）',to:'bye'}]},
+        bye:{t:'慢走！下次带朋友来，两个人也算两份钱！',o:[]}
+      }},
+    patrick:{name:'派大星',emoji:'⭐',color:'#FF8FB1',
+      nodes:{
+        start:{t:'嗨。 ……我们刚才是不是在聊什么？',o:[
+          {t:'你在干嘛呢？',to:'nothing'},
+          {t:'要不要一起发呆？',to:'stare'},
+          {t:'石头底下有什么？',to:'under'}]},
+        nothing:{t:'什么都没干。而且我干得可好了，已经干了一上午了。',o:[
+          {t:'厉害',to:'bye',fx:'like'}]},
+        stare:{t:'好呀！（两个人并排坐着，什么也没说，过了很久）……这真是最好的一天。',o:[
+          {t:'（继续发呆）',to:'bye',fx:'egg'}]},
+        under:{t:'石头底下？是我的床、我的电视，还有我藏起来的糖。',o:[
+          {t:'糖还能吃吗？',to:'candy'}]},
+        candy:{t:'不知道，我忘了是哪一年藏的。要不要一起尝尝？',o:[
+          {t:'……还是不了',to:'bye'}]},
+        bye:{t:'下次还来啊。我大概还在这儿。',o:[]}
+      }},
+    sandy:{name:'珊迪',emoji:'🐿️',color:'#7fd1a6',
+      nodes:{
+        start:{t:'嘿，伙计！要不要看看我最新的德州发明？',o:[
+          {t:'你在研究什么？',to:'sci'},
+          {t:'这里为什么有空气？',to:'air'},
+          {t:'来比试一下？',to:'sport'}]},
+        sci:{t:'我在分析比奇堡的沙子！成分完全不合理——里面居然有大量「欢乐」的残留。',o:[
+          {t:'结论呢？',to:'sci2',fx:'clue'}]},
+        sci2:{t:'结论是：科学解释不了海绵宝宝。这大概是本世纪最伟大的发现。',o:[
+          {t:'（鼓掌）',to:'bye',fx:'like'}]},
+        air:{t:'圆顶里灌的是干燥空气，我得戴着头盔才能出去。你们鱼可真省事。',o:[
+          {t:'头盔借我戴戴？',to:'helmet'}]},
+        helmet:{t:'你戴上会像个会走路的玻璃罐……不过挺可爱的，拿去吧！',o:[
+          {t:'谢啦！',to:'bye',fx:'egg'}]},
+        sport:{t:'空手道？举重？还是「谁先笑谁输」？（我已经输了三次）',o:[
+          {t:'举重！',to:'bye',fx:'like'}]},
+        bye:{t:'随时来！圆顶里永远给你留一口气！',o:[]}
+      }},
+    plankton:{name:'痞老板',emoji:'🦠',color:'#9fd14a',
+      nodes:{
+        start:{t:'欢迎来到海之霸！……等等，你真的是来吃饭的？',o:[
+          {t:'先来一份海霸糊',to:'order'},
+          {t:'你又在打蟹黄堡的主意？',to:'plan'},
+          {t:'凯伦，你怎么看？',to:'karen'}]},
+        order:{t:'（他愣了三秒）……凯伦，记下来！我们今天有——有客人了！！',o:[
+          {t:'（坐下等待）',to:'bye',fx:'egg'}]},
+        plan:{t:'「打主意」？不不不，是「学术交流」！第 1205 次学术交流！',o:[
+          {t:'前 1204 次呢？',to:'fail'}]},
+        fail:{t:'……都怪海绵宝宝挡着。每次都挡着。他怎么就那么开心。',o:[
+          {t:'也许可以换个思路',to:'bye',fx:'like'}]},
+        karen:{t:'凯伦：『根据记录，他失败 1,204 次，成功率 0.00%。建议改行。』',o:[
+          {t:'（憋笑）',to:'bye',fx:'egg'}]},
+        bye:{t:'下次一定！……下次我一定能拿到秘方！凯伦，把灯关了吧。',o:[]}
+      }},
+    resident:{name:'比奇堡居民',emoji:'🐠',color:'#6fc4d8',
+      nodes:{
+        start:{t:'嗨！今天海底真舒服，你也是出来溜达的？',o:[
+          {t:'是啊，随便逛逛',to:'walk'},
+          {t:'这附近有什么好玩的？',to:'tips'}]},
+        walk:{t:'我每天都沿这条小路走一圈。凤梨屋那边最热闹，海之霸那边最安静。',o:[
+          {t:'谢谢！',to:'bye'}]},
+        tips:{t:'去蟹堡王取个号呗！还有——记得跟章鱼哥说句话，他其实没那么凶。',o:[
+          {t:'（记下了）',to:'bye',fx:'clue'}]},
+        bye:{t:'回头见！',o:[]}
+      }}
+  };
+  var FX={
+    gary_meow:function(){collectEgg('e13_gary');toast('小蜗开口了！彩蛋已记入藏品册');},
+    like:function(){toast('💛 对方好像对你亲近了一点');},
+    clue:function(){toast('🔎 记下一条线索：也许该去看看那个物件');},
+    egg:function(){toast('🎊 彩蛋：这句台词只有选对才听得到');},
+    clarinet:function(){flags.squid_clarinet=true;toast('🎷 章鱼哥记住了你的掌声');},
+    song:function(){flags.sponge_song=true;toast('🎵 你学会了那首歌的半句');}
+  };
+  var flags={};
+
+  /* ============ NPC 作息：上班在岗 → 只在室内出现 ============ */
+  // where:'indoor' 时世界层隐藏，只在该房间的岗位出现；'world' 时街上可见
+  var schedule={
+    sponge:{emoji:'🧽',name:'海绵宝宝',color:'#FFD23F',
+      day:{where:'indoor',room:'krusty',x:1655,y:700,line:'（后厨）我正在炸蟹黄堡，哼哼哼~ 🎵'},
+      evening:{where:'indoor',room:'pineapple',x:352,y:700,line:'（在家）终于下班啦，和小蜗玩会儿！'},
+      night:{where:'indoor',room:'pineapple',x:352,y:700,line:'（在家）Zzz…'}},
+    squid:{emoji:'🐙',name:'章鱼哥',color:'#9b7bd6',
+      day:{where:'indoor',room:'krusty',x:1470,y:660,line:'（收银台）又是一天枯燥的收银…别烦我。'},
+      evening:{where:'indoor',room:'moai',x:188,y:690,line:'（在家）终于能画会儿画了。'},
+      night:{where:'indoor',room:'moai',x:188,y:690,line:'（在家）安静的夜晚，真好。'}},
+    krabs:{emoji:'🦀',name:'蟹老板',color:'#E74C3C',
+      day:{where:'indoor',room:'krusty',x:1730,y:660,line:'（柜台）钱钱钱！今天营业额达标没？'},
+      evening:{where:'indoor',room:'krusty',x:1730,y:660,line:'（柜台）还没关门，继续赚钱！'},
+      night:{where:'world',x:2050,y:600,line:'（船锚屋）和珍珍在家数钱。'}},
+    patrick:{emoji:'⭐',name:'派大星',color:'#FF8FB1',
+      day:{where:'world',x:560,y:780,line:'（闲逛）嗨！要一起发呆吗？'},
+      evening:{where:'indoor',room:'rock',x:512,y:800,line:'（在家）石头底下最舒服。'},
+      night:{where:'indoor',room:'rock',x:512,y:800,line:'（在家）Zzz…'}},
+    sandy:{emoji:'🐿️',name:'珊迪',color:'#7fd1a6',
+      day:{where:'indoor',room:'treedome',x:665,y:630,line:'（树屋）我在做德州科学实验！'},
+      evening:{where:'indoor',room:'treedome',x:665,y:630,line:'（树屋）实验还在进行。'},
+      night:{where:'indoor',room:'treedome',x:665,y:630,line:'（树屋）看星星。'}},
+    plankton:{emoji:'🦠',name:'痞老板',color:'#9fd14a',
+      day:{where:'indoor',room:'chum',x:1925,y:710,line:'（海之霸）总有一天我要偷到秘方！'},
+      evening:{where:'indoor',room:'chum',x:1925,y:710,line:'（海之霸）凯伦，计划通了吗？'},
+      night:{where:'indoor',room:'chum',x:1925,y:710,line:'（海之霸）Zzz…'}}
+  };
+  var periods=['day','evening','night'];
+  var periodLabels={day:'白天',evening:'傍晚',night:'夜晚'};
+  var curPeriod='day';
+  var npcEls={};
+  Object.keys(schedule).forEach(function(id){
+    var s=schedule[id],el=document.createElement('div');el.className='actor';
+    el.innerHTML='<div class="disc" style="background:'+s.color+'">'+s.emoji+'</div>'+
+      '<div class="nm">'+s.name+'</div><div class="bub"></div>';
+    world.appendChild(el);npcEls[id]=el;placeNPC(id,curPeriod,true);
+  });
+  function placeNPC(id,period,instant){
+    var t=schedule[id][period],el=npcEls[id];
+    el.style.transition=instant?'none':'left 1.4s linear, top 1.4s linear';
+    el.style.left=t.x+'px';el.style.top=t.y+'px';
+    // ★ 在岗 NPC 不再站在蟹堡王外面：世界层隐藏，只进对应房间
+    el.style.display=(t.where==='indoor')?'none':'block';
+    el._x=t.x;el._y=t.y;el._line=t.line;el._where=t.where;
+  }
+  function advanceTime(){
+    curPeriod=periods[(periods.indexOf(curPeriod)+1)%periods.length];
+    clockEl.textContent=periodLabels[curPeriod];
+    Object.keys(schedule).forEach(function(id){placeNPC(id,curPeriod,false);});
+    if(inInterior)renderNPCs(curRoom);
+    checkNearby();
+    toast('⏩ 现在是'+periodLabels[curPeriod]+'，居民们按作息换了位置');
+  }
+  document.getElementById('timeBtn').onclick=advanceTime;
+  // 派大星白天闲逛
+  setInterval(function(){
+    if(curPeriod!=='day')return;
+    var nx=400+Math.random()*1300,ny=720+Math.random()*140,el=npcEls.patrick;
+    el.style.transition='left 2s linear, top 2s linear';
+    el.style.left=nx+'px';el.style.top=ny+'px';el._x=nx;el._y=ny;
+  },3500);
+
+  /* ============ bot 居民：填充街道人气 ============ */
+  var BOT_DEF=[
+    ['泡泡鱼','🐠','#7fd1d8'],['条纹鱼','🐟','#f0a45c'],['小丑鱼','🐡','#ff8f6b'],
+    ['比目鱼','🐟','#a8c46a'],['石头鱼','🐠','#b39ad8'],['海胆先生','🦔','#8fb0c4']
+  ];
+  var bots=[];
+  BOT_DEF.forEach(function(d,i){
+    var el=document.createElement('div');el.className='actor bot';
+    el.innerHTML='<div class="disc" style="background:'+d[2]+'">'+d[1]+'</div>'+
+      '<div class="nm">'+d[0]+'</div><div class="bub"></div>';
+    var x=360+Math.random()*1500,y=740+Math.random()*220;
+    el.style.left=x+'px';el.style.top=y+'px';
+    world.appendChild(el);
+    bots.push({el:el,x:x,y:y,name:d[0]});
+  });
+  setInterval(function(){
+    if(curPeriod==='night')return;
+    bots.forEach(function(b){
+      b.x=340+Math.random()*1600;b.y=720+Math.random()*260;
+      b.el.style.transition='left 3s linear, top 3s linear';
+      b.el.style.left=b.x+'px';b.el.style.top=b.y+'px';
+    });
+  },3200);
+  function botNear(){ // 返回离玩家最近的 bot
+    var best=null,bd=130;
+    bots.forEach(function(b){
+      var d=Math.hypot(P.x-b.x,P.y-b.y);
+      if(d<bd){bd=d;best=b;}
+    });
+    return best;
+  }
+
+  /* ============ 输入 ============ */
+  var keys={};
+  var keyMap={w:[0,-1],s:[0,1],a:[-1,0],d:[1,0],
+    arrowup:[0,-1],arrowdown:[0,1],arrowleft:[-1,0],arrowright:[1,0]};
+  window.addEventListener('keydown',function(e){
+    var k=e.key.toLowerCase();
+    if(MG.resultOpen){if(k==='escape')exitMini();return;}
+    if(MG.active){
+      if(k==='escape'){exitMini();return;}
+      if(MG.id==='bubble'&&k===' '){blowStart();return;}
+      if(MG.id==='karate'&&KDIR[k]){karateHit(KDIR[k]);return;}
+      return;                                  // 玩法中不响应移动 / 进屋 / 对话
+    }
+    if(colOpen){if(k==='escape'||k==='e')closeCollection();return;}
+    if(rummageOpen){if(k==='escape'||k==='e')closeRummage();return;}
+    if(spinOpen){
+      if(k==='escape'||k==='e'){closeSpin();return;}
+      if(k==='arrowleft'||k==='a'||k==='arrowright'||k==='d'||k===' '){flipSpin();return;}
+      return;
+    }
+    if(dlgOpen){
+      if(k==='escape'||k==='e'){closeDialog();return;}
+      var n=parseInt(k,10);
+      if(n>=1&&n<=9){chooseOpt(n-1);return;}
+      return;
+    }
+    if(focusOpen){
+      if(k==='e'||k==='escape'){closeFocus();return;}
+      if(keyMap[k]){rotateBy(keyMap[k]);return;}
+    }
+    if(keyMap[k]) keys[k]=true;
+    if(k==='e'){
+      if(objTipOpen){closeObjTip();return;}
+      if(inInterior)interiorInteract();else tryInteract();
+    }
+    if(k==='escape'){
+      if(objTipOpen)closeObjTip();else if(photoOpen)closePhoto();else if(inInterior)exitInterior();
+    }
+  });
+  window.addEventListener('keyup',function(e){var k=e.key.toLowerCase();if(keyMap[k])keys[k]=false;if(k===' '&&MG.id==='bubble'&&MG.active)blowRelease();});
+
+  var dpad=document.getElementById('dpad'),stick=document.getElementById('stick');
+  if('ontouchstart' in window) dpad.style.display='block';
+  var drag=false;
+  function dpadMove(e){
+    if(!drag)return;var t=e.touches?e.touches[0]:e;
+    var r=dpad.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
+    var dx=t.clientX-cx,dy=t.clientY-cy,max=42,dist=Math.hypot(dx,dy);
+    if(dist>max){dx=dx/dist*max;dy=dy/dist*max;}
+    stick.style.transform='translate(calc(-50% + '+dx+'px), calc(-50% + '+dy+'px))';
+    keys['__jx']=dx/max;keys['__jy']=dy/max;
+  }
+  dpad.addEventListener('touchstart',function(e){drag=true;dpadMove(e);});
+  dpad.addEventListener('touchmove',dpadMove);
+  dpad.addEventListener('touchend',function(){drag=false;stick.style.transform='translate(-50%,-50%)';keys['__jx']=0;keys['__jy']=0;});
+
+  function blocked(x,y){
+    for(var i=0;i<buildings.length;i++){var b=buildings[i];
+      if(x>b.x-20&&x<b.x+b.w+20&&y>b.y-10&&y<b.y+b.h+30)return true;}
+    return false;
+  }
+  var nearBuilding=null,nearNPC=null,nearBot=null,nearGary=false,nearSpot=null;
+  function tryInteract(){
+    if(MG.active||MG.resultOpen)return;              // 小玩法进行 / 结算中，先收工
+    if(nearBuilding){enterRoom(nearBuilding.id);return;}
+    if(nearGary){openDialog('gary');return;}
+    if(nearSpot){startMini(nearSpot.id);return;}
+    if(nearNPC){openDialog(nearNPC);return;}
+    if(nearBot){openDialog('resident');return;}
+  }
+  function checkNearby(){
+    if(MG.active||MG.resultOpen){promptEl.style.display='none';return;}
+    nearBuilding=null;nearNPC=null;nearBot=null;nearGary=false;nearSpot=null;
+    for(var i=0;i<buildings.length;i++){var b=buildings[i];
+      if(Math.abs(P.x-b.doorX)<70&&Math.abs(P.y-b.doorY)<80){nearBuilding=b;break;}}
+    if(!nearBuilding){
+      var gEl=document.getElementById('garyWorld');
+      if(gEl&&Math.hypot(P.x-300,P.y-950)<120){
+        nearGary=true;gEl.querySelector('.bub').textContent='……喵。（点我 / 按 E）';
+        gEl.classList.add('show');clearTimeout(gEl._gt);
+        gEl._gt=setTimeout(function(){gEl.classList.remove('show');},2600);
+      }
+      if(!nearGary)Object.keys(npcEls).forEach(function(id){var el=npcEls[id];
+        if(el.style.display==='none')return; // 在岗 NPC 不在街上
+        if(Math.abs(P.x-el._x)<110&&Math.abs(P.y-el._y)<110){nearNPC=id;
+          el.querySelector('.bub').textContent=el._line;el.classList.add('show');
+          clearTimeout(el._ht);el._ht=setTimeout(function(){el.classList.remove('show');},2500);}});
+      PLAYSPOTS.forEach(function(sp){
+        var on=!nearBuilding&&!nearGary&&!nearNPC&&Math.hypot(P.x-sp.x,P.y-sp.y)<sp.r;
+        sp.el.classList.toggle('near',on);
+        if(on&&!nearSpot)nearSpot=sp;
+      });
+      if(!nearGary&&!nearNPC&&!nearSpot)nearBot=botNear();
+    }
+    if(nearBuilding){promptEl.style.display='block';promptEl.innerHTML='按 <b>E</b> 进入 '+nearBuilding.name;}
+    else if(nearGary){promptEl.style.display='block';promptEl.innerHTML='按 <b>E</b> 和 小蜗 打个招呼（或直接点它）';}
+    else if(nearSpot){promptEl.style.display='block';promptEl.innerHTML='按 <b>E</b> 开始「'+nearSpot.name+'」小玩法（或直接点击场地）';}
+    else if(nearNPC){promptEl.style.display='block';promptEl.innerHTML='按 <b>E</b> 和 '+schedule[nearNPC].name+' 聊聊';}
+    else if(nearBot){promptEl.style.display='block';promptEl.innerHTML='按 <b>E</b> 和 '+nearBot.name+' 打招呼';}
+    else promptEl.style.display='none';
+  }
+  function updateWorld(){
+    if(focusOpen||objTipOpen||dlgOpen||rummageOpen||spinOpen||colOpen)return;
+    var mx=0,my=0;
+    for(var k in keyMap){if(keys[k]){mx+=keyMap[k][0];my+=keyMap[k][1];}}
+    if(keys['__jx']){mx+=keys['__jx'];my+=keys['__jy'];}
+    if((mx||my)&&!(MG.active||MG.resultOpen)){
+      var len=Math.hypot(mx,my)||1;mx/=len;my/=len;
+      var nx=P.x+mx*P.spd,ny=P.y+my*P.spd;
+      if(!blocked(nx,P.y))P.x=nx;
+      if(!blocked(P.x,ny))P.y=ny;
+      P.x=Math.max(20,Math.min(WORLD_W-20,P.x));
+      P.y=Math.max(460,Math.min(WORLD_H-20,P.y));
+    }
+    player.style.left=P.x+'px';player.style.top=P.y+'px';
+    var vw=viewport.clientWidth,vh=viewport.clientHeight;
+    world.style.transform='translate('+(-Math.max(0,Math.min(WORLD_W-vw,P.x-vw/2)))+'px,'+
+      (-Math.max(0,Math.min(WORLD_H-vh,P.y-vh/2)))+'px)';
+    coordEl.textContent=Math.round(P.x)+','+Math.round(P.y);
+    checkNearby();
+  }
+
+  /* ============ 室内：通用房间渲染器 ============ */
+  var interior=document.getElementById('interior');
+  var roomEl=document.getElementById('room');
+  var roomDecor=document.getElementById('roomDecor');
+  var roomFx=document.getElementById('roomFx');
+  var roomNpcs=document.getElementById('roomNpcs');
+  var objLayer=document.getElementById('objLayer');
+  var seatLayer=document.getElementById('seatLayer');
+  var ipEl=document.getElementById('iplayer');
+  var questHud=document.getElementById('questHud');
+  var inInterior=false,curRoom='krusty_hall',curBid=null,seated=false,seatId=null;
+  var exitDoorEl=document.getElementById('exitDoor');
+  var EXIT_HOT={x:1086,y:651};
+  var exitHintShown=false;
+  var IP={x:600,y:690};
+  var OBJECTS=[],objEls={},seatEls={},curNpcs=[];
+
+  function renderDecor(list){
+    roomDecor.innerHTML='';
+    list.forEach(function(d){
+      var el=document.createElement('div');
+      if(d.t==='tag'){el.className='zoneTag';el.textContent=d.label;}
+      else if(d.t==='counter'){el.className='counterBar';}
+      else if(d.t==='arch'){el.className='archDoor';el.innerHTML='<span>'+(d.label||'')+'</span>';}
+      else if(d.t==='table'){el.className='table';}
+      else if(d.t==='rug'){el.className='rug';}
+      else if(d.t==='shelf'){el.className='shelf';}
+      el.style.left=d.x+'px';el.style.top=d.y+'px';
+      if(d.w)el.style.width=d.w+'px';
+      if(d.h)el.style.height=d.h+'px';
+      roomDecor.appendChild(el);
+    });
+  }
+  function renderFx(opts){
+    roomFx.innerHTML='';
+    for(var i=0;i<7;i++){(function(i){
+      var b=document.createElement('div');b.className='amb-bub';
+      var sz=8+Math.random()*16;
+      b.style.width=sz+'px';b.style.height=sz+'px';
+      b.style.left=(110+Math.random()*980)+'px';
+      b.style.top=(500+Math.random()*200)+'px';
+      b.style.animationDuration=(5+Math.random()*5)+'s';
+      b.style.animationDelay=(Math.random()*6)+'s';
+      roomFx.appendChild(b);
+    })(i);}
+    if(opts.steam){for(var j=0;j<3;j++){(function(j){
+      var st=document.createElement('div');st.className='steam';st.textContent='💨';
+      st.style.left=(166+j*24)+'px';st.style.top='186px';
+      st.style.animationDelay=(j*1.05)+'s';roomFx.appendChild(st);
+    })(j);}}
+  }
+  function renderObjects(list){
+    OBJECTS=list;objEls={};objLayer.innerHTML='';
+    list.forEach(function(o){
+      var el=document.createElement('div');
+      el.className='obj'+(o.kind&&o.kind!=='peek'?' kind-'+o.kind:'')+
+        (toggleState[o.id]?' on':'')+(toggleState['taken_'+o.id]?' taken':'');
+      el.style.left=o.x+'px';el.style.top=o.y+'px';
+      el.style.width=(o.w||56)+'px';el.style.height=(o.h||52)+'px';
+      el.innerHTML='<div class="ic">'+o.ic+'</div><div class="tx">'+o.tx+'</div>';
+      el.onclick=function(){onObject(o.id);};
+      objLayer.appendChild(el);objEls[o.id]=el;
+    });
+  }
+  function renderSeats(list){
+    seatEls={};seatLayer.innerHTML='';
+    list.forEach(function(s){
+      var el=document.createElement('div');el.className='seat';el.textContent=s.ic;
+      el.style.left=s.x+'px';el.style.top=s.y+'px';
+      el.onclick=function(){ if(seated&&seatId===s.id)standUp();else sitDown(s.id); };
+      seatLayer.appendChild(el);seatEls[s.id]=el;
+    });
+  }
+  function renderNPCs(roomId){
+    roomNpcs.innerHTML='';curNpcs=[];
+    var defs=ROOMS[roomId].npcs||[];
+    defs.forEach(function(n){
+      var t=schedule[n.id]&&schedule[n.id][curPeriod];
+      // 只有「此时段在这间房上班/在家」的 NPC 才出现
+      if(!t||t.where!=='indoor'||t.room!==ROOMS[roomId].bid)return;
+      var d=DIALOGS[n.id],s=schedule[n.id];
+      var el=document.createElement('div');el.className='actor';
+      el.innerHTML='<div class="disc" style="background:'+s.color+'">'+s.emoji+'</div>'+
+        '<div class="nm">'+s.name+'</div><div class="bub"></div>';
+      el.style.left=n.x+'px';el.style.top=n.y+'px';
+      roomNpcs.appendChild(el);
+      curNpcs.push({id:n.id,el:el,x:n.x,y:n.y,line:t.line});
+    });
+  }
+  function npcSay(id,line){
+    var n=null;curNpcs.forEach(function(x){if(x.id===id)n=x;});
+    if(!n)return;
+    n.el.querySelector('.bub').textContent=line;n.el.classList.add('show');
+    clearTimeout(n.el._t);n.el._t=setTimeout(function(){n.el.classList.remove('show');},3800);
+  }
+  function fitInterior(){
+    var vw=viewport.clientWidth,vh=viewport.clientHeight;
+    var s=Math.min(1,(vw-24)/1200,(vh-70)/760);
+    roomEl.style.transform='translate(-50%,-50%) scale('+s+')';
+  }
+  var portalLayer=document.getElementById('portalLayer');
+  function renderPortals(R){
+    portalLayer.innerHTML='';PORTALS=(R.portals||[]).slice();
+    PORTALS.forEach(function(p,i){
+      p.id='portal'+i;
+      var el=document.createElement('div');
+      el.className='portal '+(p.kind==='stair'?'stair':'door');
+      el.style.left=p.x+'px';el.style.top=p.y+'px';
+      el.innerHTML='<div class="pIc">'+p.ic+'</div><div class="pTx">'+p.tx+'</div>';
+      el.onclick=function(){switchRoom(p.to);};
+      portalLayer.appendChild(el);p.el=el;
+    });
+  }
+  function renderRoomNav(){
+    var nav=document.getElementById('roomNav'),g=GRAPH[curBid];
+    if(!g){nav.innerHTML='';return;}
+    var h='<span class="navLabel">'+g.name+' ›</span>';
+    g.rooms.forEach(function(k){
+      var R=ROOMS[k],nm=(R.title.split(' · ')[1]||R.title).replace(/（[^）]*）/g,'');
+      h+='<button class="navChip'+(k===curRoom?' on':'')+'" data-to="'+k+'">'+nm+'</button>';
+    });
+    nav.innerHTML=h;
+    [].forEach.call(nav.querySelectorAll('.navChip'),function(b){
+      b.onclick=function(){var to=b.getAttribute('data-to');if(to!==curRoom)switchRoom(to);};
+    });
+  }
+  /* 场景内门/楼梯：切换子房间（保留点餐进度） */
+  function switchRoom(to){
+    if(!ROOMS[to]||!inInterior)return;
+    closeDialog();closeObjTip();closeRummage();closeSpin();closeCollection();closeFocus();
+    loadRoom(to,false);
+    toast('🚪 '+ROOMS[to].title);
+  }
+  function loadRoom(key,fromWorld){
+    var R=ROOMS[key];if(!R)return;
+    curRoom=key;inInterior=true;seated=false;seatId=null;
+    if(typeof clearJellies==='function')clearJellies();
+    if(typeof MG!=='undefined'&&MG&&(MG.active||MG.resultOpen))exitMini(true);
+    document.body.classList.add('in-room');
+    ipEl.classList.remove('sitting');
+    IP.x=600;IP.y=690;ipEl.style.left=IP.x+'px';ipEl.style.top=IP.y+'px';
+    var th=THEME[R.bid]||THEME.krusty;
+    roomEl.style.setProperty('--w1',th.w1);roomEl.style.setProperty('--w2',th.w2);
+    roomEl.style.setProperty('--f1',th.f1);roomEl.style.setProperty('--f2',th.f2);
+    document.getElementById('roomTitle').textContent=R.title;
+    renderDecor(R.decor);renderFx(R);renderObjects(R.objects);renderSeats(R.seats);
+    renderPortals(R);renderNPCs(key);renderRoomNav();
+    fitInterior();interior.style.display='block';
+    roomEl.classList.remove('roomIn');void roomEl.offsetWidth;roomEl.classList.add('roomIn');
+    var inHall=(key==='krusty_hall');
+    questHud.style.display=inHall?'block':'none';
+    document.getElementById('ticketNr').style.display=inHall?'block':'none';
+    document.getElementById('photoSpot').style.display=inHall?'flex':'none';
+    document.getElementById('burgerReady').style.display=(inHall&&quest.step===4)?'flex':'none';
+    document.getElementById('makeBar').style.display=(inHall&&quest.step===3)?'block':'none';
+    document.getElementById('makeTxt').style.display=(inHall&&quest.step===3)?'block':'none';
+    if(inHall&&fromWorld)document.getElementById('ticketNr').textContent='当前叫号 A001 ｜ 你的号码 —';
+    promptEl.style.display='none';
+    updateWorldGuide._step=-1;tipKey=null;guideKey='';
+    if(fromWorld){
+      if(R.quest===true)resetQuest();else hideGuide();
+    }else{
+      if(curBid==='krusty')renderQuest();else hideGuide();
+    }
+    closeDialog();checkInteriorNearby();
+    if(fromWorld)toast(R.intro);
+    if(!exitHintShown){exitHintShown=true;setTimeout(function(){
+      if(inInterior)toast('🚪 走近发光门/楼梯换房间 · 右下角出口或 ESC 回街上');
+    },2300);}
+  }
+  /* 世界层进门：building id -> 该建筑的首个房间 */
+  function enterRoom(id){
+    var g=GRAPH[id];if(!g)return;
+    curBid=id;
+    loadRoom(id+'_'+g.start,true);
+  }
+  function exitInterior(){
+    inInterior=false;curBid=null;document.body.classList.remove('in-room');
+    interior.style.display='none';questHud.style.display='none';
+    goalRing.style.display='none';nearTip.style.display='none';
+    guidePath.setAttribute('d','');roomEl.style.filter='';
+    tipKey=null;guideKey='';seated=false;seatId=null;ipEl.classList.remove('sitting');
+    closeDialog();closeObjTip();closeFocus();
+    document.getElementById('roomNav').innerHTML='';
+    portalLayer.innerHTML='';PORTALS=[];
+  }
+  document.getElementById('exitBtn').onclick=exitInterior;
+  document.getElementById('roomTimeBtn').onclick=advanceTime;
+  exitDoorEl.onclick=function(){if(inInterior)exitInterior();};
+
+  /* ============ 点餐状态机（仅蟹堡王） ============ */
+  var quest={step:0,progress:0,making:false,myNr:'A007',eaten:false};
+  var QUEST_ITEMS=[
+    {t:'① 柜台取号',s:1},{t:'② 收银台结账',s:2},{t:'③ 后厨窗口等制作',s:4},
+    {t:'④ 出餐窗口取餐',s:5},{t:'⑤ 品尝（藏彩蛋）',s:6}
+  ];
+  var STEP_LABEL={0:'柜台取号',1:'收银台结账',2:'后厨窗口等制作',3:'等待制作',
+    4:'出餐台取餐',5:'品尝蟹黄堡'};
+  var GOAL={
+    0:{obj:'ticket',npc:'squid',say:'先去门口取号机拿张号，别杵着。'},
+    1:{obj:'register',npc:'squid',say:'拿到号了？过来结账，快点。'},
+    2:{obj:'window',npc:'sponge',say:'订单收到！去窗口等着，马上煎好~ 🎵'},
+    3:{obj:'window',npc:'sponge',say:'还在煎呢，在窗口边等一下下~'},
+    4:{obj:'pickup',npc:'sponge',say:'🔔 叮！做好啦，去出餐台端走！'},
+    5:{obj:'pickup',npc:'krabs',say:'趁热吃，别浪费，浪费就是浪费钱！'}
+  };
+  var goalRing=document.getElementById('goalRing');
+  var guidePath=document.getElementById('guidePath');
+  var nearTip=document.getElementById('nearTip');
+  var guideKey='';
+  function hideGuide(){
+    if(guideKey==='')return;
+    goalRing.style.display='none';guidePath.setAttribute('d','');guideKey='';
+    ['ticket','register','window','pickup'].forEach(function(id){
+      if(objEls[id])objEls[id].classList.remove('dim');
+    });
+  }
+  function updateWorldGuide(){
+    if(!inInterior||curRoom!=='krusty_hall'||quest.step>=6){hideGuide();return;}
+    var g=GOAL[quest.step];
+    if(!g){hideGuide();return;}
+    if(updateWorldGuide._step!==quest.step){
+      updateWorldGuide._step=quest.step;
+      if(g.npc&&g.say)npcSay(g.npc,g.say);
+    }
+    var k=quest.step+'|'+Math.round(IP.x)+'|'+Math.round(IP.y);
+    if(k===guideKey)return;
+    guideKey=k;
+    var o=null;OBJECTS.forEach(function(x){if(x.id===g.obj)o=x;});
+    if(!o)return;
+    var cx=o.x+(o.w||56)/2,cy=o.y+(o.h||52)/2,rw=(o.w||56)+52;
+    goalRing.style.display='block';
+    goalRing.style.left=(cx-rw/2)+'px';goalRing.style.top=(cy+(o.h||52)/2-13)+'px';
+    goalRing.style.width=rw+'px';goalRing.style.height='30px';
+    guidePath.setAttribute('d','M '+IP.x+' '+IP.y+' Q '+((IP.x+cx)/2)+' '+((IP.y+cy)/2-46)+' '+cx+' '+(cy+16));
+    ['ticket','register','window','pickup'].forEach(function(id){
+      if(objEls[id])objEls[id].classList.toggle('dim',id!==g.obj);
+    });
+  }
+  function renderQuest(){
+    var h='';
+    QUEST_ITEMS.forEach(function(it){
+      var done=quest.step>=it.s;
+      var now=(!done)&&(quest.step===it.s-1||(it.s===4&&quest.step===3)||(it.s===6&&quest.step===5));
+      h+='<div class="qi '+(done?'done':'')+' '+(now?'now':'')+'">'+
+         '<span class="dot">'+(done?'✓':'')+'</span>'+it.t+
+         (it.s===4&&quest.step===3?' <span style="opacity:.8">'+Math.round(quest.progress)+'%</span>':'')+'</div>';
+    });
+    document.getElementById('questList').innerHTML=h;
+    ['ticket','register','window','pickup'].forEach(function(id){
+      if(objEls[id])objEls[id].classList.remove('ready');});
+    var readyId={0:'ticket',1:'register',2:'window',4:'pickup'}[quest.step];
+    if(readyId&&objEls[readyId])objEls[readyId].classList.add('ready');
+    updateWorldGuide();
+  }
+  function resetQuest(){
+    quest.step=0;quest.progress=0;quest.making=false;quest.eaten=false;
+    clearInterval(startMaking._t);clearInterval(callNr._t);
+    resetBite();renderQuest();
+  }
+  function popObj(id){
+    var el=objEls[id]||document.getElementById('burgerReady');if(!el)return;
+    el.classList.remove('pop');void el.offsetWidth;el.classList.add('pop');
+    var r=el.getBoundingClientRect();
+    for(var i=0;i<6;i++){(function(i){
+      var sp=document.createElement('div');sp.className='spark';
+      sp.textContent=['✨','⭐','💫','✦','🌟','✨'][i];
+      sp.style.left=(r.left+r.width/2+(Math.random()-.5)*44)+'px';
+      sp.style.top=(r.top+r.height/2)+'px';
+      sp.style.setProperty('--dx',((Math.random()-.5)*100)+'px');
+      document.body.appendChild(sp);
+      setTimeout(function(){sp.remove();},840);
+    })(i);}
+  }
+  var curTipId=null;
+  function findObj(id){var r=null;OBJECTS.forEach(function(x){if(x.id===id)r=x;});return r;}
+  function onObject(id){
+    var o=findObj(id);if(!o)return;
+    if(o.act){doAct(o.act);return;}
+    var k=o.kind||'peek';
+    popObj(id);
+    if(k==='rummage'){openRummage(o);return;}
+    if(k==='toggle'){doToggle(o);return;}
+    if(k==='spin'){openSpin(o);return;}
+    if(k==='collect'){doCollect(o);return;}
+    if(k==='egg'){doEgg(o);return;}
+    curTipId=id;openObjTip(o.ic,o.tx,o.desc,o.secret);
+  }
+  function doAct(act){
+    var s=quest.step;
+    if(act==='ticket'){
+      if(s!==0){toast('你已经取过号啦：'+quest.myNr);return;}
+      quest.step=1;rollTicket();
+      toast('🎫 取号成功！你是 '+quest.myNr+'，请到收银台结账');
+      npcSay('squid','（收银台）哼，取了号就快点过来结账。');
+    } else if(act==='register'){
+      if(s<1){toast('请先到门口的取号机取号');return;}
+      if(s>1){toast('已经结过账了，去后厨窗口等餐吧');return;}
+      quest.step=2;toast('💵 结账完成！章鱼哥把订单递进了后厨');
+      npcSay('squid','（收银台）A007…去窗口等着，别挡着我。');
+      npcSay('sponge','（后厨）收到订单！马上煎肉饼，哼哼哼~ 🎵');
+    } else if(act==='window'){
+      if(s<2){toast('请先取号并在收银台结账');return;}
+      if(s===3){toast('海绵宝宝正在做，进度 '+Math.round(quest.progress)+'%');return;}
+      if(s>=4){toast('做好的蟹黄堡已经在出餐台啦，去取餐吧');return;}
+      startMaking();
+    } else if(act==='pickup'){
+      if(s<4){toast(s<2?'请先取号结账':'后厨还在做，稍等一下');return;}
+      if(s>=5){toast('你已经取过餐了，点蟹黄堡可以聚焦检视');openFocus();return;}
+      takeBurger();
+    } else if(act==='eat'){
+      if(quest.step<5){toast('先取餐才能品尝哦');return;}
+      openFocus();
+    }
+    if(quest.step!==s){
+      var pid={1:'ticket',2:'register',3:'window',5:'pickup'}[quest.step];
+      if(pid)popObj(pid);
+    }
+    renderQuest();checkInteriorNearby();
+  }
+  // 号码滚动：取号机吐号、叫号屏逐号跳到你的前一號
+  function rollTicket(){
+    var el=document.getElementById('ticketNr');el.classList.add('rolling');
+    var i=1;clearInterval(rollTicket._t);
+    rollTicket._t=setInterval(function(){
+      el.innerHTML='当前叫号 A001 ｜ 你的号码 <b>A'+String(i).padStart(3,'0')+'</b>';
+      i++;
+      if(i>7){clearInterval(rollTicket._t);el.classList.remove('rolling');
+        el.innerHTML='当前叫号 A001 ｜ 你的号码 <b>'+quest.myNr+'</b>';}
+    },110);
+  }
+  function callNr(){
+    var el=document.getElementById('ticketNr');var i=1;
+    clearInterval(callNr._t);
+    callNr._t=setInterval(function(){
+      if(quest.step>=4){clearInterval(callNr._t);return;}
+      el.innerHTML='当前叫号 <b>A'+String(i).padStart(3,'0')+'</b> ｜ 你的号码 '+quest.myNr;
+      i++;if(i>7){clearInterval(callNr._t);}
+    },950);
+  }
+  function startMaking(){
+    quest.step=3;quest.progress=0;quest.making=true;
+    document.getElementById('makeBar').style.display='block';
+    document.getElementById('makeTxt').style.display='block';
+    toast('🍳 海绵宝宝开始制作，请在窗口稍等');
+    callNr();
+    var phases=['和面、压出圆面包…','煎肉饼，滋滋作响…','铺生菜、盖上芝士…','挤上那一勺秘方酱料…','装盘，摆到出餐台！'];
+    clearInterval(startMaking._t);
+    startMaking._t=setInterval(function(){
+      quest.progress+=2;
+      var ph=phases[Math.min(phases.length-1,Math.floor(quest.progress/21))];
+      document.getElementById('makeFill').style.width=quest.progress+'%';
+      document.getElementById('makeTxt').textContent='海绵宝宝：'+ph+' '+Math.round(quest.progress)+'%';
+      renderQuest();
+      if(quest.progress>=100){
+        clearInterval(startMaking._t);clearInterval(callNr._t);
+        quest.making=false;quest.step=4;
+        document.getElementById('ticketNr').innerHTML='🔔 当前叫号 <b>'+quest.myNr+'</b> ｜ 请取餐！';
+        document.getElementById('makeTxt').textContent='🔔 叮！'+quest.myNr+' 请取餐';
+        document.getElementById('burgerReady').style.display='flex';
+        toast('🔔 蟹黄堡做好啦！点击出餐窗口取餐');
+        renderQuest();
+      }
+    },90);
+  }
+  function takeBurger(){
+    quest.step=5;
+    document.getElementById('burgerReady').style.display='none';
+    toast('🍔 取餐成功！点桌上的蟹黄堡可放大检视、咬着吃');
+    resetBite();renderQuest();
+  }
+  document.getElementById('burgerReady').onclick=function(){
+    if(quest.step<4){toast('还没做好，稍等一下');return;}
+    if(quest.step>=5){openFocus();return;}
+    takeBurger();renderQuest();checkInteriorNearby();
+  };
+
+  /* ============ 坐下 / 起身 ============ */
+  function curSeat(){var s=null;ROOMS[curRoom].seats.forEach(function(x){if(x.id===seatId)s=x;});return s;}
+  function sitDown(id){
+    var s=null;ROOMS[curRoom].seats.forEach(function(x){if(x.id===id)s=x;});
+    if(!s)return;
+    if(seated)standUp();
+    seated=true;seatId=id;
+    IP.x=s.x+17;IP.y=s.y+30;
+    ipEl.style.left=IP.x+'px';ipEl.style.top=IP.y+'px';
+    ipEl.classList.add('sitting');
+    Object.keys(seatEls).forEach(function(k){seatEls[k].classList.remove('occupied');});
+    if(seatEls[id])seatEls[id].classList.add('occupied');
+    roomEl.style.transition='transform .45s ease';
+    var s0=Math.min(1,(viewport.clientWidth-24)/1200,(viewport.clientHeight-70)/760);
+    roomEl.style.transform='translate(-50%,-50%) scale('+(s0*1.05)+')';
+    toast('🪑 '+s.sit+'　（按 E 或再点一下起身）');
+    tipKey=null;checkInteriorNearby();
+  }
+  function standUp(){
+    if(!seated)return;
+    seated=false;
+    var s=curSeat();seatId=null;
+    ipEl.classList.remove('sitting');
+    Object.keys(seatEls).forEach(function(k){seatEls[k].classList.remove('occupied');});
+    if(s){IP.x=s.x+17;IP.y=s.y+74;ipEl.style.left=IP.x+'px';ipEl.style.top=IP.y+'px';}
+    fitInterior();
+    toast('站起来啦，继续逛逛吧');
+    tipKey=null;checkInteriorNearby();
+  }
+
+  /* ============ 橙光式分支对话面板 ============ */
+  var dlg=document.getElementById('dlg'),dlgOpen=false,dlgState={npc:null,node:null};
+  function openDialog(npcId){
+    var D=DIALOGS[npcId];if(!D)return;
+    dlgState.npc=npcId;
+    // 选项后果：特定 flag 改变开场白
+    var start='start';
+    if(npcId==='squid'&&flags.squid_clarinet)start='start2';
+    dlgState.node=start;
+    document.getElementById('dlgPortrait').textContent=D.emoji;
+    document.getElementById('dlgPortrait').style.background=D.color;
+    document.getElementById('dlgName').innerHTML=D.name+'<small>按 1-4 选择 · ESC 结束</small>';
+    dlg.style.display='flex';dlgOpen=true;
+    renderNode();
+  }
+  function renderNode(){
+    var D=DIALOGS[dlgState.npc],N=D.nodes[dlgState.node];
+    if(!N){closeDialog();return;}
+    document.getElementById('dlgText').textContent=N.t;
+    document.getElementById('dlgFx').textContent='';
+    var box=document.getElementById('dlgOpts');box.innerHTML='';
+    if(!N.o||N.o.length===0){
+      var b=document.createElement('button');b.className='opt end';b.textContent='▼ 结束对话';
+      b.onclick=closeDialog;box.appendChild(b);
+    } else {
+      N.o.forEach(function(o,i){
+        var b=document.createElement('button');b.className='opt';
+        b.innerHTML='<span class="k">'+(i+1)+'</span>'+o.t;
+        b.onclick=function(){chooseOpt(i);};box.appendChild(b);
+      });
+    }
+  }
+  function chooseOpt(i){
+    var D=DIALOGS[dlgState.npc],N=D.nodes[dlgState.node];
+    if(!N||!N.o||!N.o[i])return;
+    var o=N.o[i];
+    if(o.fx&&FX[o.fx])FX[o.fx]();
+    // fx 可能设置 flag，影响下一次开场，这里立即记入
+    if(o.to==='bye'&&dlgState.npc==='sponge'&&o.fx==='song')flags.sponge_song=true;
+    dlgState.node=o.to;renderNode();
+  }
+  function closeDialog(){
+    dlg.style.display='none';dlgOpen=false;
+  }
+
+  /* v0.9 防重叠校验：NPC 与任何交互热点中心距不得 < 125，供回归断言复用 */
+  function roomOverlaps(key){
+    var R=ROOMS[key],out=[],hots=[];
+    if(!R)return out;
+    (R.objects||[]).forEach(function(o){
+      hots.push({t:'obj',id:o.id,x:o.x+(o.w||56)/2,y:o.y+(o.h||52)/2});});
+    (R.seats||[]).forEach(function(s,i){hots.push({t:'seat',id:'seat'+i,x:s.x+17,y:s.y+17});});
+    (R.portals||[]).forEach(function(p){hots.push({t:'portal',id:p.to,x:p.cx,y:p.cy});});
+    hots.push({t:'exit',id:'exit',x:EXIT_HOT.x,y:EXIT_HOT.y});
+    (R.npcs||[]).forEach(function(n){
+      hots.forEach(function(h){
+        var d=Math.hypot(n.x-h.x,n.y-h.y);
+        if(d<125)out.push({room:key,npc:n.id,hot:h.t+':'+h.id,d:Math.round(d)});
+      });
+    });
+    return out;
+  }
+  function allOverlaps(){
+    var out=[];
+    Object.keys(ROOMS).forEach(function(k){out=out.concat(roomOverlaps(k));});
+    return out;
+  }
+
+  /* ============ 室内热点：物件 / 椅子 / NPC 统一判定 ============ */
+  var iNear=null,tipKey=null;
+  function checkInteriorNearby(){
+    iNear=null;
+    var best=null,bd=1e9;
+    var goalObj=(curRoom==='krusty_hall'&&quest.step<6&&GOAL[Math.min(quest.step,5)])?GOAL[Math.min(quest.step,5)].obj:null;
+    OBJECTS.forEach(function(o){
+      var cx=o.x+(o.w||56)/2,cy=o.y+(o.h||52)/2;
+      var d=Math.hypot(IP.x-cx,IP.y-cy);
+      // v0.9：当前点餐流程的目标物件加权优先，避免被旁边 NPC 抢走焦点
+      if(o.act&&o.act===goalObj)d*=0.45;
+      if(d<115&&d<bd){bd=d;best={type:'obj',id:o.id,el:objEls[o.id],cx:cx,cy:cy};}
+    });
+    PORTALS.forEach(function(p){
+      var d=Math.hypot(IP.x-p.cx,IP.y-p.cy);
+      if(d<110&&d<bd){bd=d;best={type:'portal',id:p.id,el:p.el,cx:p.cx,cy:p.cy,to:p.to,tx:p.tx};}
+    });
+    ROOMS[curRoom].seats.forEach(function(s){
+      var cx=s.x+17,cy=s.y+17,d=Math.hypot(IP.x-cx,IP.y-cy);
+      if(d<88&&d<bd){bd=d;best={type:'seat',id:s.id,el:seatEls[s.id],cx:cx,cy:cy};}
+    });
+    curNpcs.forEach(function(n){
+      var d=Math.hypot(IP.x-n.x,IP.y-n.y);
+      if(d<110&&d<bd){bd=d;best={type:'npc',id:n.id,el:n.el,cx:n.x,cy:n.y};}
+    });
+    // 门口：走近即成为可交互热点（与物件/座位/NPC 统一按最近距离竞争）
+    var de=Math.hypot(IP.x-EXIT_HOT.x,IP.y-EXIT_HOT.y);
+    if(de<120&&de<bd){bd=de;best={type:'exit',id:'exit',el:exitDoorEl,cx:EXIT_HOT.x,cy:EXIT_HOT.y};}
+    iNear=best;
+    promptEl.style.display='none';
+    var key=(best?best.type+':'+best.id:'none')+'|'+(inInterior?'in':'out')+'|'+(seated?'sit':'');
+    if(key!==tipKey){
+      tipKey=key;
+      var txt='';
+      if(best){
+        if(best.type==='obj'){
+          var o=null;OBJECTS.forEach(function(x){if(x.id===best.id)o=x;});
+          var kv={rummage:'翻开找找',toggle:'开关一下',spin:'转着看',collect:'收进藏品册',egg:'逗一逗'}[o&&o.kind]||'看看';
+          txt=o&&o.act?('按 E / 点我 · '+o.tx+' · '+({ticket:'取号',register:'结账',window:'等餐',pickup:'取餐'}[o.act]||'交互'))
+                      :('按 E / 点我 · '+kv+'「'+o.tx+'」');
+        } else if(best.type==='seat'){
+          var s=null;ROOMS[curRoom].seats.forEach(function(x){if(x.id===best.id)s=x;});
+          txt=seated?'按 E / 点我 · 起身':'按 E / 点我 · 坐下（'+s.label+'）';
+        } else if(best.type==='portal') txt='按 E / 点我 · '+best.tx;
+        else if(best.type==='exit') txt='按 E / 点我 · 🚪 出去，回比奇堡';
+        else txt='按 E · 和 '+(DIALOGS[best.id]?DIALOGS[best.id].name:'居民')+' 聊聊';
+      }
+      if(best&&best.el&&inInterior){
+        var r=best.el.getBoundingClientRect();
+        nearTip.style.display='block';
+        nearTip.style.left=(r.left+r.width/2)+'px';nearTip.style.top=(r.top-6)+'px';
+        nearTip.textContent=txt;
+      } else nearTip.style.display='none';
+    }
+    updateWorldGuide();
+  }
+  function interiorInteract(){
+    if(dlgOpen){closeDialog();return;}
+    if(seated){standUp();return;}
+    if(iNear){
+      if(iNear.type==='exit'){exitInterior();return;}
+      if(iNear.type==='portal'){switchRoom(iNear.to);return;}
+      if(iNear.type==='npc'){openDialog(iNear.id);return;}
+      if(iNear.type==='seat'){sitDown(iNear.id);return;}
+      if(iNear.type==='obj'){onObject(iNear.id);return;}
+    }
+    if(curRoom==='krusty_hall'&&quest.step===5){openFocus();return;}
+    if(curRoom==='krusty_hall'&&quest.step<6){
+      var g=GOAL[Math.min(quest.step,5)];
+      if(g){npcSay(g.npc,g.say);toast('跟着金色光圈走 → '+STEP_LABEL[Math.min(quest.step,5)]);}
+      return;
+    }
+    toast('走近物件 / 椅子 / 居民按 E；到右下角 🚪 门口或按 ESC 出门');
+  }
+  function updateInterior(){
+    if(focusOpen||objTipOpen||dlgOpen||rummageOpen||spinOpen||colOpen||seated)return;
+    var mx=0,my=0;
+    for(var k in keyMap){if(keys[k]){mx+=keyMap[k][0];my+=keyMap[k][1];}}
+    if(keys['__jx']){mx+=keys['__jx'];my+=keys['__jy'];}
+    if(mx||my){
+      var len=Math.hypot(mx,my)||1;mx/=len;my/=len;
+      IP.x=Math.max(40,Math.min(1160,IP.x+mx*P.spd));
+      IP.y=Math.max(150,Math.min(720,IP.y+my*P.spd));
+      ipEl.style.left=IP.x+'px';ipEl.style.top=IP.y+'px';
+    }
+    checkInteriorNearby();
+  }
+  window.addEventListener('resize',function(){if(inInterior){fitInterior();tipKey=null;guideKey='';}});
+  document.getElementById('photoSpot').onclick=function(){photo.style.display='flex';photoOpen=true;};
+
+  /* ===== v0.8 交互类型系统：翻找 / 开关 / 旋转 / 拾取 / 彩蛋 / 藏品册 ===== */
+  function sparkle(x,y){
+    for(var i=0;i<6;i++){(function(i){
+      var sp=document.createElement('div');sp.className='spark';
+      sp.textContent=['✨','⭐','💫','✦','🌟','✨'][i];
+      sp.style.left=(x+(Math.random()-.5)*50)+'px';sp.style.top=y+'px';
+      sp.style.setProperty('--dx',((Math.random()-.5)*110)+'px');
+      document.body.appendChild(sp);setTimeout(function(){sp.remove();},840);
+    })(i);}
+  }
+  function eggTotal(){return Object.keys(EGGS).length;}
+  function collectEgg(eid){
+    if(!EGGS[eid]||found[eid])return false;
+    found[eid]=true;
+    var n=Object.keys(found).length;
+    document.getElementById('colCount').textContent=n;
+    toast('🥚 发现彩蛋 · '+EGGS[eid].tx+'（'+n+'/'+eggTotal()+'）');
+    sparkle(window.innerWidth*0.72,150);
+    return true;
+  }
+
+  /* ① 翻找：抽屉/柜子逐格翻，deep 格要翻两次（莉娜式两级交互） */
+  var rummageOpen=false;
+  function openRummage(o){
+    var st=rummageState[o.id]||{f:{},d:{}};rummageState[o.id]=st;
+    document.getElementById('rumTitle').textContent='🔎 翻找 · '+o.tx;
+    document.getElementById('rumSub').textContent=(o.data&&o.data.title)||'里头好像有些东西…';
+    var grid=document.getElementById('rumGrid');grid.innerHTML='';
+    ((o.data&&o.data.slots)||[]).forEach(function(sl,i){
+      var c=document.createElement('div');c.className='slot';
+      var op=!!st.f[i];
+      c.innerHTML=op?('<div class="sIc">'+sl.ic+'</div><div class="sTx">'+sl.tx+'</div><div class="sDs">'+sl.desc+'</div>')
+                    :('<div class="sIc">❓</div><div class="sTx">还没翻</div><div class="sDs">点一下看看</div>');
+      if(op)c.classList.add('opened');
+      if(sl.deep&&op&&!st.d[i])c.classList.add('deep');
+      c.onclick=function(){flipSlot(o,i);};
+      grid.appendChild(c);
+    });
+    document.getElementById('rummage').style.display='flex';rummageOpen=true;tipKey=null;
+  }
+  function flipSlot(o,i){
+    var sl=((o.data&&o.data.slots)||[])[i];if(!sl)return;
+    var st=rummageState[o.id];
+    if(sl.deep&&st.f[i]&&!st.d[i]){
+      st.d[i]=true;toast('🔎 '+sl.tx+'……下面还压着一层！');
+      if(sl.egg)collectEgg(sl.egg);
+      openRummage(o);return;
+    }
+    if(!st.f[i]){st.f[i]=true;toast('翻到了：'+sl.tx);if(sl.egg&&!sl.deep)collectEgg(sl.egg);}
+    openRummage(o);
+  }
+  function closeRummage(){document.getElementById('rummage').style.display='none';rummageOpen=false;}
+  document.getElementById('rumClose').onclick=closeRummage;
+  document.getElementById('rummage').onclick=function(e){if(e.target===this)closeRummage();};
+
+  /* ② 开关：状态切换 + 组合彩蛋（关台灯 + 开唱片机 = 独处时刻） */
+  function doToggle(o){
+    var on=!toggleState[o.id];toggleState[o.id]=on;
+    var el=objEls[o.id];if(el)el.classList.toggle('on',on);
+    var d=o.data||{};
+    toast(on?(d.on||'打开了。'):(d.off||'关上了。'));
+    if(on&&d.egg)collectEgg(d.egg);
+    if(curRoom==='moai_f1'&&toggleState['lamp']===false&&toggleState['gramophone']===true)
+      collectEgg('e21_night');
+  }
+
+  /* ③ 旋转检视：翻到背面看刻字 / 藏彩蛋 */
+  var spinOpen=false,curSpin=null,spinFlipped=false,spinCollected=false;
+  function openSpin(o){
+    curSpin=o;spinFlipped=false;spinCollected=false;
+    document.getElementById('spinTitle').textContent='🔄 转着看 · '+o.tx;
+    document.getElementById('spinFront').textContent=o.ic;
+    document.getElementById('spinBackTx').textContent=(o.data&&o.data.back)||'背面什么也没有。';
+    document.getElementById('spinEgg').textContent=(o.data&&o.data.egg)?'（背面好像藏着什么…）':'';
+    document.getElementById('spinCard').classList.remove('flipped');
+    document.getElementById('spin').style.display='flex';spinOpen=true;tipKey=null;
+  }
+  function flipSpin(){
+    spinFlipped=!spinFlipped;
+    document.getElementById('spinCard').classList.toggle('flipped',spinFlipped);
+    if(spinFlipped&&curSpin&&curSpin.data&&curSpin.data.egg&&!spinCollected){
+      spinCollected=true;collectEgg(curSpin.data.egg);
+    }
+  }
+  function closeSpin(){document.getElementById('spin').style.display='none';spinOpen=false;}
+  document.getElementById('spinFlip').onclick=flipSpin;
+  document.getElementById('spinCard').onclick=flipSpin;
+  document.getElementById('spinClose').onclick=closeSpin;
+  document.getElementById('spin').onclick=function(e){if(e.target===this)closeSpin();};
+
+  /* ④ 拾取：物件收进藏品册 */
+  function doCollect(o){
+    if(toggleState['taken_'+o.id]){toast('已经收进藏品册啦');return;}
+    toggleState['taken_'+o.id]=true;
+    var el=objEls[o.id];if(el)el.classList.add('taken');
+    if(o.data&&o.data.egg)collectEgg(o.data.egg);else toast('收好了：'+o.tx);
+    sparkle(window.innerWidth*0.5,window.innerHeight*0.45);
+  }
+
+  /* ⑤ 彩蛋点击：逗够次数才触发（小蜗「喵」） */
+  function doEgg(o){
+    eggTries[o.id]=(eggTries[o.id]||0)+1;
+    var d=o.data||{},need=d.tries||3;
+    if(eggTries[o.id]>=need){
+      if(d.egg&&collectEgg(d.egg))toast('🐌 它忽然开口：「喵。」然后装作什么都没发生。');
+      sparkle(window.innerWidth*0.5,window.innerHeight*0.5);
+    }else toast(d.hint||'（好像有反应……再试试）');
+  }
+
+  /* ⑥ 藏品册 */
+  var colOpen=false;
+  function openCollection(){
+    var g=document.getElementById('colGrid');g.innerHTML='';var n=0;
+    Object.keys(EGGS).forEach(function(eid){
+      var e=EGGS[eid],got=!!found[eid];if(got)n++;
+      var c=document.createElement('div');c.className='colItem'+(got?' got':'');
+      c.innerHTML='<div class="cIc">'+(got?e.ic:'❔')+'</div>'+
+        '<div class="cTx">'+(got?e.tx:'还没发现')+'</div>'+
+        (got?'<div class="cDs">'+e.desc+'</div>':'');
+      g.appendChild(c);
+    });
+    document.getElementById('colHead').textContent='🥚 藏品册 · 已发现 '+n+' / '+eggTotal();
+    document.getElementById('colCount').textContent=n;
+    document.getElementById('collection').style.display='flex';colOpen=true;
+  }
+  function closeCollection(){document.getElementById('collection').style.display='none';colOpen=false;}
+  document.getElementById('colBtn').onclick=openCollection;
+  document.getElementById('colClose').onclick=closeCollection;
+  document.getElementById('collection').onclick=function(e){if(e.target===this)closeCollection();};
+
+  /* ============ 物品检视小卡 ============ */
+  var objTip=document.getElementById('objTip'),objTipOpen=false;
+  function openObjTip(ic,title,desc,secret){
+    document.getElementById('tipIcon').textContent=ic;
+    document.getElementById('tipTitle').textContent=title;
+    document.getElementById('tipDesc').textContent=desc;
+    var sec=document.getElementById('tipSecret'),more=document.getElementById('tipMore');
+    sec.textContent='';sec.classList.remove('on');
+    if(secret){
+      more.style.display='inline-block';
+      more.onclick=function(){
+        sec.textContent='🔎 多看一眼：'+secret;sec.classList.add('on');
+        more.style.display='none';if(curTipId)popObj(curTipId);
+      };
+    }else more.style.display='none';
+    objTip.style.display='flex';objTipOpen=true;
+  }
+  function closeObjTip(){objTip.style.display='none';objTipOpen=false;}
+  document.getElementById('tipClose').onclick=closeObjTip;
+  objTip.onclick=function(e){if(e.target===objTip)closeObjTip();};
+
+  /* ============ 聚焦检视：咬痕（非逐层消失） ============ */
+  var BITE_SPOTS=[
+    [{x:186,y:34,r:30},{x:166,y:20,r:15},{x:198,y:54,r:16}],
+    [{x:190,y:96,r:31},{x:170,y:82,r:16},{x:198,y:118,r:16}],
+    [{x:24,y:30,r:30},{x:44,y:16,r:15},{x:10,y:52,r:16}],
+    [{x:64,y:130,r:30},{x:92,y:142,r:16},{x:40,y:138,r:15}],
+    [{x:100,y:78,r:78}]
+  ];
+  var biteCount=0,bitePath=document.getElementById('bitePath');
+  function circlePath(cx,cy,r){
+    return 'M '+(cx-r)+' '+cy+' a '+r+' '+r+' 0 1 0 '+(2*r)+' 0 a '+r+' '+r+' 0 1 0 '+(-2*r)+' 0 Z';
+  }
+  function buildBiteD(n){
+    var d='M0 0 H200 V160 H0 Z';
+    for(var i=0;i<n&&i<BITE_SPOTS.length;i++){
+      BITE_SPOTS[i].forEach(function(c){d+=' '+circlePath(c.x,c.y,c.r);});
+    }
+    return d;
+  }
+  var focus=document.getElementById('focus'),focusBurger=document.getElementById('focusBurger');
+  var focusOpen=false,rx=15,ry=-25;
+  function applyFocus(){focusBurger.style.transform='rotateX('+rx+'deg) rotateY('+ry+'deg)';}
+  function resetBite(){
+    biteCount=0;bitePath.setAttribute('d',buildBiteD(0));
+    document.getElementById('burgerClip').style.display='block';
+    document.getElementById('secretSauce').style.display='none';
+    document.getElementById('focusInfo').textContent='刚出锅的蟹黄堡。仔细看看，也许藏着什么。';
+    rx=15;ry=-25;applyFocus();
+  }
+  function openFocus(){
+    focus.style.display='flex';focusOpen=true;applyFocus();
+    focus.classList.remove('zoom');void focus.offsetWidth;focus.classList.add('zoom');
+    roomEl.style.transition='filter .45s ease';roomEl.style.filter='blur(2px)';
+  }
+  function closeFocus(){
+    focus.style.display='none';focusOpen=false;focus.classList.remove('zoom');roomEl.style.filter='';
+  }
+  function rotateBy(v){ry+=v[0]*12;rx-=v[1]*10;applyFocus();}
+  var crumbLayer=document.getElementById('crumbLayer');
+  function crumbs(){
+    for(var i=0;i<8;i++){
+      (function(i){var c=document.createElement('div');c.className='crumb';
+        c.style.left=(window.innerWidth/2+30+Math.random()*40)+'px';
+        c.style.top=(window.innerHeight/2-20+Math.random()*30)+'px';
+        c.style.background=['#F2B84B','#5fbf5f','#FFC23F','#7a4a2b'][i%4];
+        crumbLayer.appendChild(c);
+        var dx=(Math.random()-0.5)*220,dy=120+Math.random()*160;
+        c.animate([{transform:'translate(0,0) rotate(0deg)',opacity:1},
+          {transform:'translate('+dx+'px,'+dy+'px) rotate('+(Math.random()*360)+'deg)',opacity:0}],
+          {duration:900+Math.random()*400,easing:'ease-out'}).onfinish=function(){c.remove();};
+      })(i);
+    }
+  }
+  function bite(){
+    if(biteCount>=BITE_SPOTS.length)return;
+    rx=15;ry=-25;applyFocus();
+    biteCount++;bitePath.setAttribute('d',buildBiteD(biteCount));crumbs();
+    if(biteCount>=BITE_SPOTS.length){
+      quest.step=6;renderQuest();
+      document.getElementById('burgerClip').style.display='none';
+      var ss=document.getElementById('secretSauce');ss.style.display='block';
+      ss.querySelector('p').innerHTML='🤫 <b>秘方酱料！</b> 你把整个蟹黄堡啃光了，盘子底下留着一滩闪着诡异光芒的酱料……<br>（莉娜式隐藏交互：吃掉才看得见）';
+      document.getElementById('focusInfo').textContent='吃光啦！好像发现了不该看到的东西。';
+    } else {
+      document.getElementById('focusInfo').textContent=
+        '咔嚓！从边缘咬下一口，能看到面包、生菜、芝士、肉饼的夹层横截面。已咬 '+biteCount+' 口。';
+    }
+  }
+  document.getElementById('biteBtn').onclick=bite;
+  document.getElementById('flipBtn').onclick=function(){rx=(rx+180)%360;applyFocus();};
+  document.getElementById('rotL').onclick=function(){ry-=30;applyFocus();};
+  document.getElementById('rotR').onclick=function(){ry+=30;applyFocus();};
+  document.getElementById('closeFocus').onclick=closeFocus;
+  var fDrag=false,lastX=0,lastY=0;
+  focusBurger.addEventListener('mousedown',function(e){fDrag=true;lastX=e.clientX;lastY=e.clientY;});
+  window.addEventListener('mouseup',function(){fDrag=false;});
+  window.addEventListener('mousemove',function(e){if(!fDrag)return;
+    ry+=(e.clientX-lastX)*0.6;rx-=(e.clientY-lastY)*0.6;lastX=e.clientX;lastY=e.clientY;applyFocus();});
+  focusBurger.addEventListener('touchstart',function(e){var t=e.touches[0];
+    fDrag=true;lastX=t.clientX;lastY=t.clientY;},{passive:true});
+  window.addEventListener('touchmove',function(e){if(!fDrag||!focusOpen)return;
+    var t=e.touches[0];ry+=(t.clientX-lastX)*0.6;rx-=(t.clientY-lastY)*0.6;
+    lastX=t.clientX;lastY=t.clientY;applyFocus();},{passive:true});
+  window.addEventListener('touchend',function(){fDrag=false;});
+
+  var photo=document.getElementById('photo'),photoOpen=false;
+  document.getElementById('closePhoto').onclick=function(){photo.style.display='none';photoOpen=false;};
+  document.getElementById('mapBtn').onclick=function(){
+    var vw=viewport.clientWidth,vh=viewport.clientHeight;
+    var s=Math.min(vw/WORLD_W,vh/WORLD_H)*0.98;
+    world.style.transition='transform .8s';world.style.transformOrigin='0 0';
+    world.style.transform='scale('+s+') translate('+(-((WORLD_W*s-vw)/2)/s)+'px,'+(-((WORLD_H*s-vh)/2)/s)+'px)';
+    setTimeout(function(){world.style.transition='none';world.style.transformOrigin='';},900);
+  };
+
+  /* ================================================================
+     v1.0 主场景小玩法模块：三处场地 + 统一「小游戏会话」
+     - 水母田 Jellyfish Fields：点击 / 走近按 E 才开局，屏幕开始冒水母
+     - 泡泡摊 Bubblestand：按住蓄力吹出 5 段形态（原作蟹黄堡 / 船 / 大象）
+     - 空手道场 Karate：节奏连击（原作珊迪空手道 / 树屋健身）
+     三者共用：开场横幅 → 30 秒倒计时 → 目标进度 → 结算卡 → 收工 / 再来一局
+     ================================================================ */
+  var jellyLayer=document.getElementById('jellyLayer');
+
+  /* ---- 三处玩法场地：世界坐标单一来源，渲染 + 邻近判定共用 ---- */
+  var PLAYSPOTS=[
+    {id:'jelly', name:'水母田', sub:'Jellyfish Fields · 点击开始',x:1310,y:1150,w:380,h:250,r:185,
+      dots:[['j',-95,-32],['j',34,12],['j',104,-48],['j',-24,58],['j',72,52]]},
+    {id:'bubble',name:'泡泡摊', sub:'Bubblestand · 点击开始',     x:770, y:1160,w:180,h:150,r:140,
+      dots:[['b',-42,-22],['b',22,10],['b',48,-36]]},
+    {id:'karate',name:'空手道场',sub:'Karate · 点击开始',           x:1910,y:1120,w:230,h:180,r:165,
+      dots:[['k',0,0]]}
+  ];
+  function renderPlayspots(){
+    PLAYSPOTS.forEach(function(sp){
+      var el=document.createElement('div');
+      el.className='playspot ps-'+sp.id;el.id='ps_'+sp.id;
+      el.style.left=sp.x+'px';el.style.top=sp.y+'px';
+      var ring=document.createElement('div');ring.className='psRing';
+      ring.style.width=(sp.w+22)+'px';ring.style.height=(sp.h+22)+'px';
+      var area=document.createElement('div');area.className='psArea';
+      area.style.width=sp.w+'px';area.style.height=sp.h+'px';
+      var sign=document.createElement('div');sign.className='psSign';
+      sign.style.top=(-sp.h/2-10)+'px';
+      sign.innerHTML=sp.name+'<small>'+sp.sub+'</small>';
+      el.appendChild(ring);el.appendChild(area);el.appendChild(sign);
+      sp.dots.forEach(function(d){
+        var dot=document.createElement('div');
+        dot.className='psDot psDot-'+d[0];
+        dot.style.left=d[1]+'px';dot.style.top=d[2]+'px';
+        el.appendChild(dot);
+      });
+      el.onclick=function(){if(inInterior)return;startMini(sp.id);};
+      world.appendChild(el);sp.el=el;
+    });
+  }
+  renderPlayspots();
+
+  /* ---- 会话状态 ---- */
+  var MG={id:null,lastId:null,active:false,resultOpen:false,t:0,score:0,goal:1,
+    goalDone:false,timer:null,bannerT:null,blowRaf:null};
+  var KDIR={arrowleft:'left',a:'left',arrowright:'right',d:'right',
+    arrowup:'up',w:'up',arrowdown:'down',s:'down'};
+  var KMOVES=[{d:'left',ar:'←',nm:'左勾拳'},{d:'up',ar:'↑',nm:'上劈'},
+    {d:'down',ar:'↓',nm:'下踢'},{d:'right',ar:'→',nm:'右勾拳'}];
+  var KAR={_t:null,cur:null};
+
+  function mgEl(id){return document.getElementById(id);}
+  function mgText(){ // 顶部 HUD 第三行
+    if(MG.id==='jelly')return '已捉 '+MG.score+' 只 · 目标 '+MG.goal+' 只 · 别碰蓝色电水母';
+    if(MG.id==='bubble')return '特殊形状 '+MG.score+' / '+MG.goal+' · 共吹 '+blowCount+' 个泡';
+    if(MG.id==='karate')return '连击 '+kCombo+' · 最高 '+MG.score+' / 目标 '+MG.goal;
+    return '';
+  }
+  function updateMgHud(){
+    mgEl('mgTime').textContent=MG.t;
+    mgEl('mgScore').textContent=mgText();
+    mgEl('mgProgress').style.width=Math.min(100,MG.score/MG.goal*100)+'%';
+  }
+  function miniTick(){
+    MG.t--;
+    if(MG.t<=0){MG.t=0;updateMgHud();endMini();return;}
+    updateMgHud();
+  }
+  function showBanner(cfg){
+    var b=mgEl('mgBanner');
+    mgEl('mgBTitle').textContent=cfg.name+' · 开始！';
+    mgEl('mgBSub').textContent=cfg.goalTx+' ｜ '+cfg.time+' 秒 ｜ ESC 或「收工」随时退出';
+    b.classList.remove('on');void b.offsetWidth;b.classList.add('on');
+    clearTimeout(MG.bannerT);
+    MG.bannerT=setTimeout(function(){b.classList.remove('on');},2100);
+  }
+  function checkGoal(){
+    if(MG.goalDone||!MG.active||MG.score<MG.goal)return;
+    MG.goalDone=true;
+    document.body.classList.add('mg-goal');
+    setTimeout(function(){document.body.classList.remove('mg-goal');},1600);
+    toast('目标达成！'+MINIS[MG.id].name+' · 剩下的时间刷新纪录吧');
+  }
+
+  /* ---- 玩法配置表 ---- */
+  var MINIS={
+    jelly:{name:'捉水母',time:30,goal:12,goalTx:'目标 12 只',
+      tip:'鱼网已拿起 · 点击冒出的水母，别碰蓝色电水母！',
+      init:initJelly,end:endJelly,rank:jellyRank},
+    bubble:{name:'吹泡泡',time:30,goal:3,goalTx:'集齐 3 种特殊形状',
+      tip:'按住「吹」或空格蓄力，越久形状越特别（蟹黄堡 / 小船 / 大象）',
+      init:initBubble,end:endBubble,rank:bubbleRank},
+    karate:{name:'空手道',time:30,goal:10,goalTx:'达成 10 连击',
+      tip:'跟着箭头按方向键 / WASD，或点方向钮，别断连击',
+      init:initKarate,end:endKarate,rank:karateRank}
+  };
+
+  function startMini(id){
+    var cfg=MINIS[id];if(!cfg)return;
+    if(MG.active||MG.resultOpen)exitMini(true);
+    MG.id=id;MG.lastId=id;MG.active=true;MG.resultOpen=false;
+    MG.t=cfg.time;MG.score=0;MG.goal=cfg.goal;MG.goalDone=false;
+    document.body.classList.add('mg-active','mg-'+id);
+    PLAYSPOTS.forEach(function(sp){
+      sp.el.classList.toggle('playing',sp.id===id);
+      sp.el.classList.remove('near','guide');
+    });
+    mgEl('mgName').textContent=cfg.name;
+    mgEl('mgGoalTx').textContent=cfg.goalTx;
+    promptEl.style.display='none';               // 开局立即撤掉旧的「按 E 开始」提示
+    showBanner(cfg);cfg.init();updateMgHud();
+    clearInterval(MG.timer);MG.timer=setInterval(miniTick,1000);
+    toast(cfg.tip);
+  }
+  function endMini(){
+    if(!MG.active)return;
+    MG.active=false;MG.resultOpen=true;
+    clearInterval(MG.timer);
+    var cfg=MINIS[MG.id];if(cfg&&cfg.end)cfg.end();
+    clearJellies();clearBubbleFloats();
+    document.getElementById('toast').classList.remove('on');
+    document.body.classList.remove('mg-active','mg-'+MG.id);
+    document.body.classList.add('mg-result');
+    var r=cfg.rank();
+    mgEl('rTitle').textContent=cfg.name+' · 本轮结算';
+    mgEl('rRank').textContent=r.rank;mgEl('rRank').className='rRank '+r.cls;
+    mgEl('rLine').textContent=r.line;mgEl('rSub').textContent=r.sub;
+  }
+  function exitMini(quiet){
+    if(MG.active){var cfg=MINIS[MG.id];if(cfg&&cfg.end)cfg.end();}
+    MG.active=false;MG.resultOpen=false;MG.id=null;MG.goalDone=false;
+    clearInterval(MG.timer);cancelAnimationFrame(MG.blowRaf);
+    clearTimeout(KAR._t);clearTimeout(MG.bannerT);
+    clearJellies();clearBubbleFloats();setJellyOn(false,true);
+    PLAYSPOTS.forEach(function(sp){sp.el.classList.remove('playing');});
+    document.body.classList.remove('mg-active','mg-result','mg-jelly','mg-bubble','mg-karate','mg-goal');
+    mgEl('mgBanner').classList.remove('on');
+    if(!quiet)toast('收工啦 · 回到比奇堡街上');
+  }
+
+  /* ---------- 玩法 A：捉水母（改造 v0.9 引擎，受 MG 驱动） ---------- */
+  var jellyOn=false,jellyCaught=0,jellyScore={pink:0,blue:0,gold:0},jellyLive=[];
+  var JELLY={pink:{label:'粉水母',score:1},blue:{label:'电水母',score:-1},gold:{label:'金水母',score:3}};
+  function jellyType(){var r=Math.random();if(r<0.10)return 'gold';if(r<0.30)return 'blue';return 'pink';}
+  function updateJellyHud(){
+    mgEl('jellyTotal').textContent=jellyCaught;
+    mgEl('jPink').textContent=jellyScore.pink;
+    mgEl('jBlue').textContent=jellyScore.blue;
+    mgEl('jGold').textContent=jellyScore.gold;
+  }
+  function clearJellies(){jellyLive.forEach(function(el){clearTimeout(el._t);el.remove();});jellyLive=[];}
+  function jellyPos(el){
+    var vw=viewport.clientWidth,vh=viewport.clientHeight;
+    var x=0,y=0,tries=0,ok=false;
+    while(tries<14&&!ok){
+      x=110+Math.random()*Math.max(120,vw-220);
+      y=170+Math.random()*Math.max(120,vh-340);
+      if(x<210&&y>vh-210)x=240+Math.random()*180;
+      if(x>vw-220&&y>vh-140)x=vw-300-Math.random()*120;
+      ok=!jellyLive.some(function(e){
+        return Math.hypot(parseFloat(e.style.left)-x,parseFloat(e.style.top)-(y+60))<125;});
+      tries++;
+    }
+    el.style.left=x+'px';el.style.top=(y+60)+'px';
+    return {x:x,y:y+60};
+  }
+  function spawnJelly(forceType){
+    /* v1.0：只有「点水母田开局」后才冒水母，默认街上不出现 */
+    if(!(MG.active&&MG.id==='jelly')||!jellyOn)return null;
+    if(inInterior||dlgOpen||focusOpen||rummageOpen||spinOpen||colOpen||objTipOpen)return null;
+    if(jellyLive.length>=3)return null;
+    var t=forceType||jellyType(),cfg=JELLY[t];
+    var el=document.createElement('div');
+    el.className='jelly j-'+t;el.dataset.type=t;
+    el.innerHTML='<div class="hole"></div><div class="body"><div class="cap"></div>'+
+      '<div class="eye l"></div><div class="eye r"></div>'+
+      '<div class="tent t1"></div><div class="tent t2"></div>'+
+      '<div class="tent t3"></div><div class="tent t4"></div></div>'+
+      '<div class="tag">'+cfg.label+'</div>';
+    var p=jellyPos(el);
+    el.onclick=function(e){e.stopPropagation();catchJelly(el,t,p.x,p.y);};
+    jellyLayer.appendChild(el);jellyLive.push(el);
+    el._t=setTimeout(function(){escapeJelly(el);},2200+Math.random()*1500);
+    return el;
+  }
+  function dropJelly(el){clearTimeout(el._t);var i=jellyLive.indexOf(el);if(i>=0)jellyLive.splice(i,1);}
+  function escapeJelly(el){
+    if(!el.parentNode)return;
+    dropJelly(el);el.classList.add('gone');
+    setTimeout(function(){el.remove();},300);
+  }
+  function netSwing(x,y){
+    var n=document.createElement('div');n.className='netSwing';
+    n.style.left=x+'px';n.style.top=y+'px';document.body.appendChild(n);
+    setTimeout(function(){n.remove();},460);
+  }
+  function scorePop(x,y,txt,col){
+    var sp=document.createElement('div');sp.className='jellyScore';
+    sp.style.left=x+'px';sp.style.top=(y-30)+'px';sp.textContent=txt;
+    if(col)sp.style.color=col;
+    document.body.appendChild(sp);setTimeout(function(){sp.remove();},820);
+  }
+  function catchJelly(el,t,x,y){
+    if(!el.parentNode||el.classList.contains('caught'))return;
+    dropJelly(el);netSwing(x,y);
+    if(t==='blue'){
+      jellyScore.blue++;
+      document.body.classList.add('stung');
+      setTimeout(function(){document.body.classList.remove('stung');},380);
+      scorePop(x,y,'哎哟 -1','#5BC8FF');
+      toast('哎哟！蓝色电水母不能抓，会被蜇到！');
+    }else{
+      jellyCaught++;jellyScore[t]++;MG.score=jellyCaught;
+      scorePop(x,y,'+'+JELLY[t].score,t==='gold'?'#FFD23F':'#FF8FC7');
+      if(t==='gold')toast('稀有金水母！+3 · 海绵宝宝会羡慕的');
+      else if(jellyCaught%5===0)toast('捉到 '+jellyCaught+' 只了！「我准备好了！」');
+      checkGoal();
+    }
+    el.classList.add('caught');setTimeout(function(){el.remove();},360);
+    updateJellyHud();updateMgHud();
+  }
+  function setJellyOn(v,quiet){
+    jellyOn=!!v;
+    document.body.classList.toggle('net-mode',jellyOn);
+    if(!jellyOn)clearJellies();
+    if(!quiet)toast(jellyOn?'鱼网已拿起':'鱼网收起来了');
+  }
+  function initJelly(){
+    jellyCaught=0;jellyScore={pink:0,blue:0,gold:0};
+    clearJellies();updateJellyHud();setJellyOn(true,true);
+  }
+  function endJelly(){setJellyOn(false,true);}
+  function jellyRank(){
+    var n=jellyCaught,q=jellyScore;
+    var r=n>=15?['金牌 · 水母大师','gold']:n>=8?['银牌 · 我准备好了','silver']:['铜牌 · 再练练网','bronze'];
+    return {rank:r[0],cls:r[1],line:'本轮捉到 '+n+' 只水母',
+      sub:'粉 '+q.pink+' · 金 '+q.gold+' · 触电 '+q.blue+' 次 ｜ 原作《Jellyfishing》用网捉、碰到电水母被蜇'};
+  }
+  setInterval(function(){spawnJelly();},820);
+
+  /* ---------- 玩法 B：吹泡泡（Bubblestand 蓄力） ---------- */
+  var BLOW_SHAPES=[
+    {max:.22,key:'round',    nm:'圆泡',    special:false,score:1},
+    {max:.45,key:'big',      nm:'大圆泡',  special:false,score:2},
+    {max:.68,key:'krabby',   nm:'蟹黄堡泡',special:true, score:3},
+    {max:.90,key:'boat',     nm:'小船泡',  special:true, score:4},
+    {max:1.01,key:'elephant',nm:'大象泡',  special:true, score:5}
+  ];
+  var blow=0,blowHold=false,blowOver=0,blowCount=0,blowFound={},blowFoundN=0,bubbleFloats=[],blowLast=0;
+  function blowShape(v){for(var i=0;i<BLOW_SHAPES.length;i++){if(v<BLOW_SHAPES[i].max)return BLOW_SHAPES[i];}
+    return BLOW_SHAPES[BLOW_SHAPES.length-1];}
+  function resetBlowUI(){
+    blow=0;blowOver=0;
+    var pv=mgEl('bubblePreview');
+    pv.className='bubblePreview';pv.style.width='62px';pv.style.height='62px';
+    mgEl('bubbleShapeName').textContent='圆泡';
+    mgEl('blowFill').style.width='0%';
+    mgEl('blowBtn').classList.remove('holding');
+  }
+  function updateBlowFound(){mgEl('blowFound').textContent='特殊形状 '+blowFoundN+' / 3';}
+  function clearBubbleFloats(){bubbleFloats.forEach(function(el){el.remove();});bubbleFloats=[];}
+  function spawnBubbleFloat(sh){
+    var el=document.createElement('div');
+    el.className='bubbleFloat bf-'+sh.key;
+    el.innerHTML='<span>'+sh.nm+'</span>';
+    var sz=sh.key==='round'?72:sh.key==='big'?108:132;
+    el.style.width=sz+'px';el.style.height=sz+'px';
+    el.style.left=(viewport.clientWidth/2+(Math.random()*140-70))+'px';
+    el.style.top=(viewport.clientHeight*0.58)+'px';
+    document.body.appendChild(el);bubbleFloats.push(el);
+    setTimeout(function(){var i=bubbleFloats.indexOf(el);if(i>=0)bubbleFloats.splice(i,1);el.remove();},1550);
+  }
+  function blowTick(ts){
+    if(!blowHold||!MG.active||MG.id!=='bubble')return;
+    var dt=blowLast?Math.min(60,ts-blowLast):16;blowLast=ts;
+    blow+=dt/2200;                                  // 约 2.2 秒蓄满
+    if(blow>=1){blow=1;blowOver+=dt;
+      if(blowOver>820){blowBurst();return;}}
+    var sh=blowShape(blow),pv=mgEl('bubblePreview');
+    mgEl('blowFill').style.width=(Math.min(1,blow)*100)+'%';
+    var size=62+Math.min(1,blow)*96;
+    pv.style.width=size+'px';pv.style.height=size+'px';
+    pv.className='bubblePreview sh-'+sh.key+(blow>=1?' over':'');
+    mgEl('bubbleShapeName').textContent=blow>=1?'太大了！':sh.nm;
+    MG.blowRaf=requestAnimationFrame(blowTick);
+  }
+  function blowStart(){
+    if(!MG.active||MG.id!=='bubble'||blowHold)return;
+    blowHold=true;blow=0;blowOver=0;blowLast=0;
+    mgEl('blowBtn').classList.add('holding');
+    cancelAnimationFrame(MG.blowRaf);MG.blowRaf=requestAnimationFrame(blowTick);
+  }
+  function blowBurst(){
+    blowHold=false;cancelAnimationFrame(MG.blowRaf);
+    scorePop(viewport.clientWidth/2,viewport.clientHeight*0.55,'啪！破了','#ff6b6b');
+    toast('吹太满啦，泡泡破了！下次早点松手');
+    resetBlowUI();
+  }
+  function blowRelease(){
+    if(!blowHold)return;
+    blowHold=false;cancelAnimationFrame(MG.blowRaf);
+    var sh=blowShape(blow),x=viewport.clientWidth/2,y=viewport.clientHeight*0.55;
+    spawnBubbleFloat(sh);blowCount++;
+    scorePop(x,y,'+'+sh.score,sh.special?'#FFD23F':'#5BC8FF');
+    if(sh.special&&!blowFound[sh.key]){
+      blowFound[sh.key]=1;blowFoundN++;MG.score=blowFoundN;updateBlowFound();
+      toast('新形状：'+sh.nm+'！已集齐 '+blowFoundN+' / 3 种');
+      checkGoal();
+    }else if(sh.special){toast(sh.nm+'（已有）· 试试别的蓄力长度');}
+    else if(blowCount%4===0){toast('吹了 '+blowCount+' 个泡泡了 · 再蓄久一点会变形状');}
+    resetBlowUI();updateMgHud();
+  }
+  function initBubble(){
+    blowCount=0;blowFound={};blowFoundN=0;blowHold=false;blowOver=0;
+    clearBubbleFloats();resetBlowUI();updateBlowFound();
+  }
+  function endBubble(){blowHold=false;cancelAnimationFrame(MG.blowRaf);clearBubbleFloats();}
+  function bubbleRank(){
+    var n=blowFoundN,c=blowCount;
+    var r=n>=3?['金牌 · 泡泡大师','gold']:n>=1?['银牌 · 会吹形状了','silver']:['铜牌 · 再蓄久一点','bronze'];
+    return {rank:r[0],cls:r[1],line:'吹出 '+c+' 个泡泡 · 集齐 '+n+' / 3 种特殊形状',
+      sub:'原作《Bubblestand》：蓄力越久泡泡越大，还能吹成蟹黄堡 / 船 / 大象'};
+  }
+  var blowBtn=mgEl('blowBtn');
+  blowBtn.addEventListener('pointerdown',function(e){e.preventDefault();blowStart();});
+  ['pointerup','pointerleave','pointercancel'].forEach(function(ev){
+    blowBtn.addEventListener(ev,function(e){e.preventDefault();blowRelease();});});
+
+  /* ---------- 玩法 C：空手道节奏连击 ---------- */
+  var kCombo=0,kBest=0;
+  function karateNext(){
+    if(!MG.active||MG.id!=='karate')return;
+    clearTimeout(KAR._t);
+    KAR.cur=KMOVES[Math.floor(Math.random()*KMOVES.length)];
+    mgEl('kArrow').textContent=KAR.cur.ar;
+    mgEl('kName').textContent=KAR.cur.nm;
+    var mv=mgEl('kMove');mv.classList.remove('wrong','right');
+    var f=mgEl('kFill');f.style.animation='none';void f.offsetWidth;
+    f.style.animation='kDrain 1.4s linear both';
+    KAR._t=setTimeout(karateTimeout,1400);
+  }
+  function karateTimeout(){
+    if(!MG.active||MG.id!=='karate')return;
+    kCombo=0;mgEl('kMove').classList.add('wrong');
+    scorePop(viewport.clientWidth/2,viewport.clientHeight*0.55,'太慢了','#ff6b6b');
+    karateNext();
+  }
+  function karateHit(d){
+    if(!MG.active||MG.id!=='karate'||!KAR.cur)return;
+    var mv=mgEl('kMove');mv.classList.remove('wrong','right');
+    if(d===KAR.cur.d){
+      kCombo++;if(kCombo>kBest)kBest=kCombo;MG.score=kBest;
+      mv.classList.add('right');
+      scorePop(viewport.clientWidth/2,viewport.clientHeight*0.55,'Nice! '+kCombo,'#7ee0a0');
+      if(kCombo%5===0)toast(kCombo+' 连击！珊迪都看愣了');
+      checkGoal();
+    }else{
+      kCombo=0;mv.classList.add('wrong');
+      scorePop(viewport.clientWidth/2,viewport.clientHeight*0.55,'失误','#ff6b6b');
+    }
+    mgEl('kCombo').textContent=kCombo;updateMgHud();karateNext();
+  }
+  function initKarate(){kCombo=0;kBest=0;mgEl('kCombo').textContent='0';karateNext();}
+  function endKarate(){clearTimeout(KAR._t);}
+  function karateRank(){
+    var n=kBest;
+    var r=n>=10?['金牌 · 空手道高手','gold']:n>=5?['银牌 · 有模有样','silver']:['铜牌 · 珊迪会陪你练','bronze'];
+    return {rank:r[0],cls:r[1],line:'最高连击 '+n+' 次',
+      sub:'原作珊迪与海绵宝宝的空手道 / 树屋健身：跟着节奏出招，别断连击'};
+  }
+  var kPad=document.querySelectorAll('#mgKarate .kPad button');
+  for(var ki=0;ki<kPad.length;ki++){
+    (function(btn){btn.onclick=function(){karateHit(btn.getAttribute('data-d'));};})(kPad[ki]);
+  }
+
+  /* ---------- 会话按钮绑定 ---------- */
+  mgEl('mgExit').onclick=function(){exitMini();};
+  mgEl('rAgain').onclick=function(){startMini(MG.lastId);};
+  mgEl('rBack').onclick=function(){exitMini();};
+  function mgGuide(){
+    if(MG.active||MG.resultOpen){toast('先「收工」退出当前玩法，再去看别的场地');return;}
+    PLAYSPOTS.forEach(function(sp){sp.el.classList.add('guide');});
+    setTimeout(function(){PLAYSPOTS.forEach(function(sp){sp.el.classList.remove('guide');});},3200);
+    toast('镇上 3 处玩法场地：水母田 / 泡泡摊 / 空手道场 · 走近按 E 或直接点击开场');
+  }
+  mgEl('mgGuideBtn').onclick=mgGuide;
+  document.getElementById('garyWorld').onclick=function(){
+    if(MG.active||MG.resultOpen||inInterior)return;openDialog('gary');};
+  setJellyOn(false,true);                         // 默认街上不冒水母
+
+  function loop(){
+    if(inInterior)updateInterior();else updateWorld();
+    requestAnimationFrame(loop);
+  }
+  window.__BB={
+    P:P,IP:IP,quest:quest,doAct:doAct,bite:bite,resetBite:resetBite,
+    enterRoom:enterRoom,enterKrusty:function(){enterRoom('krusty');},exitKrusty:exitInterior,
+    exitInterior:exitInterior,getINear:function(){return iNear;},exitDoor:function(){return exitDoorEl;},
+    isInterior:function(){return inInterior;},
+    openFocus:openFocus,closeFocus:closeFocus,renderQuest:renderQuest,
+    setIP:function(x,y){IP.x=x;IP.y=y;ipEl.style.left=x+'px';ipEl.style.top=y+'px';checkInteriorNearby();},
+    OBJECTS:function(){return OBJECTS;},objEls:function(){return objEls;},
+    ROOMS:ROOMS,DIALOGS:DIALOGS,schedule:schedule,npcEls:npcEls,bots:bots,
+    getRoom:function(){return curRoom;},getPeriod:function(){return curPeriod;},
+    advanceTime:advanceTime,placeNPC:placeNPC,
+    openDialog:openDialog,chooseOpt:chooseOpt,closeDialog:closeDialog,
+    getDlg:function(){return {open:dlgOpen,npc:dlgState.npc,node:dlgState.node,
+      optCount:document.querySelectorAll('#dlgOpts .opt').length};},
+    sitDown:sitDown,standUp:standUp,isSeated:function(){return seated;},
+    rollTicket:rollTicket,callNr:callNr,flags:flags,
+    updateWorldGuide:updateWorldGuide,curNpcs:function(){return curNpcs;},
+    GRAPH:GRAPH,EGGS:EGGS,found:function(){return found;},collectEgg:collectEgg,
+    switchRoom:switchRoom,loadRoom:loadRoom,getCurBid:function(){return curBid;},
+    renderPortals:renderPortals,renderRoomNav:renderRoomNav,portals:function(){return PORTALS;},
+    openRummage:openRummage,flipSlot:flipSlot,closeRummage:closeRummage,
+    getRummageState:function(){return rummageState;},getToggleState:function(){return toggleState;},
+    doToggle:doToggle,openSpin:openSpin,flipSpin:flipSpin,closeSpin:closeSpin,
+    doCollect:doCollect,doEgg:doEgg,openCollection:openCollection,closeCollection:closeCollection,
+    onObject:onObject,findObj:findObj,
+    roomOverlaps:roomOverlaps,allOverlaps:allOverlaps,
+    jelly:{spawn:spawnJelly,catch:catchJelly,setOn:setJellyOn,
+      score:function(){return jellyScore;},total:function(){return jellyCaught;},
+      live:function(){return jellyLive.length;},on:function(){return jellyOn;},clear:clearJellies},
+    garyEl:function(){return document.getElementById('garyWorld');},
+    netMode:function(){return document.body.classList.contains('net-mode');},
+    checkNearby:checkNearby,tryInteract:tryInteract,setP:function(x,y){P.x=x;P.y=y;},
+    escapeJelly:escapeJelly,jellyEls:function(){return jellyLive;},
+    PLAYSPOTS:PLAYSPOTS,MG:MG,MINIS:MINIS,
+    startMini:startMini,endMini:endMini,exitMini:exitMini,
+    nearSpot:function(){return nearSpot;},mgGuide:mgGuide,
+    bubble:{hold:blowStart,release:blowRelease,burst:blowBurst,
+      get:function(){return blow;},set:function(v){blow=v;},holding:function(){return blowHold;},
+      found:function(){return blowFoundN;},shapes:function(){return Object.keys(blowFound);},
+      count:function(){return blowCount;},shapeAt:blowShape},
+    moveLocked:function(){return !!(MG.active||MG.resultOpen);},
+    karate:{next:karateNext,hit:karateHit,timeout:karateTimeout,
+      combo:function(){return kCombo;},best:function(){return kBest;},
+      move:function(){return KAR.cur?KAR.cur.d:null;}}
+  };
+  loop();
+})();
+</script>
+</body>
+</html>

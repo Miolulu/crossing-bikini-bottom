@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>《比奇堡》沉浸式连通世界 · 需求与重构方案 v2.8</title>
+<style>
+:root{
+  --deep:#062338; --sea:#0B5E86; --sea2:#1287A8; --aqua:#3FD0D8;
+  --sand:#F6E3C5; --sand2:#E8CFA6; --sponge:#FFD23F; --coral:#FF6B4A;
+  --pink:#FF8FB1; --ink:#0E1B24; --paper:#FBF6EC; --paper2:#F3EADA;
+  --green:#2FA36B; --purple:#8C6BD8; --red:#D64545;
+  --shadow:0 10px 30px rgba(6,35,56,.14);
+  --shadow-sm:0 4px 14px rgba(6,35,56,.10);
+  --r:18px;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Source Han Sans SC",system-ui,sans-serif;
+  line-height:1.8;font-size:16px;letter-spacing:.01em;-webkit-font-smoothing:antialiased;}
+img{max-width:100%;display:block;}
+a{color:var(--sea);text-decoration:none;}
+a:hover{text-decoration:underline;}
+
+.head{padding:54px 32px 40px;color:#fff;
+  background:
+    radial-gradient(120% 140% at 80% -10%, rgba(63,208,216,.45), transparent 60%),
+    radial-gradient(120% 140% at 10% 0%, rgba(255,210,63,.30), transparent 55%),
+    linear-gradient(160deg,#062338 0%,#0B5E86 55%,#1287A8 100%);
+  position:relative;overflow:hidden;}
+.head:after{content:"";position:absolute;inset:auto 0 0 0;height:36px;
+  background:radial-gradient(60% 100% at 50% 0,rgba(255,255,255,.18),transparent);}
+.head h1{margin:0 0 10px;font-size:30px;letter-spacing:.02em;}
+.head .sub{opacity:.9;font-size:15px;max-width:900px;}
+.tag{display:inline-block;margin-top:14px;margin-right:8px;padding:5px 12px;border-radius:999px;
+  background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);font-size:13px;}
+
+.wrap{max-width:1060px;margin:0 auto;padding:28px 22px 80px;}
+.toc{background:var(--paper2);border:1px solid rgba(6,35,56,.08);border-radius:var(--r);
+  padding:18px 22px;margin:0 0 30px;box-shadow:var(--shadow-sm);}
+.toc b{display:block;margin-bottom:8px;color:var(--sea);}
+.toc a{display:inline-block;margin:3px 14px 3px 0;font-size:14.5px;}
+
+section{background:#fff;border:1px solid rgba(6,35,56,.07);border-radius:var(--r);
+  padding:26px 28px;margin:0 0 24px;box-shadow:var(--shadow-sm);}
+section h2{margin:0 0 14px;font-size:22px;color:var(--deep);
+  border-left:6px solid var(--aqua);padding-left:14px;}
+section h3{margin:22px 0 10px;font-size:17.5px;color:var(--sea2);}
+section h4{margin:16px 0 6px;font-size:15.5px;color:var(--ink);}
+p{margin:10px 0;}
+ul,ol{margin:10px 0;padding-left:22px;}
+li{margin:6px 0;}
+small{color:#6b7c88;}
+
+.callout{border-radius:14px;padding:16px 18px;margin:16px 0;border:1px solid;}
+.callout b{display:block;margin-bottom:4px;}
+.warn{background:#FFF4F1;border-color:#FFD3C7;color:#9a3b22;}
+.ok{background:#EFFaf3;border-color:#BFE9D0;color:#1f6a45;}
+.info{background:#EAF6FB;border-color:#BFE3F0;color:#15566e;}
+
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14.5px;}
+th,td{border:1px solid rgba(6,35,56,.12);padding:10px 12px;text-align:left;vertical-align:top;}
+th{background:var(--paper2);color:var(--deep);}
+tr:nth-child(even) td{background:#FBFAF6;}
+
+.kbd{font-family:ui-monospace,Menlo,Consolas,monospace;background:#0E1B24;color:#fff;
+  padding:2px 8px;border-radius:6px;font-size:13px;}
+
+.svgbox{border:1px solid rgba(6,35,56,.12);border-radius:14px;background:#eef7fb;padding:10px;margin:16px 0;overflow:auto;}
+.svgbox svg{width:100%;height:auto;min-width:640px;}
+
+.pill{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12.5px;font-weight:600;}
+.pill.red{background:#FFE3DC;color:#C23B1E;}
+.pill.green{background:#DFF5E6;color:#1f7a47;}
+.pill.blue{background:#DCEFF7;color:#106489;}
+.pill.gray{background:#ECECEC;color:#555;}
+.pill.gold{background:#FFF3CF;color:#9a7400;}
+
+details{border:1px solid rgba(6,35,56,.1);border-radius:12px;padding:6px 14px;margin:12px 0;background:#fff;}
+summary{cursor:pointer;font-weight:600;color:var(--sea2);padding:8px 0;}
+details[open] summary{color:var(--deep);}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin:14px 0;}
+.card{border:1px solid rgba(6,35,56,.1);border-radius:14px;padding:14px 16px;background:#FBFAF6;}
+.card h4{margin:0 0 6px;color:var(--deep);}
+.card .meta{font-size:13px;color:#6b7c88;}
+
+.foot{max-width:1060px;margin:0 auto;padding:0 22px 60px;color:#6b7c88;font-size:13.5px;}
+.btn{display:inline-block;margin-top:10px;padding:10px 18px;border-radius:12px;
+  background:var(--sea);color:#fff;font-weight:600;box-shadow:var(--shadow-sm);}
+.btn:hover{text-decoration:none;background:var(--sea2);}
+</style>
+</head>
+<body>
+
+<div class="head">
+  <h1>《比奇堡》沉浸式连通世界 · 需求与重构方案 v2.6</h1>
+  <div class="sub">v2.0 的重构版，本次修订已锁定关键决策，并补全两大设定：① <b>NPC 作息与"主线生活"系统</b>（NPC 不再钉死在一点，而是按工作时间/生活时间在全镇移动）；② <b>莉娜的清洁物语式物品交互</b>（点击物品→放大聚焦检视、旋转看细节、藏隐藏交互）。美术资产滞后生成（另开账号），已建立开发日志与交付产物清单以便交接。<b>v2.4 追加交互系统定稿</b>：橙光式分支对话、家具坐下、NPC 室内外位置逻辑、号码滚动与 bot 居民，并把其余 5 栋室内按同一套范式全部做完（§7.6–7.10）。<b>v2.5 追加场景内出口系统</b>：修复「进屋后出不去」（世界层 HUD 让位 + 室内顶栏），六间房统一加一扇可走近/可点击的发光出口门（§7.11）。<b>v2.6 追加三项</b>：① <b>交互形式多样化</b>——抽屉/柜子可「打开翻找」、开关、旋转看背面、拾取、逗彩蛋等 8 类动词 + 27 件彩蛋藏品册（§7.12）；② <b>建筑升级为多房间·多楼层</b>——蟹堡王拆成前厅/后厨/办公室、章鱼哥家做 3 层带楼梯，六栋共 <b>14 个子房间</b>靠场景内门/楼梯连通（§7.13）；③ <b>美术风格选型与 token 消耗评估</b>（§8），并产出可直接交生图账号的《美术资产规格与提示词包.md》。<b>v2.7 追加三项</b>：① <b>主场景捉水母小玩法</b>——打地鼠式刷新、鱼网光标、三型水母（粉/蓝电/金）与计数板，填充街道留白（§7.14）；② <b>NPC 站位防重叠</b>——全量扫描 14 房间并修正章鱼哥/海绵宝宝坐标，加「点餐目标优先」与可复算校验函数（§7.15）；③ <b>小蜗可交互</b>——世界层可点实体 + 橙光式分支对话树 + 彩蛋联动（§7.15）。<b>v2.8 追加三项</b>：① <b>三处玩法场地 + 小游戏会话框架</b>——水母田 / 泡泡摊 / 空手道场各自圈定一片世界区域，点击或走近按 E 才开局，含开场横幅、30 秒倒计时、目标进度、结算卡与「收工」退出，<b>默认街上不再满屏冒水母</b>（§7.16）；② <b>《Bubblestand》吹泡泡</b>——按住蓄力 5 段形态（含蟹黄堡 / 小船 / 大象）与集齐 3 种特殊形状目标（§7.17）；③ <b>珊迪空手道节奏连击</b>——方向招式限时命中、10 连击目标（§7.17）。v2.7 表格里两个「后续候选」至此全部落地。</div>
+  <span class="tag">状态：决策已确认 · 进入最小闭环开发</span>
+  <span class="tag">渲染：2.5D 连通世界（轻等角）</span>
+  <span class="tag">范围：最小闭环（连通世界+蟹堡王）</span>
+  <span class="tag">多人：v1 仅 bot 居民</span>
+</div>
+
+<div class="wrap">
+
+<div class="toc">
+  <b>目录</b>
+  <a href="#s0">0. 问题复盘</a>
+  <a href="#s1">1. 目标体验</a>
+  <a href="#s2">2. 原作空间逻辑</a>
+  <a href="#s3">3. 连通世界地图</a>
+  <a href="#s4">4. 技术架构</a>
+  <a href="#s5">5. 六大建筑</a>
+  <a href="#s6">6. NPC 与互动（含作息系统）</a>
+  <a href="#s7">7. 房间摆放与交互系统</a>
+  <a href="#s7b">　└ 7.6–7.10 交互系统详设（v2.4）</a>
+  <a href="#s7c">　└ 7.11 场景内出口与室内/世界层切换（v2.5）</a>
+  <a href="#s7d">　└ 7.12 交互形式多样化 · 8 类动词 + 彩蛋藏品册（v2.6）</a>
+  <a href="#s7e">　└ 7.13 多房间·多楼层：房间图 Room Graph（v2.6）</a>
+  <a href="#s7f">　└ 7.14 主场景捉水母小玩法（v2.7）</a>
+  <a href="#s7g">　└ 7.15 NPC 站位防重叠 + 小蜗交互（v2.7）</a>
+  <a href="#s8e">　└ 8.5 v2.7 新增资产与调用次数增量</a>
+  <a href="#s7h">　└ 7.16 三处玩法场地 + 小游戏会话框架（v2.8）</a>
+  <a href="#s7i">　└ 7.17 吹泡泡 / 空手道玩法落地（v2.8）</a>
+  <a href="#s8f">　└ 8.6 v2.8 新增资产与调用次数增量</a>
+  <a href="#s8">8. 美术风格评估 & token 消耗（v2.6）</a>
+  <a href="#s9">9. 移动端 & 多人</a>
+  <a href="#s10">10. IP 合规</a>
+  <a href="#s11">11. 实施路线</a>
+  <a href="#s12">12. 决策确认记录</a>
+  <a href="#s13">13. 开发日志 & 交付清单</a>
+</div>
+
+<!-- 0 -->
+<section id="s0">
+  <h2>0. 问题复盘：为什么上一版"没有沉浸感"</h2>
+  <div class="callout warn">
+    <b>根因：做成了"分镜切换"，而不是"一个世界"。</b>
+    上一版把体验切成几个互相独立的全屏"场景"，玩家通过淡入淡出跳转。这本质上是幻灯片，缺乏"身临其境"的漫步感与空间连续感。
+  </div>
+  <p>你真正想要的是：<b>一个连通的比奇堡</b>（六栋建筑立在同一张世界地图上、道路相连）、<b>自由行走 + 相机跟随</b>、<b>建筑是真实实体（走到门口才进）</b>、<b>NPC 有自己的生活（按作息在全镇移动）</b>、<b>物品可放大聚焦检视</b>。这正是本方案要落地的目标。</p>
+</section>
+
+<!-- 1 -->
+<section id="s1">
+  <h2>1. 目标体验定义</h2>
+  <div class="callout ok">
+    <b>一句话：</b>你是比奇堡的一名新居民，在一个连续、鲜活、可自由行走的海底小镇里散步、串门、和按作息生活的邻居打招呼、在蟹堡王吃一口会一层层被咬掉的蟹黄堡。
+  </div>
+  <h3>体验原则（设计红线）</h3>
+  <ul>
+    <li><b>连续世界 &gt; 分镜切换</b>：任何时刻都在"同一个比奇堡"，不存在换页割裂。</li>
+    <li><b>漫步感</b>：相机跟随角色，世界随行走平移/缩放，远景/中景/近景视差。</li>
+    <li><b>NPC 有主线生活</b>：NPC 按"作息表"在全镇移动与行为，不是固定摆设（详见 §6.3）。</li>
+    <li><b>物品可聚焦检视</b>：点物品放大细看、旋转、交互、挖隐藏彩蛋（详见 §7，莉娜式）。</li>
+    <li><b>可进入的房子</b>：6 栋建筑是地图实体，门口进入，出来回原位。</li>
+    <li><b>低门槛</b>：打开即玩，移动端一等公民，不强制登录/打字聊天。</li>
+  </ul>
+</section>
+
+<!-- 2 -->
+<section id="s2">
+  <h2>2. 原作空间逻辑（调研结论）</h2>
+  <table>
+    <tr><th>区域</th><th>组成与空间关系</th><th>设计取值</th></tr>
+    <tr><td><b>康康路居住区</b></td><td>三栋房子固定三角：海绵宝宝凤梨屋=<b>124号正中</b>；章鱼哥摩艾屋=<b>122号左侧</b>；派大星石头屋=<b>120号右侧</b></td><td>三栋紧贴成"家区"</td></tr>
+    <tr><td><b>市中心商业区</b></td><td>蟹堡王 与 海之霸 <b>永远隔街对望</b></td><td>两店面对面放主街两端</td></tr>
+    <tr><td><b>珊迪圆顶树屋</b></td><td>充气玻璃圆顶，内部有空气</td><td>居住区与市中心过渡带</td></tr>
+    <tr><td><b>蟹老板船锚屋</b></td><td>蟹老板与珍珍的家（彩蛋珍珍出处）</td><td>v1 暂不作可进入主建筑</td></tr>
+    <tr><td><b>外围（扩展）</b></td><td>水母田、酷乐湖、手套乐园、划浪学校</td><td>v1 远景地标/后续章节</td></tr>
+  </table>
+  <div class="callout info">
+    <b>参考范式：</b>《SpongeBob: Battle for Bikini Bottom》的"比奇堡枢纽世界"——所有地标在同一张大地图、走路可达、门口进入、NPC 在街上走动。本方案复刻其"连通感"，并叠加原作作息逻辑与莉娜式物品交互。
+  </div>
+</section>
+
+<!-- 3 -->
+<section id="s3">
+  <h2>3. 目标世界地图（连通场景）</h2>
+  <div class="svgbox">
+    <svg viewBox="0 0 1000 560" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="比奇堡连通世界地图示意图">
+      <defs>
+        <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1aa3c4"/><stop offset="1" stop-color="#0B5E86"/></linearGradient>
+        <radialGradient id="bubble" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#ffffff" stop-opacity="0.9"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></radialGradient>
+      </defs>
+      <rect width="1000" height="560" fill="url(#bg)"/>
+      <g opacity="0.35" fill="#062338">
+        <rect x="60" y="70" width="40" height="90"/><rect x="120" y="50" width="30" height="110"/>
+        <rect x="200" y="80" width="50" height="80"/><rect x="640" y="60" width="36" height="100"/>
+        <rect x="720" y="40" width="28" height="120"/><rect x="900" y="70" width="44" height="90"/>
+        <polygon points="430,160 470,40 510,160"/>
+      </g>
+      <path d="M0,420 Q250,400 500,418 T1000,420 L1000,560 L0,560 Z" fill="#caa86a"/>
+      <path d="M0,440 Q250,425 500,440 T1000,442 L1000,560 L0,560 Z" fill="#b8954f" opacity="0.7"/>
+      <path d="M0,470 Q500,455 1000,470" stroke="#e8d6a8" stroke-width="26" fill="none" opacity="0.85"/>
+      <circle cx="150" cy="180" r="14" fill="url(#bubble)"/><circle cx="260" cy="120" r="9" fill="url(#bubble)"/>
+      <circle cx="520" cy="160" r="12" fill="url(#bubble)"/><circle cx="820" cy="140" r="10" fill="url(#bubble)"/>
+      <circle cx="700" cy="220" r="8" fill="url(#bubble)"/><circle cx="920" cy="200" r="13" fill="url(#bubble)"/>
+      <g>
+        <g transform="translate(150,330)"><rect x="-34" y="-30" width="68" height="90" rx="6" fill="#9c7b4f"/><rect x="-22" y="-12" width="14" height="16" fill="#3a2a16"/><rect x="8" y="-12" width="14" height="16" fill="#3a2a16"/><rect x="-14" y="20" width="28" height="8" fill="#3a2a16"/><text x="0" y="84" text-anchor="middle" font-size="13" fill="#fff">章鱼哥·摩艾屋</text></g>
+        <g transform="translate(300,300)"><ellipse cx="0" cy="55" rx="40" ry="10" fill="#0B5E86" opacity="0.3"/><path d="M-30,40 Q-34,-40 0,-55 Q34,-40 30,40 Z" fill="#FFD23F"/><path d="M-32,-30 L0,-62 L32,-30 L12,-22 L-12,-22 Z" fill="#2FA36B"/><circle cx="-12" cy="0" r="6" fill="#0E1B24"/><circle cx="12" cy="0" r="6" fill="#0E1B24"/><path d="M-10,16 Q0,24 10,16" stroke="#0E1B24" stroke-width="3" fill="none"/><text x="0" y="78" text-anchor="middle" font-size="13" fill="#fff">海绵宝宝·凤梨屋(家)</text></g>
+        <g transform="translate(450,335)"><ellipse cx="0" cy="50" rx="42" ry="11" fill="#0B5E86" opacity="0.3"/><path d="M-38,50 Q-44,0 0,-8 Q44,0 38,50 Z" fill="#8a8f96"/><path d="M-38,50 Q0,40 38,50 Z" fill="#6f747b"/><text x="0" y="74" text-anchor="middle" font-size="13" fill="#fff">派大星·石头屋</text></g>
+        <g transform="translate(600,320)"><ellipse cx="0" cy="48" rx="40" ry="10" fill="#0B5E86" opacity="0.3"/><path d="M-38,48 A38,48 0 0 1 38,48 Z" fill="#bfeaf2" opacity="0.85" stroke="#7fc7d6" stroke-width="2"/><rect x="-6" y="-4" width="12" height="52" fill="#7fc7d6"/><circle cx="0" cy="-30" r="6" fill="#2FA36B"/><text x="0" y="74" text-anchor="middle" font-size="13" fill="#fff">珊迪·圆顶树屋</text></g>
+      </g>
+      <g>
+        <g transform="translate(780,310)"><ellipse cx="0" cy="55" rx="54" ry="12" fill="#0B5E86" opacity="0.3"/><rect x="-46" y="-20" width="92" height="75" rx="6" fill="#c0392b"/><path d="M-46,-20 L0,-46 L46,-20 Z" fill="#e74c3c"/><rect x="-30" y="6" width="60" height="30" fill="#8e2a1e"/><text x="-46" y="-52" font-size="13" fill="#fff" text-anchor="middle">蟹堡王</text></g>
+        <g transform="translate(900,330)"><ellipse cx="0" cy="45" rx="44" ry="10" fill="#0B5E86" opacity="0.3"/><path d="M-40,45 Q-46,-10 0,-18 Q46,-10 40,45 Z" fill="#5b6e57"/><rect x="-30" y="8" width="60" height="34" fill="#3f4f3c"/><circle cx="0" cy="-2" r="9" fill="#9fd14a"/><text x="0" y="68" text-anchor="middle" font-size="13" fill="#fff">海之霸</text></g>
+      </g>
+      <g transform="translate(300,395)"><circle cx="0" cy="0" r="9" fill="#fff" stroke="#FF6B4A" stroke-width="3"/><text x="0" y="26" text-anchor="middle" font-size="11" fill="#fff">你(新居民)</text></g>
+      <text x="300" y="500" text-anchor="middle" font-size="13" fill="#fff" opacity="0.85">← 居住区 →</text>
+      <text x="700" y="500" text-anchor="middle" font-size="13" fill="#fff" opacity="0.85">市中心(主街) →</text>
+    </svg>
+  </div>
+  <p><small>示意图为俯视简化版，仅表达"连通 + 锚点关系"。实际渲染为<b>轻等角(斜俯视)微缩沙盘</b>（呼应莉娜的清洁物语视角），相机跟随玩家平移。</small></p>
+  <div class="callout info">
+    <b>★ 建筑错落排布（用户二次修正）</b>：六栋建筑<b>不能排成一排</b>。按参考图（游戏主城截图 + 手绘比奇堡地图）应为——居住区在左/下（摩艾屋、凤梨屋、石头屋、圆顶树屋），商业区在中上/右上（蟹堡王、海之霸），入口导览在右下；沿<b>弯曲小路</b>散布，前后高低错位、体量不一。
+    实现上用 <code>z-index = 常量 − y</code>，令靠前（y 大）的建筑遮挡靠后的，形成景深。当前 Demo 六栋建筑顶部 y = <code>[520,540,560,600,620,790]</code>，已明显错落（旧版几乎同在 540–580 一条线）。
+  </div>
+</section>
+
+<!-- 4 -->
+<section id="s4">
+  <h2>4. 技术架构：单连续世界（2.5D · 轻等角）</h2>
+  <h3>4.1 核心模型：World Space，而非多 Scene</h3>
+  <ul>
+    <li><b>单一世界坐标系</b>：所有建筑/NPC/玩家/装饰有全局 (x,y) 坐标，存在于同一张大地图。</li>
+    <li><b>相机跟随（第三人称）</b>：视口只显示一小块；玩家移动相机平移跟随，边缘轻微缩放/视差。</li>
+    <li><b>分层视差</b>：远景天际线（慢移）、中景建筑与 NPC（正常）、近景海草/气泡（快移）。</li>
+    <li><b>轻等角微缩沙盘</b>：主视角采用轻度 isometric/斜俯视，强化"微缩比奇堡"的沙盘感，并利于物品聚焦检视（见 §7）。</li>
+    <li><b>建筑 = 世界实体</b>：门触发区，走到门口按 <span class="kbd">E</span> 进入；内部独立空间，出来回原位。</li>
+  </ul>
+  <h3>4.2 旧版 vs 新版</h3>
+  <table>
+    <tr><th>维度</th><th>旧版(v0.2 分镜)</th><th>新版(v2 连通世界)</th></tr>
+    <tr><td>空间结构</td><td>多个独立全屏 scene 切换</td><td><span class="pill green">单一连续 World Space + 相机跟随</span></td></tr>
+    <tr><td>NPC 位置</td><td>固定站位</td><td><span class="pill green">按作息表全镇移动</span></td></tr>
+    <tr><td>物品交互</td><td>无</td><td><span class="pill green">莉娜式聚焦检视（放大/旋转/隐藏交互）</span></td></tr>
+    <tr><td>进入建筑</td><td>无</td><td>门口触发 → 室内 → 回原位</td></tr>
+  </table>
+  <div class="callout info">
+    <b>渲染决策（已确认）：2.5D 轻等角连通世界</b>。移动端友好、单文件离线、还原原作 2D 手绘气质且契合莉娜式微缩沙盘。全 3D 开放世界成本/性能过高，留作后续可选升级。蟹黄堡等少量道具用 CSS3D/轻量 WebGL 做真 3D（在聚焦检视中呈现）。
+  </div>
+</section>
+
+<!-- 5 -->
+<section id="s5">
+  <h2>5. 六大建筑与内部空间</h2>
+  <div class="grid">
+    <div class="card"><h4>🍍 凤梨屋</h4><div class="meta">居中 · 你的家区邻居</div><p>客厅/厨房/卧室。可触发：和小蜗互动（1% 恶搞）、看相册。海绵宝宝下班后回到这里。</p></div>
+    <div class="card"><h4>🗿 摩艾屋</h4><div class="meta">左侧 · 冷淡艺术家</div><p>极简、挂自画像与竖笛（✦可聚焦检视）。章鱼哥下班回此画画/吹笛，靠近被嫌弃。</p></div>
+    <div class="card"><h4>🪨 石头屋</h4><div class="meta">右侧 · 憨憨乐天</div><p>内部一切为沙子做。派大星在此发呆；白天多在外面闲逛。</p></div>
+    <div class="card"><h4>🛖 圆顶树屋</h4><div class="meta">过渡带 · 充气温室</div><p>充满空气、有树与器械（✦可检视）。珊迪在此做科学实验。</p></div>
+    <div class="card"><h4>🍔 蟹堡王</h4><div class="meta">市中心 · 核心玩法</div><p><b>取号 → 结账 → 窗口等制作 → 取餐</b>四步动线（§7.2）；内部为<b>连成一片的多分区房间</b>；蟹黄堡<b>咬痕式</b>进食（§7.3）。白天：海绵宝宝后厨、章鱼哥收银台、蟹老板办公室。</p></div>
+    <div class="card"><h4>🥣 海之霸</h4><div class="meta">市中心 · 对面死对头</div><p>凯伦（电脑屏）吐槽、痞老板密谋。可看"海霸糊"黑暗料理；痞老板作彩蛋身份。</p></div>
+  </div>
+  <div class="callout ok">
+    <b>★ 蟹堡王内部 = 连成一片的多分区房间（用户二次修正）</b>：🔥 后厨/煎炉区 · 💵 前厅收银台（ORDER HERE）· 💰 蟹老板办公室 · 🪟 出餐窗口与取餐台 · 🍽 红白格餐桌就餐区 · 🚪 拱门后巷 · 📸 合影点；房间按莉娜式<b>塞满可点物件</b>。详见 §7。
+  </div>
+  <div class="callout warn">
+    <b>★ v2.6 更正（用户七次修正）</b>：上面「<b>同一张室内平面</b>展示全部区域」的表述<b>已作废</b>。用户明确指出「不能只用一个平面图展示全部的区域」——建筑必须做成<b>多个独立房间 / 多楼层</b>，靠场景内的门与楼梯连接。据此蟹堡王拆为 <b>前厅 / 后厨 / 蟹老板办公室</b> 三间，章鱼哥家做 <b>1F 客厅 / 2F 画室 / 3F 阁楼卧室</b> 三层带楼梯，其余四栋各拆两间，六栋共 <b>14 个子房间</b>。完整规格见 <a href="#s7e">§7.13</a>。
+  </div>
+</section>
+
+<!-- 6 -->
+<section id="s6">
+  <h2>6. NPC 与互动系统</h2>
+  <h3>6.1 角色分层</h3>
+  <table>
+    <tr><th>类型</th><th>成员</th><th>可抽为玩家身份</th><th>行为</th></tr>
+    <tr><td><b>主 NPC（固定）</b></td><td>章鱼哥、蟹老板、海绵宝宝、派大星</td><td><span class="pill red">不可</span></td><td>性格化、按作息全镇移动</td></tr>
+    <tr><td><b>彩蛋 NPC（部分随机）</b></td><td>珍珍、珊迪、痞老板</td><td><span class="pill green">可</span></td><td>少数玩家抽到隐藏身份</td></tr>
+    <tr><td><b>玩家 & 随机居民</b></td><td>你 + 在线居民</td><td>—</td><td>彩色 token 占位</td></tr>
+  </table>
+  <h3>6.2 互动机制</h3>
+  <ul>
+    <li><b>头上气泡对话</b>：靠近自动/按键触发，还原原作"头顶冒字"。</li>
+    <li><b>邻近提示</b>：靠近门或 NPC 显示"按 <span class="kbd">E</span> 进入/交谈"。</li>
+    <li><b>次级 NPC 状态影响态度</b>：章鱼哥"心情值"受你吵闹影响；蟹老板见你消费更热情。</li>
+    <li><b>性格一致</b>：章鱼哥冷嘲、海绵宝宝元气哼歌、蟹老板张口谈钱、派大星语出惊人。</li>
+  </ul>
+
+  <h3>6.3 ★ NPC 作息与"主线生活"系统（新增 · 核心设定）</h3>
+  <div class="callout info">
+    <b>原则：NPC 不是钉死在某一点，而是按"一天的时间线"在比奇堡里生活、移动。</b>玩家在不同时间/情境进入场景，会在不同位置遇到他们——这是"他们在过自己的生活"的沉浸感来源。
+  </div>
+  <ul>
+    <li><b>世界时钟</b>：游戏内时间轴（可真实流逝或加速），分 清晨/上午/午间/下午/傍晚/夜晚 等时段；UI 显示当前时段，支持"快进到某时段"调试。</li>
+    <li><b>作息表(schedule)</b>：每个 NPC 一张 时段 → 所在位置 + 当时行为 的映射，数据驱动。</li>
+    <li><b>位置锚点</b>：每个地点有 NPC 的"站位坐标"（如蟹堡王后厨、收银台、摩艾屋画室）。</li>
+    <li><b>移动</b>：时段切换时 NPC 沿道路从旧位置插值走到新位置（带简单巡逻/发呆），<b>不是瞬移</b>。</li>
+    <li><b>行为</b>：到达后播放符合性格的行为（海绵宝宝后厨炸堡哼歌、章鱼哥收银台翻白眼、派大星闲逛）。</li>
+  </ul>
+  <table>
+    <tr><th>NPC</th><th>上班 / 日间</th><th>傍晚 / 下班</th><th>夜晚</th><th>备注</th></tr>
+    <tr><td><b>海绵宝宝</b></td><td>蟹堡王<b>后厨</b>（炸肉饼、哼歌）</td><td>凤梨屋（睡/与小蜗玩）</td><td>凤梨屋</td><td>偶尔水母田(v2)</td></tr>
+    <tr><td><b>章鱼哥</b></td><td>蟹堡王<b>收银台</b>（抱怨、翻白眼）</td><td>摩艾屋（画画/吹竖笛）</td><td>摩艾屋</td><td>讨厌被打扰</td></tr>
+    <tr><td><b>蟹老板</b></td><td>蟹堡王<b>柜台</b>（盯账、贪财吆喝）</td><td>蟹堡王/船锚屋</td><td>船锚屋(珍珍)</td><td>基本长在店里</td></tr>
+    <tr><td><b>派大星</b></td><td><b>闲逛</b>（居住区/主街随机游走）</td><td>石头屋（发呆）</td><td>石头屋</td><td>无固定工作，找海绵宝宝</td></tr>
+    <tr><td><b>珊迪</b></td><td>圆顶树屋（科学实验）</td><td>圆顶树屋/外出</td><td>圆顶树屋</td><td>v1 在树屋</td></tr>
+    <tr><td><b>痞老板</b></td><td>海之霸（密谋偷秘方）</td><td>海之霸</td><td>海之霸</td><td>偶尔溜去蟹堡王</td></tr>
+  </table>
+  <div class="callout ok">
+    <b>玩家体验示例：</b>白天进蟹堡王 → 看到海绵宝宝在后厨、章鱼哥在收银台、蟹老板在柜台；傍晚再去 → 店里只剩蟹老板，海绵宝宝章鱼哥已回家。这种"他们有自己的生活"的错觉就是沉浸感来源。
+  </div>
+  <details><summary>实现要点（展开）</summary>
+    <ul>
+      <li>数据结构：<code>schedule = { npcId: { 时段: {x,y,behavior} } }</code>，位置用世界坐标锚点。</li>
+      <li>时段切换：计算目标坐标 → 沿道路路径点线性插值移动 → 到达播放 behavior 动画/气泡。</li>
+      <li>派大星等"闲逛"类：用随机游走 + 在几个锚点间徘徊，不绑定固定工位。</li>
+      <li>可扩展：后续加更多 NPC、更多时段、特殊事件（如"蟹老板生日"全城变动）。</li>
+    </ul>
+  </details>
+</section>
+
+<!-- 7 -->
+<section id="s7">
+  <h2>7. 房间摆放与交互系统（莉娜范式 · 分支对话 · 坐下 · 六室）</h2>
+  <div class="callout info">
+    <b>二次调研结论（《莉娜的清洁物语》/ Clean Start，Serious Sim 2026）</b>——三条必须照搬的范式：
+    <ul>
+      <li><b>房间 = 等角微缩立体沙盘，塞满数百件可点小道具</b>：家具、摆件、杂物按空间错落陈列，密度本身就是沉浸感；不是几个空色块分区。</li>
+      <li><b>两级交互</b>：普通点击/划过 → 交互或整理；部分物件可「额外检视」→ 放大、看介绍、旋转，<b>其中还藏另外的交互/线索</b>（环境叙事）。游戏内操作提示即「方向键 / WASD 旋转 · ESC / E 返回」。</li>
+      <li><b>界面挂进度清单</b>（如「丢掉披萨盒 3/4」「衣服收进抽屉 2/4」）：任务逐条打勾、形成有先后的动线，但<b>无倒计时、无失败惩罚</b>；找不到时还有「灯泡高亮提示」。</li>
+    </ul>
+  </div>
+
+  <h3>7.1 房间摆放规则（新增 · 核心修正）</h3>
+  <ul>
+    <li>室内按<b>等角微缩沙盘</b>布置：后墙（蓝色木板）、菱形地砖、中间留走动空间；物件沿墙 / 柜台 / 桌面<b>错落陈列</b>，玩家可在房间内 WASD 走动。</li>
+    <li><b>物件即交互点</b>：每个可点物件有图标 + 短标签，悬停高亮；当前流程该点的物件<b>呼吸式发光</b>引导（等价莉娜的灯泡提示）。</li>
+    <li><b>点开看介绍</b>：非流程物件点击弹出检视小卡（名称 + 一句介绍）；部分物件藏「🔎 多看一眼」线索（保险柜里的秘方纸条、账本夹的旧照片、菜单被涂改的原价…）。</li>
+    <li><b>可走动也可直接点</b>：靠近按 <span class="kbd">E</span>，或直接点击物件（不强制走近），降低操作门槛。</li>
+  </ul>
+
+  <h3>7.2 ★ 蟹堡王点餐动线（新增 · 有前置条件的任务链）</h3>
+  <div class="callout ok">
+    <b>用户指定动线：先在柜台取号 → 在收银台结账 → 到后厨窗口等待汉堡制作出来 → 点击出餐窗口取餐。</b>不是「进店随便点汉堡」，而是一条有先后顺序的流程；每一步对应房间里一个具体物件。
+  </div>
+  <table>
+    <tr><th>步</th><th>交互物件</th><th>动作与反馈</th><th>前置条件</th></tr>
+    <tr><td>① 取号</td><td>🎫 取号机（门口）</td><td>吐出号码条 A007，号码屏显示「你的号码」；章鱼哥催促</td><td>—</td></tr>
+    <tr><td>② 结账</td><td>💵 收银台（章鱼哥）</td><td>章鱼哥吐槽并把订单递进后厨；海绵宝宝接单</td><td>需已取号</td></tr>
+    <tr><td>③ 等制作</td><td>🪟 后厨窗口</td><td>进度条 + 分阶段文案（和面 → 煎肉饼 → 铺生菜芝士 → 挤秘方酱料 → 装盘）</td><td>需已结账</td></tr>
+    <tr><td>④ 取餐</td><td>🍽️ 出餐台</td><td>「🔔 叮！A007 请取餐」，发光蟹黄堡出现，点击取走</td><td>需制作完成</td></tr>
+    <tr><td>⑤ 品尝（彩蛋）</td><td>🍔 蟹黄堡</td><td>进入聚焦检视，咬着吃；吃光露秘方酱料</td><td>需已取餐</td></tr>
+  </table>
+  <ul>
+    <li><b>前置校验</b>：跳步会提示「请先取号」「请先结账」「后厨还在做」，不会静默放行。</li>
+    <li><b>进度清单 HUD</b>：右上角常驻 5 条任务，完成打勾、当前高亮、制作中显示百分比（莉娜式清单）。</li>
+    <li><b>无倒计时 / 无失败</b>：制作进度是等待动画而非限时压力，保持松弛感。</li>
+  </ul>
+
+  <h3>7.3 ★ 蟹黄堡「咬痕」进食（修正：不再逐层消失）</h3>
+  <div class="callout ok">
+    <b>旧做法（已废弃）</b>：咬一口 → 一整层（面包 / 生菜 / …）整层淡出消失，看起来像汉堡在「脱衣服」。<br>
+    <b>新做法</b>：汉堡始终是一只完整的多层堡，每咬一口用 <code>SVG clipPath（evenodd 挖洞）</code> 从边缘<b>啃出一簇带齿的圆弧缺口</b>，缺口处所有层一同被切掉，露出<b>面包 / 生菜 / 芝士 / 肉饼的夹层横截面</b>，并伴随碎屑粒子。咬满 5 口吃光 → 盘底露出「秘方酱料」隐藏彩蛋。
+  </div>
+  <ul>
+    <li>缺口路径：右上 → 右下 → 左上 → 左下 → 中间大口，逐口扩大，符合真实啃咬顺序。</li>
+    <li><b>五层全程保留</b>（不整层隐藏），可旋转 / 翻面观察缺口处的夹层截面。</li>
+    <li>聚焦检视操作：<b>方向键 / WASD 旋转</b>、鼠标拖拽旋转、<b>E / ESC 返回</b>（对齐莉娜操作提示）；「😋 咬一口」「🔄 翻面」「↺↻ 左/右转」按钮适配触屏。</li>
+  </ul>
+
+  <h3>7.4 其他物品（沿用）</h3>
+  <table>
+    <tr><th>物品</th><th>所在</th><th>交互</th></tr>
+    <tr><td>收银机 / 菜单牌 / 小费罐</td><td>蟹堡王前厅</td><td>点开看介绍；菜单牌藏被涂改的原价</td></tr>
+    <tr><td>煎炉 / 锅铲 / 酱料瓶 / 饮料机</td><td>蟹堡王后厨</td><td>点开看介绍；酱料瓶藏「别让痞老板看见」</td></tr>
+    <tr><td>保险柜 / 账本 / 画像</td><td>蟹老板办公室</td><td>点开看介绍；保险柜与账本藏秘方线索 / 旧照片</td></tr>
+    <tr><td>船锚 / 救生圈 / 桌上杂物 / 拖把</td><td>全店</td><td>点开看介绍（撑起环境叙事密度）</td></tr>
+    <tr><td>章鱼哥的竖笛（✦）</td><td>摩艾屋</td><td>放大查看；「吹一下」章鱼哥更烦</td></tr>
+    <tr><td>小蜗（✦）</td><td>凤梨屋</td><td>「逗一下」；1% 恶搞彩蛋</td></tr>
+  </table>
+
+  <h3>7.5 ★ 交互形式：世界内引导（diegetic）· 四次修正</h3>
+  <div class="callout warn">
+    <b>问题复盘（v0.5.1 的交互退化）</b>：为修复「取号后收银机点不动」，上一版加了<b>屏幕 UI 兜底</b>——可点进度清单、底部「下一步」按钮、按 E 无条件执行当前步骤。结果点餐从「在微缩房间里走动、观察、发现物件」退化成「点 UI 按钮推进任务清单」，与「身临其境」目标相悖。
+  </div>
+  <div class="callout ok">
+    <b>重构原则：交互与引导全部发生在场景里，不依赖屏幕 UI 按钮。</b> 同时<b>保留 v0.5.1 的全部点击命中修复</b>（装饰层点击穿透、物件 z-index:30、HUD 层级重排）——保证「点得中」，不再需要靠 UI 兜底来防卡死。
+  </div>
+  <table>
+    <tr><th>机制</th><th>做法</th><th>替代了什么 UI</th></tr>
+    <tr><td>🎯 目标光圈 + 光路</td><td>当前步骤的目标物件脚下有<b>金色脉动椭圆光圈</b>，玩家脚下到目标之间连一条<b>流动虚线光路</b>（世界坐标，随玩家走动实时更新）</td><td>替代「下一步」按钮指路</td></tr>
+    <tr><td>💬 物件锚定气泡</td><td>走近物件才在<b>物件头顶</b>浮出「按 E / 点我 · 收银台 · 结账」小气泡，跟着物件走</td><td>替代屏幕中央大号 #prompt</td></tr>
+    <tr><td>🗣 NPC 带路台词</td><td>每步由对应 NPC 说一句指向台词（章鱼哥「先去门口取号机拿张号」、海绵宝宝「订单收到，去窗口等着」…）</td><td>替代 toast 流程提示</td></tr>
+    <tr><td>🧾 纸质点单条</td><td>清单降级为角落一张<b>带胶带、微微倾斜的米黄纸条</b>，纯展示、<b>不可点</b>、不可推进</td><td>废弃「清单条目可点」</td></tr>
+    <tr><td>✨ 交互反馈</td><td>物件弹跳 + 碎星光粒子；非目标流程物件<b>变暗</b>引导视线；交互成功光圈自动转移到下一目标</td><td>让「下一步」由世界状态变化表达</td></tr>
+    <tr><td>🔭 镜头语言</td><td>进店淡入推近、聚焦检视改为<b>半透明虚化 + 缩放推近</b>（房间仍隐约可见），非黑屏弹窗</td><td>消除硬切换的割裂感</td></tr>
+    <tr><td>🫧 环境生命力</td><td>海底光斑缓慢摇曳、气泡上浮、煎炉蒸汽、物件呼吸发光（纯 CSS 动画，零 JS 循环开销）</td><td>补「房间活起来」</td></tr>
+    <tr><td>👆 触屏手势</td><td>聚焦检视支持单指拖拽旋转蟹黄堡</td><td>移动优先落到操作层</td></tr>
+  </table>
+  <ul>
+    <li><b>走近才触发</b>：按 E 只在玩家真正走近当前目标物件/NPC 时生效；未走近则由 NPC 带路提示，<b>不静默跳步</b>。点击物件仍是可靠主通道（命中修复保留）。</li>
+    <li><b>完成后撤引导</b>：吃光蟹黄堡（step=6）后收起光圈/光路、所有物件恢复亮度，房间回到可自由检视的探索状态。</li>
+    <li><b>性能</b>：物件位置是静态的，气泡 rect 只在「目标变化」时读一次、光路仅在玩家移动时重绘，避免每帧强制布局（移动端 60fps）。</li>
+  </ul>
+
+<div id="s7b"></div>
+<h3>7.6 ★ 分支对话系统（橙光式选项互动）· 五次修正</h3>
+<div class="callout warn">
+  <b>用户反馈</b>：「和 NPC 对话至少得有选项吧？类似橙光那种对话互动？」——旧版 <code>talkNPC()</code> 只弹一句头顶气泡，玩家没有任何选择权，NPC 像一块会说话的路牌。
+</div>
+<ul>
+  <li><b>数据驱动的对话树</b>：每个 NPC 一组 <code>{name, emoji, nodes}</code>，节点含台词 <code>t</code> 与 2–4 个选项 <code>o[]</code>；选项带 <code>to</code>（跳转下一节点）与可选 <code>fx</code>（后果）。</li>
+  <li><b>面板形态</b>：屏幕底部对话框，左侧圆形立绘（角色色盘）、名字条、台词、竖排编号选项（<b>1–4 数字键 / 点击 / 触屏</b>均可）；末节点为「▼ 结束对话」。<code>ESC / E</code> 随时退出，对话期间暂停移动。</li>
+  <li><b>分支与后果</b>：选项分叉到不同节点；<code>fx</code> 触发彩蛋/线索/好感提示；<b>部分选项会改变下次见面的开场白</b>（例：让章鱼哥吹完竖笛并鼓掌后，再对话会变成「……又是你。上次那声鼓掌，我到现在还记着。」）。</li>
+  <li><b>性格化台词</b>：章鱼哥冷淡、海绵宝宝亢奋、蟹老板句句不离钱、派大星逻辑清奇、珊迪科学梗、痞老板嘴硬（凯伦毒舌）；bot 居民另有一组通用寒暄树。当前共 <b>7 组对话树</b>。</li>
+  <li><b>覆盖范围</b>：世界层 NPC（街上）、室内岗位 NPC、bot 居民，按 E 全部进入同一套对话面板，不再是一句气泡打发。</li>
+</ul>
+
+<h3>7.7 ★ 家具「坐下」交互 · 五次修正</h3>
+<div class="callout warn">
+  <b>用户反馈</b>：「椅子也不能交互，我以为是可以坐下的那种」。旧版椅子是纯装饰（<code>pointer-events:none</code>），从未进入交互热点。
+</div>
+<ul>
+  <li>椅子 / 沙发 / 床沿 / 树桩 / 石头凳等做成<b>可点、可走近的座位实体</b>，与物件、NPC 一起纳入统一的「最近热点」判定（取距离最近者，避免多个热点互相抢焦点）。</li>
+  <li>走近按 E 或点击 → 玩家移到座位、切换<b>坐姿</b>（缩身 + 座椅标记）、座位高亮为占用态、镜头轻微推近、弹出一句环境叙事台词（如「你陷进软软的沙发里，小蜗在旁边慢吞吞地爬」）。</li>
+  <li>再按 E / 再点一下 → 起身、恢复站姿与镜头；坐下期间暂停移动。</li>
+  <li>当前 Demo 共 <b>23 个座位</b>：蟹堡王 8 张椅子 + 其余 5 栋各 3 个。</li>
+</ul>
+
+<h3>7.8 ★ NPC 室内外位置逻辑（修正「章鱼哥为什么在餐厅外面」）</h3>
+<div class="callout warn">
+  <b>用户反馈</b>：「章鱼哥为啥在蟹堡王餐厅外面？」根因：作息表只给世界坐标，<code>day</code> 时段章鱼哥被放在蟹堡王<b>外墙左侧 (1470,660)</b>，而按「上班在岗」设定他此刻应在<b>蟹堡王室内收银台</b>——世界层缺少「室内 / 室外」区分。
+</div>
+<ul>
+  <li>作息表每项新增 <code>where:'indoor' | 'world'</code> 与 <code>room</code> 字段。<b>在岗 NPC 世界层直接隐藏</b>，只在对应房间的岗位出现；只有「下班 / 闲逛」状态才在街上可见。</li>
+  <li>房间 NPC 由 <code>renderNPCs(roomId)</code> 按「时段 + 房间」动态生成：白天蟹堡王内为 sponge / squid / krabs 三人；傍晚 sponge 回凤梨屋、squid 回摩艾屋、krabs 仍在柜台；夜晚只剩蟹老板回船锚屋（街上可见）。</li>
+  <li><b>快进时间会同步刷新当前房间的 NPC</b>，不会出现「人已在室内却按旧时段显示」的错位。</li>
+  <li>副产物：白天街上只有派大星（闲逛）+ 6 个 bot 居民，主角们都在各自岗位上——这正是 §6.3「NPC 有主线生活」的真正落地。</li>
+</ul>
+
+<h3>7.9 号码滚动动画 与 bot 居民（任务 ②③）</h3>
+<ul>
+  <li><b>取号机</b>：取号后号码屏数字<b>逐位滚动</b>（A001 → A007）并定格到你的号码，带上下抖动 + 模糊的翻号动画。</li>
+  <li><b>叫号屏</b>：结账进入制作后，叫号屏按节奏 A001 → A006 逐号跳动，与后厨「和面 / 煎肉饼 / 铺菜 / 挤酱料 / 装盘」分阶段进度并行；制作完成定格「🔔 当前叫号 A007 ｜ 请取餐！」。</li>
+  <li><b>bot 居民</b>：街道常驻 6 位随机小鱼居民（泡泡鱼 / 条纹鱼 / 小丑鱼 / 比目鱼 / 石头鱼 / 海胆先生），沿小路随机漫游（CSS transition，零 JS 每帧开销），带名字牌；靠近按 E 可打招呼（走通用对话树）。夜晚回家、街上安静。</li>
+</ul>
+
+<h3>7.10 六栋室内规格（任务 ① · 全部可进入）</h3>
+<p>把 v0.6 的「单一蟹堡王房间」泛化为<b>数据驱动的通用房间渲染器</b>：<code>THEME</code> 换肤 + <code>ROOMS</code>（decor / objects / seats / npcs / quest）配置，6 间共用同一套世界内交互（走近热点、点开检视、隐藏线索、分支对话、坐下、镜头推近、环境动效）。</p>
+<table>
+  <tr><th>房间</th><th>主题换肤</th><th>分区</th><th>可点物件</th><th>座位</th><th>时段 NPC</th></tr>
+  <tr><td>🍔 蟹堡王</td><td>蓝木墙 + 菱形地砖</td><td>后厨 / 收银台 / 办公室 / 就餐区 / 出餐窗口 / 拱门</td><td>22</td><td>8</td><td>白天 3 人（岗位）</td></tr>
+  <tr><td>🍍 凤梨屋</td><td>菠萝黄 + 暖沙地</td><td>客厅 / 厨房 / 卧室 / 菠萝天窗</td><td>13</td><td>3</td><td>傍晚起 海绵宝宝</td></tr>
+  <tr><td>🗿 摩艾屋</td><td>冷灰石 + 灰木地</td><td>客厅 / 画室 / 卧室 / 阁楼</td><td>12</td><td>3</td><td>傍晚起 章鱼哥</td></tr>
+  <tr><td>🪨 石头屋</td><td>沙褐 + 沙地</td><td>沙地客厅 / 零食角 / 石头底下</td><td>12</td><td>3</td><td>傍晚起 派大星</td></tr>
+  <tr><td>🌳 圆顶树屋</td><td>树绿 + 草绿地</td><td>实验室 / 客厅 / 健身区 / 气闸</td><td>12</td><td>3</td><td>全天 珊迪</td></tr>
+  <tr><td>🥣 海之霸</td><td>暗橄榄绿 + 灰绿地</td><td>点餐台 / 后厨 / 凯伦控制台 / 后巷</td><td>12</td><td>3</td><td>全天 痞老板</td></tr>
+</table>
+<ul>
+  <li><b>莉娜式环境叙事</b>：每间房 12–22 个小道具，点开看介绍，部分藏「🔎 多看一眼」线索（保险柜里的秘方纸条、账本夹的旧照片、画架背后的辞职信、白板上的公式、凯伦的失败计数…）。</li>
+  <li><b>点餐动线仅蟹堡王启用</b>：其余 5 栋不显示点单条 / 号码屏 / 合影点，进门即回到自由探索状态（无任务压力）。</li>
+  <li class="pill gray"><b>⚠ 本表已被 §7.13 取代</b>：上表是 v2.4「每栋一间房」的旧规格；v2.6 起每栋拆成多房间/多楼层，共 14 间，物件与座位总数随之扩展。</li>
+</ul>
+
+<h3 id="s7c">7.11 ★ 场景内出口与室内/世界层切换（v2.5 · 用户反馈「进屋后出不去」）</h3>
+<div class="callout warn">
+  <b>问题复盘</b>：v0.7 里「← 离开」按钮（<code>#exitBtn</code>）其实一直存在，但被世界层 <code>#controls</code>（右上角、<code>z-index:260</code>、两个不透明按钮）完全盖住并吃掉点击；<code>ESC</code> 虽能退出，却没有可见提示、移动端更是没有键盘。<br>
+  <b>关键坑</b>：<code>#interior</code> 自身是 <code>z-index:200</code> 的<b>层叠上下文</b>，顶栏子元素无论把 <code>z-index</code> 提多高都压不过外部 fixed 层——所以「提高按钮层级」是无效解，必须让世界层 HUD 让位。
+</div>
+<ul>
+  <li><b>层叠正解</b>：进室内时给 <code>body</code> 加 <code>.in-room</code>，让世界层 HUD（<code>#hud / #controls / #legend</code>）隐藏；把「⏩ 快进 / ← 离开」收进<b>室内顶栏</b>，顶栏独占屏幕顶部、不再与外部层争。退出室内移除 class，世界 HUD 原样恢复。室内顶栏常驻一行操作提示：「WASD 走动 · 走近 🚪 门口按 E 出去 · 或直接点门 / 按 ESC」。</li>
+  <li><b>场景内出口门（主通道）</b>：六间房右下角统一立一扇<b>金色脉动门框</b> + 纯 CSS 绘制的拱形门板与金色圆把手（不依赖 emoji 字体，规避沙箱/部分浏览器缺字体）+ 门牌「← 出去 / 回比奇堡」。门纳入统一「最近热点」判定（与 obj / seat / npc 按距离竞争）：<b>走近按 E 或直接点门</b>即可回到街上；靠近时物件锚定气泡显示「按 E / 点我 · 🚪 出去，回比奇堡」。</li>
+  <li><b>四条出门通道</b>：① 走近 🚪 门口按 <span class="kbd">E</span> ② 直接点出口门 ③ 点顶栏「← 离开」 ④ 按 <span class="kbd">ESC</span>。任一条都能出，移动端无键盘也可用；首次进屋 2.3s 后一次性 toast 提示出口位置。</li>
+  <li><b>不抢焦点</b>：门口与座位 / 物件 / NPC 共用最近热点，站在收银台前不会误触发出门；把原本紧贴门左上角的一张「角落的椅子」挪到 (860,620)，给门口留出干净的接近空间。</li>
+  <li><b>室内快进不丢</b>：顶栏新增「⏩ 快进」，复用 <code>advanceTime()</code>，会同步刷新当前房间 NPC（按时段换班）。<code>#dpad</code> 移动端摇杆保留在左下角，与右下角出口门互不遮挡。</li>
+</ul>
+<div class="callout ok">
+  <b>验收</b>：87 项浏览器断言全通过（原 67 项全回归 + 20 项出口专项）——含「← 离开」<code>elementFromPoint</code> 命中自身、出口门未被遮挡、走近门口热点为 <code>exit</code>、四条通道各自可出门、六间房均可进可出、站在收银台不误触发门口、室内快进可用。
+</div>
+
+<h3 id="s7d">7.12 ★ 交互形式多样化 · 8 类动词 + 彩蛋藏品册（v2.6 · 用户「交互都有点一样了」）</h3>
+<div class="callout warn">
+  <b>问题复盘</b>：v0.7.1 里除了点餐动线与坐下，几乎所有物件都是「点一下 → 弹介绍小卡」这一种交互，用户反馈「整体的交互都有点一样了」。本次把物件交互拆成<b>按类型(kind)分发</b>的 8 类动词，每类的操作与反馈形式都不同；并用<b>彩蛋藏品册</b>把不同交互的产出统一收拢，形成「翻找 → 发现 → 收集」的探索动机。
+</div>
+<table>
+  <tr><th>#</th><th>动词 / kind</th><th>典型物件</th><th>交互形式（与其他类不同之处）</th></tr>
+  <tr><td>①</td><td><b>检视 peek</b></td><td>菜单牌、闹钟、旧报纸</td><td>弹介绍卡；<b>两级</b>——需再点「🔎 多看一眼」才揭示隐藏线索（莉娜式「额外检视」）</td></tr>
+  <tr><td>②</td><td><b>翻找 rummage</b></td><td>抽屉、保险柜、冰箱、储物柜、糖罐、海霸糊桶</td><td>弹出<b>柜子内部格子面板</b>，逐格点开；部分格子标 <code>deep</code>，翻一次只见「好像还有夹层」，<b>再翻一次</b>才出真正内容（两级翻找）</td></tr>
+  <tr><td>③</td><td><b>开关 toggle</b></td><td>煎炉、台灯、点唱机、电视、窗帘、机械臂、凯伦</td><td>物件本体<b>状态切换</b>（发光/变亮 class），开与关各有专属台词；<b>组合条件</b>可触发彩蛋（关掉章鱼哥家台灯 + 打开唱片机 = 「独处时刻」）</td></tr>
+  <tr><td>④</td><td><b>旋转检视 spin</b></td><td>竖笛、锅铲、自画像、显微镜、海螺、石头顶</td><td>弹出可翻转的 3D 卡片，<b>翻到背面</b>才看到刻字/签名/笔记，背面常藏彩蛋</td></tr>
+  <tr><td>⑤</td><td><b>拾取 collect</b></td><td>第一枚金币、芝麻、黑胶、气泡罐、橡果、试剂瓶</td><td>点一下物件<b>从场景淡出变灰</b>，收进藏品册并飘碎星；不可重复拾取</td></tr>
+  <tr><td>⑥</td><td><b>逗彩蛋 egg</b></td><td>小蜗</td><td><b>连点 N 次</b>才触发（小蜗第 3 次才「喵」一声）；非常规点击节奏</td></tr>
+  <tr><td>⑦</td><td><b>坐下 sit</b></td><td>椅子/沙发/床沿（沿用 §7.7）</td><td>移动角色到座位、切坐姿、座位占用态</td></tr>
+  <tr><td>⑧</td><td><b>分支对话 / 换房 / 点餐</b></td><td>NPC（§7.6）、门与楼梯（§7.13）、点餐四件套（§7.2）</td><td>选项树 / 场景切换 / 有前置条件的任务链</td></tr>
+</table>
+<ul>
+  <li><b>彩蛋藏品册</b>：屏幕常驻「🥚 N / 27」按钮，点开是 27 格图鉴；未发现为灰色虚线「❔还没发现」，已发现显示图标 + 名称 + 一句环境叙事。<b>27 件彩蛋分布在 6 类交互里</b>——翻找夹层、旋转背面、开关组合、拾取、逗够次数、检视多看一眼——逼玩家换着方式探索，而不是把每个物件点一遍。</li>
+  <li><b>就近提示按动词变化</b>：走近物件时锚定气泡显示「翻开找找 / 开关一下 / 转着看 / 收进藏品册 / 逗一逗」，交互形式一眼可辨。</li>
+  <li><b>设计红线仍然成立</b>：所有交互都发生在场景内或场景锚定的面板里，不退回「点 HUD 按钮推进流程」（§7.5 的世界内交互原则未变）。</li>
+</ul>
+<div class="callout ok"><b>验收</b>：Demo v0.8 中 14 间房共 89 个可点物件，6 类新动词均有实例；真实 Chromium 断言覆盖「翻找两级夹层」「开关组合彩蛋」「旋转翻面得彩蛋」「拾取后变灰」「逗三次才触发」「检视两级揭示」全部通过。</div>
+
+<h3 id="s7e">7.13 ★ 多房间·多楼层：房间图 Room Graph（v2.6 · 用户「不能只用一个平面图」）</h3>
+<div class="callout info">
+  <b>核心模型变更</b>：从「1 栋建筑 = 1 个房间」升级为「<b>1 栋建筑 = 一张房间图</b>」。数据结构 <code>GRAPH[建筑].rooms = [子房间 key...]</code> + 扁平 <code>ROOMS[子房间 key]</code>；每个子房间自带 <code>title / decor / objects / seats / npcs / portals / theme / quest</code>。玩家在场景内走近<b>发光门 / 楼梯</b>（<code>portal</code>）按 <span class="kbd">E</span> 或直接点击即切换子房间，<b>不切 Scene、不淡出到另一页</b>，仍是同一个连续世界。
+</div>
+<table>
+  <tr><th>建筑</th><th>楼层 / 房间数</th><th>子房间</th><th>连接方式</th><th>设计依据</th></tr>
+  <tr><td>🍔 蟹堡王</td><td><b>3 间</b></td><td>前厅(点餐区) / 后厨(煎炉区) / 蟹老板办公室</td><td>2 扇 🚪 门，前厅↔后厨、前厅↔办公室</td><td>用户点名：「前厅/后厨/蟹老板办公室」；点餐动线留在前厅，制作在前厅窗口可见、后厨可走进看煎炉</td></tr>
+  <tr><td>🗿 摩艾屋（章鱼哥家）</td><td><b>3 层</b></td><td>1F 客厅 / 2F 画室 / 3F 阁楼卧室</td><td>🪜 楼梯：1F↑2F↑3F，2F/3F 可下行</td><td>用户点名：「3 层，可能会有楼梯入口」</td></tr>
+  <tr><td>🍍 凤梨屋</td><td>2 间</td><td>客厅 / 厨房与卧室</td><td>🚪 门</td><td>原作菠萝屋上下层</td></tr>
+  <tr><td>🪨 石头屋</td><td>2 间</td><td>沙地客厅 / 石头底下</td><td>🪨 翻石入口（楼梯型）</td><td>「掀开石头底下才是家」</td></tr>
+  <tr><td>🌳 圆顶树屋</td><td>2 间</td><td>实验室 / 气闸与健身区</td><td>🚪 气闸门</td><td>气闸舱设定</td></tr>
+  <tr><td>🥣 海之霸</td><td>2 间</td><td>点餐台 / 后厨与控制室</td><td>🚪 门</td><td>前店后厂</td></tr>
+</table>
+<ul>
+  <li><b>NPC 岗位落到具体房间</b>：白天海绵宝宝在<b>后厨</b>、章鱼哥在<b>前厅收银台</b>、蟹老板在<b>办公室</b>——正好落实 §6.3 作息系统「上班时各就其位」的原始诉求，且按房间渲染，不会出现「章鱼哥站在餐厅外面」。傍晚/夜晚各自回家到对应住宅的首层。</li>
+  <li><b>楼层导航条</b>：室内顶栏显示「建筑名 › 各房间 chip」，当前房间高亮，可点 chip 快速换房（无障碍辅助通道）；<b>主通道仍是场景内发光门/楼梯</b>，符合 §7.5 世界内交互原则。</li>
+  <li><b>出口语义分层</b>：门/楼梯 = <b>换房间</b>（保留点餐进度、藏品状态）；右下角金色出口门 / 顶栏「← 离开」/ ESC = <b>回街上</b>（§7.11 四条通道不变）。</li>
+  <li><b>子房间独立换肤</b>：同一栋内各房间可覆写主题色与蒸汽/气泡开关（如后厨开蒸汽、前厅关），营造「同一栋楼里不同空间」的层次。</li>
+</ul>
+
+<h3 id="s7f">7.14 ★ 主场景填充：捉水母小玩法（v2.7 · 用户「主场景感觉有点空」）</h3>
+  <div class="callout ok"><b>v2.8 重要修订</b>（用户：「水母这个最好让用户有感知是小玩法，可以圈定一片区域叫水母田，点了以后屏幕开始出现水母，玩家知道是在捉水母」）：本节 v0.9 的三条规则已被取代——<b>默认街上不再出现水母</b>，改为在世界中圈定一片<b>「水母田」场地</b>，走近按 E 或直接点击才开局，开局有横幅 / 倒计时 / 目标 / 结算（详见 <b>§7.16</b>）；玩法进行中锁定移动、进屋自动清场、ESC 或「收工」退出；原「右上角捉水母开关」改为<b>「玩法场地」引导按钮</b>（高亮三处场地，不是 UI 列表）。三色计分、鱼网光标、纯 CSS 水母、中文文案兜底等规则继续有效。</div>
+  <div class="callout warn"><b>问题</b>：世界层只有走路 / 进屋 / NPC 对话，缺少即时反馈，街道显得空。用户要求「类似打地鼠，屏幕出现水母点击就捉到了，鼠标交互改成捉鱼网，有种在捉水母的感觉」，并「类比看看能够从原作中提取什么类似的小玩法」。</div>
+  <p><b>7.14.1 原作玩法提取（调研依据）</b></p>
+  <table>
+    <tr><th>原作 / 衍生游戏</th><th>核心玩法</th><th>本项目取舍</th></tr>
+    <tr><td>《Jellyfishing》/ 1999 官方《SpongeBob's Jellyfishin' Game》</td><td>持<b>水母网</b>挥网捕捉，不同颜色水母分值不同；碰到水母会被蜇扣分；需抓到稀有蓝水母过关</td><td><b>本次实现</b>：鱼网光标 + 点击捕捉 + 三色分值 + 电水母惩罚</td></tr>
+    <tr><td>《Game Frenzy》「Catch the Pink Jellyfish」</td><td>左右滑动<b>只抓粉水母，别抓蓝色电水母</b></td><td>本次实现：蓝电水母为负分陷阱</td></tr>
+    <tr><td>《Jellyfish Dodge》</td><td>躲水母 / 拍走水母 / <b>收集金色水母</b> / 到达水母网</td><td>本次实现：金色稀有水母 +3</td></tr>
+    <tr><td>《Bubblestand》吹泡泡</td><td>蓄力越久泡泡越大，能吹出蟹黄堡 / 船 / 大象形状</td><td><b>v2.8 已实现</b>（§7.17）：5 段蓄力形态 + 集齐 3 种特殊形状</td></tr>
+    <tr><td>珊迪空手道 / 树屋健身</td><td>节奏按键 / 连击小游戏</td><td><b>v2.8 已实现</b>（§7.17）：方向招式 + 10 连击目标</td></tr>
+    <tr><td>蟹堡王翻肉饼 / 四步点餐</td><td>煎炉分阶段制作、出餐窗口取餐</td><td><b>已完成</b>（§7.2 / §7.3）</td></tr>
+  </table>
+  <p><b>7.14.2 本次落地规则（Demo v0.9）</b></p>
+  <ul>
+    <li><b>打地鼠式刷新</b>：视口内随机位置每约 1.15s 冒出 1 只，2.5–4.1s 未点击自动缩回；同屏上限 3 只；新水母与在场水母保持 ≥125px 间距，避免叠在一起。</li>
+    <li><b>三型水母</b>：粉水母（约 70%，+1）、蓝色电水母（约 20%，点到 -1、屏幕轻闪 + 「被蜇了」台词，<b>不计入捕捉总数</b>）、金色稀有水母（约 10%，+3 + 稀有提示）。水母为<b>纯 CSS 绘制</b>（半圆伞盖 + 4 条触须 + 眼睛），不依赖 emoji 字体、不占生图额度。</li>
+    <li><b>鱼网光标</b>：世界层默认启用 <code>body.net-mode</code>，鼠标变成内联 SVG <code>data:</code> 的<b>网圈 + 网格 + 木柄</b>光标；点击有金色网挥动扩散反馈与 <code>+N</code> 浮字。移动端无 cursor，改为直接点击 + 同样反馈，保持移动端一等公民。</li>
+    <li><b>计数板</b>：右下角常驻「捉水母 N 只 / 粉·电·金」分项计数；右上角按钮可开关（关时收网、清场、不再冒出）。</li>
+    <li><b>不阻断世界</b>：进屋 / 对话 / 聚焦检视 / 翻找 / 旋转 / 藏品册打开时暂停生成并清空在场水母；水母层仅自身可点且 <code>stopPropagation</code>，不影响 WASD 行走、进屋与 NPC 交互。</li>
+    <li><b>文案兜底</b>：新增 UI 一律中文为主，规避缺 emoji 字体环境显示方框；小蜗立绘用中文「蜗」字 + 色盘兜底。</li>
+  </ul>
+
+  <h3 id="s7g">7.15 ★ NPC 站位防重叠 + 小蜗可交互（v2.7）</h3>
+  <div class="callout warn"><b>用户反馈</b>：① 取餐台与章鱼哥重叠，取餐时会点到和章鱼哥对话；② 海绵宝宝也会和交互的物品重合，「检查一下其他 NPC 站位有没有这种情况，要避免重叠」；③「小蜗为啥不能交互，感觉小蜗最好也可以交互」。</div>
+  <p><b>7.15.1 全量扫描结果</b>：用浏览器内真实数据（<code>__BB.ROOMS</code>）对 14 个子房间的 8 个在岗 NPC 与全部 obj / seat / portal / exit 热点计算中心距，阈值 125px。<b>仅 2 处冲突，其余 6 个 NPC 站位安全</b>：</p>
+  <table>
+    <tr><th>房间</th><th>NPC 原坐标</th><th>冲突热点（中心距）</th><th>新坐标</th></tr>
+    <tr><td>蟹堡王 · 前厅</td><td>章鱼哥 (880,300)</td><td>取餐台 pickup <b>61px</b></td><td><b>(540,350)</b> → 距取餐台 299px</td></tr>
+    <tr><td>蟹堡王 · 后厨</td><td>海绵宝宝 (250,290)</td><td>酱料瓶 18px / 冰箱 63px / 锅铲 71px / 煎炉 91px / 芝麻 102px</td><td><b>(660,330)</b> → 最近热点 170px+</td></tr>
+    <tr><td>办公室 / 摩艾 1F / 凤梨客厅 / 石头屋 / 树屋 / 海之霸</td><td>6 个 NPC</td><td><b>0 冲突</b></td><td>保持不动</td></tr>
+  </table>
+  <p><b>7.15.2 三层修复</b></p>
+  <ul>
+    <li><b>坐标分离</b>：两处重叠 NPC 移到房间内空地，仍贴合岗位（章鱼哥在收银台后侧、海绵宝宝在后厨柜台右侧），不破坏「在岗 NPC 只在室内出现」的作息设定（§7.8）。</li>
+    <li><b>点餐目标优先</b>：<code>checkInteriorNearby()</code> 对当前 <code>quest.step</code> 对应的目标物件（取号机 / 收银台 / 出餐窗口 / 取餐台）距离乘 <b>0.45 加权</b>，玩家站位略偏也优先命中该步物件而非旁边 NPC；非目标物件不加权，走近仍可自由翻找，不退回 UI 流程。</li>
+    <li><b>可复算校验</b>：新增 <code>roomOverlaps(key)</code> / <code>allOverlaps()</code>，遍历全部房间返回 &lt;125px 的 NPC↔热点冲突，挂到 <code>__BB</code> 供回归断言；v0.9 断言要求 <code>allOverlaps() === []</code>。以后新增物件 / NPC 会自动被测出，避免同类问题复发。</li>
+  </ul>
+  <p><b>7.15.3 小蜗交互</b>：室内原有 <code>garyl</code> 是「逗 3 次出彩蛋」的 egg 物件，但<b>世界层没有小蜗</b>，且凤梨屋右上角有一块「🐌 小蜗」<b>装饰标签不可点</b>，造成「看得到却点不动」的误导。修复：</p>
+  <ul>
+    <li>删除误导装饰标签，改为「🖼 水母照片墙」（贴合客厅挂满水母照片的设定），可点的小蜗只剩自带标签的物件本体。</li>
+    <li>世界层新增可点小蜗实体（凤梨屋前空地 <b>(300,950)</b>，刻意避开六栋建筑的门热点，避免被「按 E 进屋」抢焦点）；<b>点击或走近按 E</b> 都能进入橙光式分支对话，名字牌直接写「小蜗（点我）」。</li>
+    <li>新增 <code>DIALOGS.gary</code> <b>7 节点对话树</b>（摸壳 / 问会不会说话 / 喂生菜 / 悄悄走开）；「你刚才是不是说了『喵』」→「（果然是小蜗）」分支触发 <code>FX.gary_meow</code> 解锁彩蛋 <code>e13_gary</code>。世界层与室内两条路径都能拿到该彩蛋，<code>collectEgg</code> 去重，<b>不增加 27 件藏品册总数</b>。</li>
+  </ul>
+  <h3 id="s7h">7.16 ★ 三处玩法场地 + 小游戏会话框架（v2.8 · 用户「让玩家有感知是小玩法」）</h3>
+  <div class="callout warn"><b>用户反馈</b>：「可以的 把剩下的小玩法都做入主场景吧 然后水母这个最好让用户有感知是小玩法，可以圈定一片区域叫水母田，点了以后屏幕开始出现水母，玩家知道是在捉水母」。即：① v2.7 表格里列为「后续候选」的<b>吹泡泡 / 空手道全部落地</b>；② 把 v0.9「默认满屏冒水母」改成<b>圈定区域 + 点击开局</b>，让「进入小玩法」这件事本身可见。</div>
+  <p><b>7.16.1 设计原则</b>：延续 §7.5 的<b>世界内(diegetic)交互</b>纪律——入口不是凭空的 UI 按钮，而是<b>世界里一片看得见、走得到、可点击的场地</b>；玩法规则反馈（横幅 / 计时 / 结算）属于「小游戏内状态」，允许用浮层 HUD，但一律用场景化造型（木牌计分板、泡泡舞台、沙袋招式卡），不退回「可点清单 / 下一步按钮」那类 UI 流程。</p>
+  <p><b>7.16.2 三处场地（世界坐标单一来源，渲染与邻近判定共用 <code>PLAYSPOTS</code>）</b></p>
+  <table>
+    <tr><th>场地</th><th>世界坐标 / 圈定区域</th><th>视觉（纯 CSS，不生图）</th><th>进入方式</th><th>玩法</th></tr>
+    <tr><td><b>水母田</b><br><small>Jellyfish Fields</small></td><td>中心 (1310,1150)，椭圆 380×250，邻近半径 185</td><td>青绿草地椭圆 + 白色虚线围栏 + 金色呼吸光圈 + 5 只静态粉水母 + 棕色木牌</td><td>走近按 E / 直接点击</td><td>捉水母（§7.14）</td></tr>
+    <tr><td><b>泡泡摊</b><br><small>Bubblestand</small></td><td>中心 (770,1160)，圆角矩形 180×150，邻近半径 140</td><td>淡蓝圆角地台 + 3 个半透明泡泡 + 木牌</td><td>走近按 E / 直接点击</td><td>吹泡泡（§7.17）</td></tr>
+    <tr><td><b>空手道场</b><br><small>Karate</small></td><td>中心 (1910,1120)，椭圆 230×180，邻近半径 165</td><td>暖橙沙地椭圆 + 木桩 + 木牌</td><td>走近按 E / 直接点击</td><td>空手道连击（§7.17）</td></tr>
+  </table>
+  <p><b>坐标校验</b>：三处场地均落在建筑下方的开阔沙地（世界 y 1010–1290），逐一验算与<b>六栋建筑的门热点</b>、<b>小蜗 (300,950)</b> 以及<b>彼此</b>的间距，<code>v1.0</code> 断言 <code>A8</code> 要求 0 冲突；木牌文字为纯中文 + 小字英文，规避缺 emoji 字体。右上角「玩法场地」按钮点击后给三处同时加金色光圈 3.2 秒并提示，属<b>世界内带路引导</b>而非打开面板列表。</p>
+  <p><b>7.16.3 统一小游戏会话（<code>MG</code>）</b>：三个玩法共用一套五阶段闭环，这是「有感知」的核心：</p>
+  <table>
+    <tr><th>阶段</th><th>表现</th><th>说明</th></tr>
+    <tr><td>① 开局</td><td>中央大字横幅「<b>捉水母 · 开始！</b>」+ 副标题「目标 12 只 ｜ 30 秒 ｜ ESC 或收工随时退出」；视口叠加一层很淡的主题光晕；对应场地亮起 <code>playing</code> 金色光圈</td><td>2.1 秒淡出；明确宣告「进入了一个小玩法」</td></tr>
+    <tr><td>② 进行</td><td>顶部玩法 HUD：玩法名 / 剩余秒数 / 目标 / 进度条 / 分项成绩；右上「收工 · 退出玩法」；各玩法专属舞台</td><td>30 秒倒计时，每秒刷新</td></tr>
+    <tr><td>③ 目标</td><td>达成目标时进度条满 + 顶部金光脉冲 + 「目标达成」提示，剩余时间可继续刷新纪录</td><td>三玩法目标：捉 12 只 / 集齐 3 种特殊形状 / 10 连击</td></tr>
+    <tr><td>④ 结算</td><td>半透明遮罩 + 白色结算卡：玩法名、<b>金 / 银 / 铜评级</b>、成绩明细、原作出处小注、两个按钮「再来一局」「回镇上」</td><td>时间到自动结算，也可随时收工</td></tr>
+    <tr><td>⑤ 退出</td><td>四条通道：右上「收工」、ESC、「回镇上」、直接进屋（自动清场）；清空水母 / 泡泡 / 招式定时器 / 全部 body class</td><td>退出后回到可自由行走的世界层</td></tr>
+  </table>
+  <ul>
+    <li><b>默认不出水母（关键改动）</b>：<code>jellyOn=false</code>、<code>net-mode</code> 关闭、<code>jellyLayer</code> 无实体；<code>spawnJelly()</code> 增加前置条件 <code>MG.active &amp;&amp; MG.id==='jelly'</code>。<b>只有点了水母田，屏幕才开始出现水母</b>——玩家明确知道自己在捉水母，而不是把随机冒出的东西当成背景动画。</li>
+    <li><b>玩法中锁定移动</b>：<code>updateWorld()</code> 在 <code>MG.active||MG.resultOpen</code> 时跳过位移，避免 WASD / 方向键与吹泡泡、空手道按键冲突；相机保持，玩家仍站在场地旁。<code>checkNearby()</code> 早退并隐藏旧提示条，<code>tryInteract()</code> 不响应进屋 / 对话，杜绝误触。</li>
+    <li><b>进屋自动清场</b>：<code>loadRoom()</code> 检测会话进行中则静默 <code>exitMini(true)</code>，室内不残留水母 / 舞台 / 计时器。</li>
+    <li><b>可复算校验</b>：<code>PLAYSPOTS</code> / <code>MG</code> / <code>MINIS</code> 及三玩法的计分、形态、连击状态全部挂到 <code>__BB</code>，供 v1.0 的 88 项浏览器断言逐项复算。</li>
+  </ul>
+
+  <h3 id="s7i">7.17 ★ 吹泡泡 / 空手道玩法落地（v2.8 · 补齐原作候选）</h3>
+  <p><b>7.17.1 吹泡泡《Bubblestand》</b>：原作里海绵宝宝教派大星吹泡泡，蓄力越久泡泡越大，还能吹出蟹黄堡、船、大象等形状。落地为<b>按住蓄力 → 在想要的形态松手 → 泡泡飘走</b>：</p>
+  <table>
+    <tr><th>蓄力区间</th><th>形态</th><th>分值</th><th>是否计入「特殊形状」</th></tr>
+    <tr><td>0 – 22%</td><td>圆泡</td><td>+1</td><td>否</td></tr>
+    <tr><td>22 – 45%</td><td>大圆泡</td><td>+2</td><td>否</td></tr>
+    <tr><td>45 – 68%</td><td><b>蟹黄堡泡</b></td><td>+3</td><td>是</td></tr>
+    <tr><td>68 – 90%</td><td><b>小船泡</b></td><td>+4</td><td>是</td></tr>
+    <tr><td>90 – 100%</td><td><b>大象泡</b></td><td>+5</td><td>是</td></tr>
+    <tr><td>蓄满后再停留 0.8s</td><td>—</td><td>0</td><td>自动「啪」破掉并重置蓄力（技巧点：不能一直按）</td></tr>
+  </table>
+  <ul>
+    <li><b>操作</b>：鼠标 / 触屏按住「按住吹」大按钮，或按住空格；蓄力条与圆形预览实时变大并切换颜色形态（蟹黄堡暖黄 / 小船木棕 / 大象灰紫），松手吹出一个向上飘走、带中文名与 <code>+N</code> 浮字的泡泡。移动端一等公民。</li>
+    <li><b>目标</b>：30 秒内<b>集齐 3 种特殊形状</b>（去重计数），达标金光提示；结算按集齐数与总泡泡数给评级。</li>
+    <li><b>纯 CSS 绘制</b>：预览与飘走的泡泡均为径向渐变圆 + 形状化圆角，不依赖 emoji、不占生图额度。</li>
+  </ul>
+  <p><b>7.17.2 空手道 / 树屋健身</b>：原作珊迪与海绵宝宝空手道对战、树屋健身的节奏连击。落地为<b>限时方向招式</b>：</p>
+  <ul>
+    <li>屏幕中央招式卡随机出 <b>← 左勾拳 / ↑ 上劈 / ↓ 下踢 / → 右勾拳</b> 之一，配 1.4 秒限时条；按<b>方向键 / WASD</b> 或点<b>四个纯中文方向钮</b>在限时内命中即 <code>combo+1</code> 并换下一招；按错或超时 combo 归零。中文按钮避免缺字体环境出现小方框。</li>
+    <li><b>目标</b>：30 秒内达成 <b>10 连击</b>（记录最高连击），每 5 连击有台词反馈；结算按最高连击评级。</li>
+    <li>招式卡有命中 / 失误的缩放与抖动反馈，<code>+N</code> 浮字复用既有组件；全部纯 CSS。</li>
+  </ul>
+  <p><b>7.17.3 三玩法评级对照</b></p>
+  <table>
+    <tr><th>玩法</th><th>金牌</th><th>银牌</th><th>铜牌</th><th>结算主指标</th></tr>
+    <tr><td>捉水母</td><td>≥15 只 · 水母大师</td><td>≥8 只 · 我准备好了</td><td>再练练网</td><td>本轮捉到 N 只（粉 / 金 / 触电分项）</td></tr>
+    <tr><td>吹泡泡</td><td>集齐 3 种 · 泡泡大师</td><td>集齐 1–2 种</td><td>再蓄久一点</td><td>吹出 N 个泡泡 / 集齐 M 种特殊形状</td></tr>
+    <tr><td>空手道</td><td>≥10 连击 · 空手道高手</td><td>≥5 连击</td><td>珊迪会陪你练</td><td>最高连击 N 次</td></tr>
+  </table>
+  <div class="callout ok"><b>至此 §7.14.1 的原作玩法类比表全部落地</b>：捉水母（v2.7）、吹泡泡与空手道（v2.8）、翻肉饼与四步点餐（§7.2 / §7.3 早期完成）。主场景从「只有走路 / 进屋 / 对话」变为<b>一条街上三处可反复玩、各有目标与结算的小玩法场地</b>。</div>
+  </section>
+
+<!-- 8 -->
+<section id="s8">
+  <h2>8. 美术风格评估 & token 消耗估算（v2.6）</h2>
+  <div class="callout warn">
+    <b>结论先行</b>：推荐 <b>方案 A「2.5D 轻等角微缩手绘」</b>；它同时满足已锁定的 2.5D 连通世界架构、莉娜式可点微缩沙盘、移动端单文件性能、批量生图风格一致性、以及「神似非形似」的 IP 合规。<b>本次不擅自生图</b>——先把消耗与规格写清，等你确认风格与生图账号后再开工（沿用 game-art-prompt-pack「先说明消耗再询问」纪律）。
+  </div>
+
+  <h3>8.1 四种候选风格对比</h3>
+  <table>
+    <tr><th>评估维度（权重）</th><th>A · 2.5D 等角微缩手绘 ⭐推荐</th><th>B · 3D 黏土/低模渲染</th><th>C · 2D 赛璐璐（原作风）</th><th>D · 像素 / 体素</th></tr>
+    <tr><td>契合 2.5D 轻等角 DOM 分层架构</td><td>★★★ 天然一致</td><td>★★ 需转成贴图</td><td>★ 缺纵深</td><td>★★ 可行但气质不合</td></tr>
+    <tr><td>契合莉娜式「可点微缩沙盘」</td><td>★★★</td><td>★★★</td><td>★ 平面化</td><td>★ 细节不足</td></tr>
+    <tr><td><b>批量生图风格一致性</b>（风格锚点可控）</td><td>★★★ 平涂+描边最易锁定</td><td>★★ 光影/材质易漂移</td><td>★★ 线条易漂移</td><td>★★★ 栅格天然齐</td></tr>
+    <tr><td>移动端性能 / 单文件体积</td><td>★★★ 透明 PNG 轻量</td><td>★ 贴图重、易超 4MB</td><td>★★★</td><td>★★★</td></tr>
+    <tr><td>透明底抠图可靠性</td><td>★★★ 硬边好抠</td><td>★★ 软阴影留脏边</td><td>★★</td><td>★★★</td></tr>
+    <tr><td>「身临其境」空间纵深</td><td>★★★</td><td>★★★</td><td>★</td><td>★★</td></tr>
+    <tr><td>IP 合规（神似非形似）</td><td>★★★ 可控制在配色/构图气质</td><td>★★</td><td>★ 太接近原作描线，风险高</td><td>★★★</td></tr>
+    <tr><td>生图量与积分消耗</td><td>中（可用镜像/换色省量）</td><td>高（需多角度渲染）</td><td>中</td><td>低</td></tr>
+  </table>
+  <ul>
+    <li><b>为什么不是全 3D</b>：呼应 §4 的 2.5D vs 3D 评估——当前是 DOM 分层 + CSS 透视的单文件离线实现，改全 3D 会推翻整套已验证架构（相机跟随、z-index 景深、点击命中、移动端手势），且生图一致性和体积都更差。</li>
+    <li><b>B 的局部用途</b>：个别「英雄道具」（蟹黄堡聚焦检视、办公室保险柜）可用预制 3D 渲染件补充质感，<b>不作为全局风格</b>。</li>
+    <li><b>C 被否原因</b>：等角空间纵深表达弱，且描线过于接近原作，与 §10「不 1:1 复刻」冲突。<b>D 被否原因</b>：与用户反复强调的「身临其境 + 莉娜微缩质感」背离。</li>
+  </ul>
+
+  <h3>8.2 推荐方案的风格基线（可直接交生图账号）</h3>
+  <div class="callout ok">
+    <b>风格锚点（全项目逐字复用，一个字都不改）</b>：轻等角 2.5D 微缩沙盘插画，厚而柔和的深蓝描边，明快平涂色块，高饱和海底色（菠萝黄 / 珊瑚红 / 海水青 / 暖沙金），统一左上方柔光源，边缘干净便于抠图，透明或单一纯色背景，主体朝右、基线齐平、互不重叠，儿童绘本般的圆润比例，无文字、无 logo、无水印、无投影。<br>
+    <small>EN: light isometric 2.5D miniature diorama illustration, thick soft navy outlines, flat bright color blocking, high-saturation underwater palette, consistent soft top-left light, clean edges for cutout, plain solid background, subject facing right, aligned baseline, no overlap, rounded storybook proportions, no text, no logo, no watermark, no shadow.</small>
+  </div>
+  <ul>
+    <li><b>色板（单图用色 ≤ 6）</b>：海水青 <code>#1AA3C4</code>、深海底蓝 <code>#062338</code>（描边）、菠萝黄 <code>#F2C14E</code>、珊瑚红 <code>#E74C3C</code>、暖沙金 <code>#CAA86A</code>、泡沫白 <code>#F7FBFE</code>。<b>交互高亮金 <code>#FFD23F</code> 一律由代码叠加，不画进图</b>（否则无法做呼吸/发光动画，也污染抠图）。</li>
+    <li><b>素材图三铁律</b>：纯色背景、主体间绝不重叠、基线齐平；<b>必须排除影子/投影/环境光遮蔽</b>；只生成朝右单一方向，左向由代码 <code>scaleX(-1)</code> 镜像省一半量。</li>
+    <li><b>换色复用</b>：需要代码换色的主体（如 6 款 bot 小鱼）要求着色区单一纯色平涂、描边层独立，代码替换一个色值即可出变体。</li>
+    <li><b>完整规格</b>：变量槽位表、提示词模板、负面词、批量执行清单、命名归档规则、验收自检、L1/L2/L3 降级方案 → 见配套文件 <code>美术资产规格与提示词包.md</code>。</li>
+  </ul>
+
+  <h3>8.3 资产盘点与生成量估算（可复算口径）</h3>
+  <p>按 <code>生成量 = 主体数 × 状态/变体数 × 版本数</code> 估算，扣除<b>可由代码省掉</b>的部分（镜像、纯色换色、纯 CSS 几何/光效/动效、蟹黄堡 5 层与咬痕已是 CSS 绘制）。</p>
+  <table>
+    <tr><th>资产类别</th><th>主体数（v0.8 实测归约）</th><th>状态/版本</th><th>成图张数</th><th>说明</th></tr>
+    <tr><td>连通世界全景 / 瓦片</td><td>1（或 8 瓦片）</td><td>×1</td><td>1–8</td><td>六建筑错落 + 弯曲小路；MVP 用 1 张大图</td></tr>
+    <tr><td>六栋建筑外观</td><td>6</td><td>×1（朝右，镜像复用）</td><td>6</td><td>透明底，等角</td></tr>
+    <tr><td>子房间背景（后墙+地砖）</td><td>6 主题模板 → 14 房间</td><td>×1.2</td><td>7–14</td><td>同栋房间共用色板 + 局部小改</td></tr>
+    <tr><td>可点物件</td><td>89 实例 → <b>约 60 独立主体</b></td><td>×1.4（翻找/开关/旋转双态）</td><td>~84</td><td>同类道具（桌盐/饮料杯/椅子…）归约；交互态由 CSS 叠加为主，仅约 30 件需双态贴图</td></tr>
+    <tr><td>门 / 楼梯 portal</td><td>2 类 × 主题</td><td>×1</td><td>~12</td><td>纯几何门框 + 图标，可大量用 CSS</td></tr>
+    <tr><td>角色（6 主 NPC + 6 bot + 玩家）</td><td>13</td><td>×2.5（立绘 / 世界 token / 行走帧）</td><td>~33</td><td>朝右单一方向 + 镜像</td></tr>
+    <tr><td>彩蛋藏品图标</td><td>27</td><td>×1</td><td>~27</td><td>可用 emoji/纯 CSS 圆底兜底，非必生图</td></tr>
+    <tr><td>UI 贴纸（对话框 / 点单条 / 藏品册 / 翻找面板 / 号码屏…）</td><td>~12</td><td>×1</td><td>~12</td><td>多数为 CSS 组件，仅质感贴纸需生图</td></tr>
+    <tr><td>蟹黄堡 5 层 + 5 级咬痕</td><td>—</td><td>—</td><td><b>0</b></td><td>已是 CSS + SVG clipPath 绘制，无需生图</td></tr>
+  </table>
+
+  <h3>8.4 token / 积分消耗估算（参数化，不编造单价）</h3>
+  <div class="callout info">
+    <b>口径说明</b>：AI 生图按「调用次数」计费（1 张成图 ≈ 1 次调用），不同平台/模型/分辨率单价差异很大，<b>此处不假定任何具体单价</b>。给出可复算的<b>调用次数 C</b>，再用公式 <code>总消耗 = C × P</code>（P = 你账号实际单次单价）代入。
+  </div>
+  <table>
+    <tr><th>档位</th><th>成图张数</th><th>含试错重抽(×1.35)</th><th>≈ 调用次数 C</th><th>代入示例（仅演示，P 需你核实）</th></tr>
+    <tr><td><b>L1 降级</b>：仅世界全景 + 6 建筑 + 6 主题房间模板</td><td>~20</td><td>×1.35</td><td><b>≈ 27 次</b></td><td>若 P=20 → ~540；P=50 → ~1,350</td></tr>
+    <tr><td><b>L2 推荐起点</b>：L1 + 核心 40 物件 + 7 立绘 + 13 token</td><td>~95</td><td>×1.35</td><td><b>≈ 130 次</b></td><td>若 P=20 → ~2,600；P=50 → ~6,500</td></tr>
+    <tr><td><b>L3 完整</b>：14 房间 + 60 物件双态 + 全角色 + 27 彩蛋 + UI</td><td>~220</td><td>×1.35</td><td><b>≈ 300 次</b></td><td>若 P=20 → ~6,000；P=50 → ~15,000</td></tr>
+    <tr><td>首批「锁风格」验证</td><td>1 主体 × 1 状态</td><td>—</td><td><b>1–3 次</b></td><td>先跑 1 张看风格对不对，锁定参数后再批量</td></tr>
+  </table>
+  <ul>
+    <li><b>降本策略</b>：① 先跑 1 张锁风格/种子/模型版本，避免「手感没验证就批量 = 返工 × 主体数」；② 朝右单一方向 + 代码镜像省一半；③ 换色主体单一纯色平涂，代码替换色值出变体；④ 光晕/呼吸/发光/碎星等动态效果<b>一律代码叠加，绝不画进图</b>；⑤ 蟹黄堡、门框、光圈、进度条等几何件继续用 CSS/SVG，不生图；⑥ 每生成 3 张抽检 1 张防风格漂移。</li>
+    <li><b>若你指的是「开发侧 LLM token」</b>：本项目为单文件 HTML（v0.8 约 114 KB ≈ 3–4 万 token 文本），截至目前 8 个大版本、每版含全量代码读写与浏览器断言，累计粗估 <b>30 万–80 万 token 量级</b>（粗估，取决于是否全量重写）。后续迭代已改用<b>补丁脚本</b>而非整文件重写、避免重复贴全文，可将单轮消耗压到全量重写的约 1/5。</li>
+  </ul>
+  <h3 id="s8e">8.5 v2.7 新增资产与调用次数增量</h3>
+  <p>本次新增功能<b>几乎不增加生图量</b>：三型水母、鱼网光标、网挥动、计数板、小蜗色盘均为纯 CSS / SVG 绘制，沿用「效果不画进图」纪律（§6 负面词、提示词包 §8 不进图清单）。</p>
+  <table>
+    <tr><th>新增资产</th><th>是否需生图</th><th>说明</th></tr>
+    <tr><td>粉 / 蓝电 / 金 三型水母</td><td>否（CSS 已实现）</td><td>若要替换为手绘贴图：3 主体 × 1 状态 ≈ <b>3 次</b>调用</td></tr>
+    <tr><td>鱼网光标 + 网挥动</td><td>否</td><td>SVG data-URI + CSS 动画，动态效果绝不入图</td></tr>
+    <tr><td>小蜗造型 / 对话立绘</td><td>可选</td><td>当前用中文「蜗」字 + 色盘兜底；若要造型 ≈ <b>2 次</b>调用</td></tr>
+    <tr><td>捉水母计数板 / 小蜗对话面板</td><td>否</td><td>复用既有 UI 组件，仅换文案</td></tr>
+  </table>
+  <p><b>结论</b>：L1 / L2 / L3 的 <b>≈27 / 130 / 300 次调用估算不变</b>；若要把水母与小蜗换成手绘贴图，最多 +5 次调用。</p>
+  <h3 id="s8f">8.6 v2.8 新增资产与调用次数增量</h3>
+  <p>三处玩法场地、开场横幅 / 玩法 HUD / 结算卡、泡泡与招式舞台<b>全部为纯 CSS / SVG 绘制</b>，沿用「效果不画进图」纪律（§6 负面词、提示词包 §8 不进图清单）。</p>
+  <table>
+    <tr><th>新增资产</th><th>是否需生图</th><th>说明</th></tr>
+    <tr><td>三处场地地面 + 木牌（水母田草地 / 泡泡摊地台 / 空手道沙地）</td><td>可选</td><td>当前用 CSS 椭圆渐变 + 虚线围栏 + 棕色木牌；若要手绘地面贴图 ≈ <b>3 张</b>（世界瓦片，不含文字，门牌文字由 HTML 渲染）</td></tr>
+    <tr><td>三型水母 / 五段泡泡 / 木桩沙袋</td><td>否（CSS 已实现）</td><td>水母沿用 v2.7；泡泡为径向渐变圆 + 形状化圆角；沙袋为棕色圆角矩形。若要手绘替换 ≈ <b>8 张</b></td></tr>
+    <tr><td>开场横幅 / 玩法 HUD / 结算卡 / 蓄力条 / 招式卡 / 方向钮</td><td>否</td><td>复用既有深蓝玻璃拟态 UI，仅换中文文案；发光、呼吸、飘动、<code>+N</code> 浮字一律 CSS 动画叠加</td></tr>
+    <tr><td>鱼网光标 / 网挥动</td><td>否</td><td>沿用 v2.7 SVG data-URI，动态效果绝不入图</td></tr>
+  </table>
+  <p><b>结论</b>：L1 / L2 / L3 的 <b>≈27 / 130 / 300 次调用估算不变</b>；若要把三处场地地面与全部玩法主体换成手绘贴图，最多 <b>+8～11 次</b>调用（3 地面 + 8 主体，取其一即可）。<b>风格锚点、色板与负面词一字未改</b>，跨文档仍与提示词包逐字一致。</p>
+  <div class="callout ok"><b>建议下一步</b>：先按 L1（≈27 次调用）跑 6 栋建筑 + 1 张全景验证风格；确认后走 L2（≈130 次）。风格锚点与批量清单已写入《美术资产规格与提示词包.md》，可直接交给生图账号，无需重新口述。</div>
+</section>
+
+<!-- 9 -->
+<section id="s9">
+  <h2>9. 移动端 & 多人</h2>
+  <h3>9.1 移动端一等公民</h3>
+  <ul><li>虚拟摇杆 + 点击移动；邻近提示按钮化（轻点即交互）；聚焦检视适配触屏（双指缩放/拖拽旋转）。</li>
+  <li>性能：背景分块懒加载、视口外不重绘、移动端降分辨率、减少 DOM 层数。</li></ul>
+  <h3>9.2 多人（已确认：v1 仅 bot）</h3>
+  <ul><li>v1 用 <b>机器人居民</b> 填充世界（街上走动、偶尔冒气泡），保证"有人气"且不依赖后端。</li>
+  <li>后续接 <b>WebSocket</b>：真实玩家互相可见、可打招呼；单人与多人无缝切换。</li></ul>
+</section>
+
+<!-- 10 -->
+<section id="s10">
+  <h2>10. IP 与合规</h2>
+  <ul>
+    <li><b>定位</b>：非官方同人粉丝作品，<b>非商用</b>，保留一键下架通道。</li>
+    <li><b>美术</b>："神似非形似"，不 1:1 复刻受版权保护的精确角色造型与商标。</li>
+    <li><b>配音</b>：仿原作"语气/唱腔"风格（神似），不使用原版音轨或特定声优原声。</li>
+  </ul>
+</section>
+
+<!-- 11 -->
+<section id="s11">
+  <h2>11. 实施路线（最小闭环优先）</h2>
+  <div class="callout ok"><b>范围已扩展（v2.4）：</b>用户要求把「① 其余 5 栋室内 ② 号码滚动动画 ③ bot 居民」一并做完，并先定稿交互范式。现已全部完成——六栋建筑<b>均可进入</b>，共用同一套世界内交互；美术替换仍是唯一滞后项（另账号生图）。</div>
+  <table>
+    <tr><th>阶段</th><th>目标</th><th>关键产出</th><th>状态</th></tr>
+    <tr><td><b>Phase 0</b><br>骨架(占位)</td><td>World Space + 相机跟随 + 行走 + 视差 + 轻等角</td><td>能在比奇堡自由散步、六栋错落同框</td><td><span class="pill green">✅ 完成</span></td></tr>
+    <tr><td><b>Phase 1</b><br>进入建筑</td><td>门触发 + <b>六栋通用房间渲染器</b> + <b>场景内出口门（v0.7.1）</b></td><td>六栋均可进可出（4 条出门通道）、主题换肤</td><td><span class="pill green">✅ 完成</span></td></tr>
+    <tr><td><b>Phase 2</b><br>蟹堡王玩法</td><td>四步点餐 + 号码滚动 + 咬痕蟹黄堡(聚焦检视) + 合影</td><td>核心可玩闭环</td><td><span class="pill green">✅ 完成</span></td></tr>
+    <tr><td><b>Phase 3</b><br>NPC 作息 + 交互</td><td>世界时钟 + 室内外位置 + 分支对话 + 坐下 + bot 居民</td><td>NPC 按时间出现在对应房间/街道</td><td><span class="pill green">✅ 完成</span></td></tr>
+    <tr><td><b>Phase 4</b><br>美术替换</td><td>占位几何 → 生图资产</td><td>视觉到位（另账号生图）</td><td><span class="pill gray">滞后 · 唯一待办</span></td></tr>
+    <tr><td><b>Phase 5</b><br>纵深扩展（v2.6 已完成）</td><td>交互形式多样化(8 类动词 + 27 彩蛋) + 房间图(14 子房间/多楼层) + 美术风格与 token 评估</td><td>Demo v0.8：68 项断言 0 报错；方案 v2.6；美术规格与提示词包</td><td><span class="pill green">✅ 完成</span></td></tr>
+    <tr><td><b>Phase 6</b><br>主场景填充（v2.7 已完成）</td><td>捉水母打地鼠玩法 + 鱼网光标 + 小蜗交互 + NPC 站位防重叠与点餐目标优先</td><td>Demo v0.9：107 项断言 0 报错；方案 v2.7</td><td><span class="pill green">✅ 完成</span></td></tr>
+    <tr><td><b>Phase 7</b><br>玩法场地化（v2.8 已完成）</td><td>三处世界内场地 + 统一小游戏会话（横幅/计时/目标/结算/收工）+ 吹泡泡 + 空手道连击 + 默认不出水母</td><td>Demo v1.0：155 项断言 0 报错；方案 v2.8</td><td><span class="pill green">✅ 完成</span></td></tr>
+  </table>
+</section>
+
+<!-- 12 -->
+<section id="s12">
+  <h2>12. 决策确认记录</h2>
+  <table>
+    <tr><th>#</th><th>决策项</th><th>结论</th></tr>
+    <tr><td>1</td><td>渲染路线</td><td><span class="pill green">确认：2.5D 轻等角连通世界</span></td></tr>
+    <tr><td>2</td><td>美术优先级</td><td><span class="pill green">确认：滞后，另账号生图；全程占位几何 + 资产插槽</span></td></tr>
+    <tr><td>3</td><td>首版范围</td><td><span class="pill green">确认：最小闭环（连通世界 + 蟹堡王）</span></td></tr>
+    <tr><td>4</td><td>多人</td><td><span class="pill green">确认：v1 仅 bot 居民</span></td></tr>
+    <tr><td>5</td><td>NPC 作息系统</td><td><span class="pill green">新增需求：已补全 §6.3</span></td></tr>
+    <tr><td>6</td><td>物品交互</td><td><span class="pill green">新增需求：莉娜式聚焦检视，已补全 §7</span></td></tr>
+    <tr><td>7</td><td>建筑排布</td><td><span class="pill green">二次修正：错落散布 + 弯曲小路 + 前后景深，禁止一排（§3）</span></td></tr>
+    <tr><td>8</td><td>蟹堡王内部</td><td><span class="pill green">二次修正：多分区连通房间，非单一房间（§5、§7.1）</span></td></tr>
+    <tr><td>9</td><td>点餐动线</td><td><span class="pill green">三次修正：取号→结账→等制作→取餐，带前置条件与进度清单（§7.2）</span></td></tr>
+    <tr><td>10</td><td>蟹黄堡进食</td><td><span class="pill green">三次修正：咬痕缺口 + 夹层横截面，废弃逐层消失（§7.3）</span></td></tr>
+    <tr><td>11</td><td>交互形式</td><td><span class="pill green">四次修正：世界内(diegetic)引导——目标光圈/光路/物件气泡/NPC 带路/镜头推近；废弃「下一步按钮 + 可点清单 + 按E无条件兜底」（§7.5）</span></td></tr>
+    <tr><td>12</td><td>NPC 对话</td><td><span class="pill green">五次修正：<b>橙光式分支选项树</b>——立绘/台词/编号选项/分支跳转/选项后果改变下次开场；废弃单句气泡（§7.6）</span></td></tr>
+    <tr><td>13</td><td>家具交互</td><td><span class="pill green">五次修正：椅子/沙发/床沿<b>可坐下、可起身</b>，带坐姿、座位占用态、镜头推近与环境台词（§7.7）</span></td></tr>
+    <tr><td>14</td><td>NPC 位置</td><td><span class="pill green">五次修正：<b>在岗 NPC 只在室内岗位出现，世界层隐藏</b>；修复「章鱼哥站在蟹堡王外面」（§7.8）</span></td></tr>
+    <tr><td>15</td><td>范围扩展</td><td><span class="pill green">确认：其余 5 栋室内 + 号码滚动动画 + bot 居民<b>一并做完</b>（§7.9 / §7.10）</span></td></tr>
+    <tr><td>16</td><td>推进顺序</td><td><span class="pill green">确认：<b>先把交互范式定稿并写入文档，再复刻到 5 栋</b>，避免做完再返工（用户「或者先把交互定好更新到文档里」）</span></td></tr>
+    <tr><td>17</td><td>室内出口</td><td><span class="pill green">六次修正：修复「进屋后出不去」——世界层 HUD 让位 + 室内顶栏 + <b>六间通用场景内出口门</b>；四条出门通道，出口也算世界内交互而非纯 UI 按钮（§7.11）</span></td></tr>
+    <tr><td>18</td><td>交互形式多样化</td><td><span class="pill green">七次修正：废弃「所有物件都是点一下看介绍」——拆成 <b>8 类动词</b>（检视/翻找/开关/旋转/拾取/逗彩蛋/坐下/对话与换房），抽屉柜子可<b>两级翻找</b>，加 <b>27 件彩蛋藏品册</b>（§7.12）</span></td></tr>
+    <tr><td>19</td><td>多房间·多楼层</td><td><span class="pill green">七次修正：<b>推翻「一张平面图展示全部区域」</b>——建筑升级为房间图，蟹堡王 3 间、章鱼哥家 3 层带楼梯，六栋共 14 子房间靠场景内门/楼梯连通（§7.13、§5 更正）</span></td></tr>
+    <tr><td>20</td><td>美术风格选型</td><td><span class="pill green">评估结论：推荐 <b>2.5D 轻等角微缩手绘</b>（方案 A），否定全 3D / 原作赛璐璐 / 像素；风格锚点、色板、负面词、变量槽位见 §8 与《美术资产规格与提示词包.md》</span></td></tr>
+    <tr><td>21</td><td>正式投入 / token</td><td><span class="pill green">用户「决定把这个落实下来」：产出美术风格与 <b>token/积分消耗估算</b>（L1≈27 / L2≈130 / L3≈300 次生图调用，参数化不编单价）；<b>不擅自生图</b>，先说明消耗等确认（§8.4）</span></td></tr>
+    <tr><td>22</td><td>NPC 站位防重叠</td><td><span class="pill green">八次修正：全量扫描 14 房间，修正章鱼哥 / 海绵宝宝坐标；加<b>点餐目标优先</b>与 <code>allOverlaps()</code> 可复算校验，断言要求 0 冲突（§7.15）</span></td></tr>
+    <tr><td>23</td><td>小蜗交互</td><td><span class="pill green">新增：世界层可点实体 + 走近按 E + 7 节点橙光式对话树 + 彩蛋联动；删除误导装饰标签；不增加 27 件藏品册总数（§7.15.3）</span></td></tr>
+    <tr><td>24</td><td>主场景捉水母</td><td><span class="pill green">新增：打地鼠式刷新 + 三型水母（粉 +1 / 蓝电 -1 / 金 +3）+ 鱼网光标 + 计数板 + 开关；进屋/对话时暂停，不阻断行走；中文文案兜底（§7.14）</span></td></tr>
+    <tr><td>25</td><td>原作玩法类比</td><td><span class="pill green">调研《Jellyfishing》《Game Frenzy》《Jellyfish Dodge》《Bubblestand》与空手道；本次实现捉水母，吹泡泡 / 空手道列为后续候选，翻肉饼与四步点餐已完成（§7.14.1）</span></td></tr>
+    <tr><td>26</td><td>玩法要有「进入感」</td><td><span class="pill green">用户「圈定一片区域叫水母田，点了以后屏幕开始出现水母」：<b>默认街上不出水母</b>，三处世界内场地点击 / 走近按 E 才开局；DIEGETIC 入口，废弃 v0.9「满屏随机冒 + 右上角开关」（§7.16）</span></td></tr>
+    <tr><td>27</td><td>小游戏会话闭环</td><td><span class="pill green">新增 <code>MG</code> 五阶段：开场横幅 → 30 秒倒计时 + 目标进度 → 达标金光 → 金银铜结算卡 → 收工 / 再来一局；玩法中锁移动、进屋清场、ESC 退出（§7.16.3）</span></td></tr>
+    <tr><td>28</td><td>吹泡泡落地</td><td><span class="pill green">《Bubblestand》5 段蓄力形态（圆泡 / 大圆泡 / 蟹黄堡 / 小船 / 大象）、蓄满会破、集齐 3 种特殊形状目标；鼠标 / 触屏按住或空格（§7.17.1）</span></td></tr>
+    <tr><td>29</td><td>空手道落地</td><td><span class="pill green">珊迪空手道节奏连击：4 方向招式限时 1.4s、按对 +1 / 按错或超时归零、10 连击目标、纯中文方向钮（§7.17.2）</span></td></tr>
+  </table>
+</section>
+
+<!-- 13 -->
+<section id="s13">
+  <h2>13. 开发日志 & 交付产物清单</h2>
+  <div class="callout info">
+    <b>因美术将另账号生成，以下两份清单为"可随时交接"的持久化文件（位于 <code>/workspace/比奇堡需求文档/</code>）：</b>
+    <ul>
+      <li><b>开发日志.md</b>：按日期记录决策、已完成、进行中、阻塞项。</li>
+      <li><b>交付产物清单.md</b>：美术资产规格（给生图账号逐条出图）+ 代码交付物 + 状态。</li>
+    </ul>
+    本节给出当前快照，最新以两个 .md 文件为准。
+  </div>
+  <h3>13.1 开发日志（快照 2026-11-08）</h3>
+  <table>
+    <tr><th>日期</th><th>事项</th><th>状态</th></tr>
+    <tr><td>2026-11-08</td><td>复盘旧版分镜问题；调研原作空间逻辑 + BFBB 枢纽世界</td><td>✅ 完成</td></tr>
+    <tr><td>2026-11-08</td><td>产出 v2.0 重构方案（连通世界）</td><td>✅ 完成</td></tr>
+    <tr><td>2026-11-08</td><td>确认 4 项决策；新增 NPC 作息系统(§6.3) 与莉娜式物品交互(§7)</td><td>✅ 完成</td></tr>
+    <tr><td>2026-11-08</td><td>建立 开发日志.md / 交付产物清单.md；升级 v2.1</td><td>✅ 完成</td></tr>
+    <tr><td>2026-11-08</td><td>最小闭环 Phase 0 骨架（连通世界行走+相机+占位几何）</td><td>✅ 完成</td></tr>
+    <tr><td>2026-11-08</td><td>Demo v0.4：建筑错落散布 + 弯曲小路 + 蟹堡王六分区可走动室内</td><td>✅ 完成</td></tr>
+    <tr><td>2026-11-08</td><td>二次调研莉娜「房间摆放/两级交互/进度清单」；升级方案 v2.2</td><td>✅ 完成</td></tr>
+    <tr><td>2026-11-08</td><td>Demo v0.5：22 个可点物件微缩房间 + 四步点餐动线 + 咬痕蟹黄堡；CDP 全流程验证 0 报错</td><td>✅ 完成</td></tr>
+    <tr><td>2026-11-08</td><td>Demo v0.5.1：修复「取号后收银机点不动」（层级穿透 + HUD 重排 + 四条兜底通道）；15 项断言通过</td><td>✅ 完成</td></tr>
+    <tr><td>2026-11-08</td><td>Demo v0.6：交互形式重构为「世界内引导(diegetic)」——移除 UI 兜底，光圈/光路/气泡/NPC 带路/镜头/动效/触屏；43 项断言 0 报错；升级方案 v2.3</td><td>✅ 完成</td></tr>
+    <tr><td>2026-11-08</td><td>Demo v0.7：交互系统定稿（分支对话 / 坐下 / NPC 室内外 / 号码滚动 / bot 居民）+ 六栋通用房间全部可进入；<b>67 项断言 0 报错</b>；升级方案 v2.4</td><td>✅ 完成</td></tr>
+    <tr><td>2026-11-10</td><td>Demo v0.7.1：修复「进屋后出不去」——层叠上下文让位 + 室内顶栏 + 六间通用<b>场景内出口门</b>（纯 CSS 门形）+ 四条出门通道；<b>87 项断言 0 报错</b>；升级方案 v2.5</td><td>✅ 完成</td></tr>
+    <tr><td>2026-11-10</td><td>Demo v0.8：房间图重构（14 子房间 / 门与楼梯 / 3 层楼层导航）+ 8 类交互动词 + 27 彩蛋藏品册；<b>68 项断言 0 报错</b>；升级方案 v2.6，产出《美术资产规格与提示词包.md》与美术风格/token 评估</td><td>✅ 完成</td></tr>
+    <tr><td>2026-11-10</td><td>Demo v0.9：修复取餐台↔章鱼哥 / 后厨↔海绵宝宝站位重叠（全量扫描 + 目标优先 + 可复算校验）、小蜗可点击可对话、主场景捉水母打地鼠玩法（鱼网光标 / 三型水母 / 计数板）；<b>107 项断言 0 报错</b>；升级方案 v2.7</td><td>✅ 完成</td></tr>
+    <tr><td>2026-11-10</td><td>Demo v1.0：三处玩法场地（水母田 / 泡泡摊 / 空手道场）+ 统一小游戏会话（横幅 / 30 秒 / 目标 / 结算 / 收工）+ 吹泡泡 5 段蓄力 + 空手道 10 连击；<b>默认不出水母，点水母田才开局</b>；<b>88 项新断言 + 67 项 v0.8 回归 = 155 项 0 报错</b>；升级方案 v2.8</td><td>✅ 完成</td></tr>
+  </table>
+  <h3>13.2 交付产物清单（美术 · 给生图账号）</h3>
+  <table>
+    <tr><th>资产</th><th>用途</th><th>规格</th><th>状态</th></tr>
+    <tr><td>连通世界全景</td><td>世界背景（轻等角微缩沙盘）</td><td>大图/可分块，含六建筑+道路+天际线</td><td><span class="pill gray">待生图</span></td></tr>
+    <tr><td>六栋建筑外观</td><td>地图实体</td><td>各一栋，原作锚点造型</td><td><span class="pill gray">待生图</span></td></tr>
+    <tr><td>蟹堡王室内</td><td>Phase 1 室内</td><td>后厨/收银台/用餐区</td><td><span class="pill gray">待生图</span></td></tr>
+    <tr><td>其余 5 栋室内</td><td>后续迭代</td><td>各一间</td><td><span class="pill gray">待生图</span></td></tr>
+    <tr><td>角色 sprite</td><td>主角/主NPC/彩蛋NPC</td><td>含行走帧；透明背景</td><td><span class="pill gray">待生图</span></td></tr>
+    <tr><td>蟹黄堡分层</td><td>聚焦检视</td><td>面包/生菜/芝士/肉饼/面包 五层 + <b>咬痕缺口边缘横截面</b>（含 5 级缺口贴图）</td><td><span class="pill gray">待生图</span></td></tr>
+    <tr><td>蟹堡王房间物件</td><td>莉娜式微缩沙盘</td><td>取号机/收银机/煎炉/酱料瓶/保险柜/账本/桌盐/饮料杯/拖把等 <b>22 个</b>小道具，等角统一光源、带悬停高亮态</td><td><span class="pill gray">待生图</span></td></tr>
+    <tr><td>UI 元件</td><td>气泡/提示/聚焦框/进度清单</td><td>卡通风格；含任务清单勾选态、制作进度条</td><td><span class="pill gray">待生图</span></td></tr>
+    <tr><td>世界内引导元件</td><td>场景内（非 HUD）</td><td>金色脉动光圈 / 流动虚线光路 / 物件锚定气泡 / 米黄纸质点单条（带胶带）/ 碎星光粒子 / 海底光斑 / 上浮气泡 / 煎炉蒸汽，等角统一光源</td><td><span class="pill gray">待生图</span></td></tr>
+    <tr><td><b>分支对话 UI（v2.4）</b></td><td>橙光式选项面板</td><td>圆形立绘框（角色色盘 + 光晕）/ 名字条 / 台词框 / 编号选项按钮（常态·悬停·选中）/ 结束态按钮 / 后果提示条；移动端窄版</td><td><span class="pill gray">待生图</span></td></tr>
+    <tr><td><b>坐姿与座位（v2.4）</b></td><td>家具交互</td><td>玩家「坐下」sprite（含座椅标记）、座位常态 / 悬停高亮 / 占用态；6 类座椅：圆椅、沙发、床沿、树桩、石头凳、吧台凳</td><td><span class="pill gray">待生图</span></td></tr>
+    <tr><td><b>其余 5 栋室内（v2.4）</b></td><td>等角微缩房间</td><td>凤梨屋(菠萝黄) / 摩艾屋(冷灰) / 石头屋(沙褐) / 圆顶树屋(树绿) / 海之霸(暗橄榄绿)：各含后墙、地砖、区域标签、拱门、<b>12 个小道具</b>（闹钟/小蜗/竖笛/自画像/石头电视/显微镜/凯伦/海霸糊桶…）+ 隐藏线索贴图</td><td><span class="pill gray">待生图</span></td></tr>
+    <tr><td><b>bot 居民（v2.4）</b></td><td>街道人气</td><td>6 款小鱼造型（泡泡鱼/条纹鱼/小丑鱼/比目鱼/石头鱼/海胆先生），带名字牌、行走帧、打招呼气泡</td><td><span class="pill gray">待生图</span></td></tr>
+    <tr><td><b>号码屏滚动（v2.4）</b></td><td>蟹堡王 UI</td><td>翻滚数字牌 A001–A007（含抖动/模糊中间帧）、「请取餐」定格态、叫号屏外框</td><td><span class="pill gray">待生图</span></td></tr>
+    <tr><td><b>场景内出口门（v2.5）</b></td><td>六间房通用 · 室内右下角</td><td>金色脉动门框 + 拱形门板（<b>纯形状，勿用 emoji 字体</b>）+ 金色圆把手 + 门牌「← 出去 / 回比奇堡」；常态 / 悬停 / 呼吸发光三态 + 门下浅金光晕；等角统一光源</td><td><span class="pill gray">待生图</span></td></tr>
+    <tr><td><b>14 子房间背景（v2.6）</b></td><td>房间图 · 6 主题模板</td><td>蟹堡王(前厅/后厨/办公室)、摩艾屋(1F/2F/3F)、凤梨屋、石头屋、树屋、海之霸各 2 间；同栋共用色板，后墙/地砖等角统一光源</td><td><span class="pill gray">待生图</span></td></tr>
+    <tr><td><b>门 / 楼梯 portal（v2.6）</b></td><td>房间连接点</td><td>蓝色发光门 / 金色楼梯两型，带方向门牌（→ 后厨 / ↑ 上二楼 / ↓ 下一楼）；常态·悬停·呼吸三态，<b>纯几何勿依赖 emoji 字体</b></td><td><span class="pill gray">待生图</span></td></tr>
+    <tr><td><b>翻找 / 旋转 / 藏品册 UI（v2.6）</b></td><td>交互面板</td><td>柜子内部格子（未翻❓/已翻/deep 夹层金色脉动三态）、可翻转 3D 卡片（正反面）、27 格藏品册（未发现虚线 / 已发现金色实线 + 圆底图标）、彩蛋计数按钮</td><td><span class="pill gray">待生图</span></td></tr>
+    <tr><td><b>交互双态物件（v2.6）</b></td><td>翻找/开关/旋转</td><td>约 30 件需双态：抽屉开关态、灯/煎炉/电视亮灭态、竖笛/锅铲/自画像背面刻字；<b>高亮发光一律代码叠加，不画进图</b></td><td><span class="pill gray">待生图</span></td></tr>
+    <tr><td><b>27 件彩蛋藏品图标（v2.6）</b></td><td>藏品册</td><td>秘方纸条 / 第一枚金币 / 竖笛刻字 / 小蜗「喵」/ 独处时刻…；小尺寸透明 PNG，可用纯 CSS 圆底 + emoji 兜底，<b>非必生图</b></td><td><span class="pill gray">可选</span></td></tr>
+    <tr><td><b>三型水母（v2.7）</b></td><td>主场景捉水母</td><td>粉 / 蓝电 / 金三色半圆伞盖 + 触须；<b>已用纯 CSS 绘制</b>，仅在要换手绘贴图时才需出图（3 张，≤6 色、透明底、无投影）</td><td><span class="pill gray">可选</span></td></tr>
+    <tr><td><b>鱼网光标 / 网挥动（v2.7）</b></td><td>鼠标交互</td><td><b>不生图</b>：SVG data-URI 网圈 + 网格 + 木柄；挥动扩散圈与 +N 浮字由 CSS 动画叠加（动态效果不入图）</td><td>—</td></tr>
+    <tr><td><b>小蜗造型 / 立绘（v2.7）</b></td><td>世界层 NPC + 对话面板</td><td>当前用中文「蜗」字 + 暖沙金色盘兜底（规避缺 emoji 字体）；若要蜗牛壳造型 ≈ 2 张（世界 token / 圆形立绘），需中文/无文字、透明底</td><td><span class="pill gray">可选</span></td></tr>
+    <tr><td><b>三处玩法场地地面（v2.8）</b></td><td>水母田 / 泡泡摊 / 空手道场</td><td>3 张世界瓦片：青绿草地椭圆、淡蓝圆角地台、暖橙沙地椭圆；<b>已用纯 CSS 渐变 + 虚线围栏绘制</b>；若换手绘，图内<b>不含木牌文字</b>（HTML 渲染）、透明底、无投影</td><td><span class="pill gray">可选</span></td></tr>
+    <tr><td><b>五段泡泡形态 / 木桩沙袋（v2.8）</b></td><td>吹泡泡 / 空手道场</td><td>圆泡 / 大圆泡 / 蟹黄堡泡 / 小船泡 / 大象泡 + 木桩；<b>已用纯 CSS 径向渐变 + 形状化圆角绘制</b>，不依赖 emoji、默认不生图</td><td>—</td></tr>
+    <tr><td><b>开场横幅 / 玩法 HUD / 结算卡（v2.8）</b></td><td>小游戏会话</td><td><b>不生图</b>：复用深蓝玻璃拟态 UI，仅换中文文案；金光脉冲、呼吸、飘动、<code>+N</code> 浮字全部 CSS 动画叠加</td><td>—</td></tr>
+  </table>
+  <p><small>代码交付物、变量槽位表、提示词模板、负面词、批量执行清单与 token 估算详见 <code>交付产物清单.md</code> 与 <code>美术资产规格与提示词包.md</code>。</small></p>
+</section>
+
+</div>
+
+<div class="foot">
+  比奇堡沉浸式连通世界 · 需求与重构方案 v2.6 — 已确认 2.5D 连通世界、美术滞后、最小闭环、v1 bot 多人。v2.1 追加 NPC 作息系统与莉娜式聚焦检视；v2.2 追加建筑错落排布、蟹堡王多分区、四步点餐动线、咬痕式进食；<b>v2.3 追加交互形式重构：世界内(diegetic)引导（§7.5）——目标光圈/光路/物件锚定气泡/NPC 带路/纸质点单条/镜头推近/环境动效/触屏手势，废弃屏幕 UI 按钮兜底</b>；<b>v2.4 追加交互系统定稿（§7.6–7.10）：橙光式分支对话、家具坐下、NPC 室内外位置修正、号码滚动与 bot 居民，并把其余 5 栋室内按同一套范式全部做完（六栋均可进入）</b>；<b>v2.5 追加场景内出口系统（§7.11）：修复「进屋后出不去」——世界层 HUD 让位 + 室内顶栏 + 六间通用发光出口门 + 四条出门通道</b>。<b>v2.6 追加：交互形式多样化（§7.12，8 类动词 + 27 彩蛋藏品册）、多房间·多楼层房间图（§7.13，六栋 14 子房间、蟹堡王 3 间、章鱼哥家 3 层带楼梯）、以及美术风格评估与 token/积分消耗估算（§8，推荐 2.5D 轻等角微缩手绘，L1/L2/L3 ≈ 27/130/300 次生图调用）</b>。<b>v2.7 追加：主场景捉水母小玩法（§7.14，打地鼠式 + 鱼网光标 + 三型水母 + 计数板，并类比原作提取后续候选玩法）、NPC 站位防重叠与点餐目标优先（§7.15，全量扫描 14 房间 + allOverlaps 校验）、小蜗可交互（世界层可点实体 + 7 节点对话树 + 彩蛋联动），以及新增资产几乎不增加生图量的评估（§8.5）</b>。<b>v2.8 追加：三处玩法场地 + 小游戏会话框架（§7.16，水母田 / 泡泡摊 / 空手道场，点击或走近按 E 才开局、默认街上不出水母，含横幅 / 30 秒倒计时 / 目标进度 / 金银铜结算 / 收工退出）、吹泡泡 5 段蓄力与空手道节奏连击全部落地（§7.17，补齐 §7.14.1 的两个「后续候选」），以及新增资产仍几乎不增加生图量的评估（§8.6）</b>。最新开发日志、交付清单与生图提示词包见配套 .md 文件。
+</div>
+
+</body>
+</html>

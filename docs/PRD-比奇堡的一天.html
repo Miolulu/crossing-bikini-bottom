@@ -1,0 +1,1610 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>《比奇堡的一天》· 产品需求与体验设计文档 v1.1</title>
+<style>
+:root{
+  --deep:#062338; --sea:#0B5E86; --sea2:#1287A8; --aqua:#3FD0D8;
+  --sand:#F6E3C5; --sand2:#E8CFA6; --sponge:#FFD23F; --coral:#FF6B4A;
+  --pink:#FF8FB1; --ink:#0E1B24; --paper:#FBF6EC; --paper2:#F3EADA;
+  --green:#2FA36B; --purple:#8C6BD8;
+  --shadow:0 10px 30px rgba(6,35,56,.14);
+  --shadow-sm:0 4px 14px rgba(6,35,56,.10);
+  --r:18px;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Source Han Sans SC",system-ui,sans-serif;
+  line-height:1.75; font-size:16px; letter-spacing:.01em;
+  -webkit-font-smoothing:antialiased;
+}
+img{max-width:100%; display:block;}
+a{color:var(--sea);}
+
+/* ---------- 布局 ---------- */
+.wrap{display:flex; align-items:flex-start;}
+.side{
+  width:264px; flex:0 0 264px; position:sticky; top:0; height:100vh;
+  background:linear-gradient(180deg,#07263C 0%,#0B3E5C 100%);
+  color:#DCEFF6; padding:22px 16px 30px; overflow-y:auto;
+  border-right:1px solid rgba(255,255,255,.08);
+}
+.side::-webkit-scrollbar{width:6px;}
+.side::-webkit-scrollbar-thumb{background:rgba(255,255,255,.18); border-radius:3px;}
+.brand{display:flex; gap:10px; align-items:center; margin-bottom:6px;}
+.brand .dot{width:26px;height:26px;border-radius:50%;background:radial-gradient(circle at 32% 30%,#fff8c9,var(--sponge) 55%,#e0a600);box-shadow:0 0 0 3px rgba(255,210,63,.18);}
+.brand b{font-size:15px; letter-spacing:.06em;}
+.brand-sub{font-size:11px; color:#8FB8CC; letter-spacing:.14em; margin:0 0 18px 36px;}
+.nav-group{font-size:10.5px; letter-spacing:.18em; color:#6E99AE; margin:18px 8px 8px;}
+.nav a{
+  display:block; padding:7px 10px; border-radius:9px; font-size:13.5px;
+  color:#C6E1EC; text-decoration:none; transition:.18s; border-left:2px solid transparent;
+}
+.nav a:hover{background:rgba(63,208,216,.12); color:#fff;}
+.nav a.active{background:rgba(255,210,63,.14); color:var(--sponge); border-left-color:var(--sponge); font-weight:600;}
+.side-foot{margin-top:26px; font-size:11px; color:#6E99AE; line-height:1.6; border-top:1px solid rgba(255,255,255,.08); padding-top:14px;}
+
+.main{flex:1; min-width:0;}
+.inner{max-width:1020px; margin:0 auto; padding:0 40px 100px;}
+
+/* ---------- 封面 ---------- */
+.cover{
+  position:relative; height:88vh; min-height:600px; overflow:hidden;
+  display:flex; flex-direction:column; justify-content:center; align-items:center;
+  color:#fff; text-align:center; padding:40px;
+}
+.cover img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; filter:saturate(1.05) brightness(.92); z-index:0;}
+.cover::after{content:""; position:absolute; inset:0; z-index:1; background:radial-gradient(ellipse at 50% 45%,rgba(4,26,42,.62) 0%,rgba(4,26,42,.46) 45%,rgba(4,26,42,.88) 100%);}
+.cover>*{position:relative; z-index:2;}
+.kicker{font-size:12px; letter-spacing:.42em; text-transform:uppercase; color:var(--sponge); margin-bottom:20px; text-shadow:0 2px 12px rgba(0,0,0,.4);}
+.cover h1{
+  font-size:clamp(38px,6vw,74px); margin:0; line-height:1.08; letter-spacing:.02em;
+  text-shadow:0 6px 26px rgba(0,0,0,.45), 0 2px 0 rgba(255,255,255,.06);
+}
+.cover h1 small{display:block; font-size:.28em; letter-spacing:.3em; color:#BFE6F3; margin-top:16px; font-weight:400;}
+.cover p.tagline{max-width:620px; margin:26px auto 0; font-size:15.5px; color:#E4F3F9; line-height:1.9;}
+.cover .meta{display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:34px; font-size:12px;}
+.cover .meta span{border:1px solid rgba(255,255,255,.3); padding:6px 14px; border-radius:99px; backdrop-filter:blur(6px); background:rgba(255,255,255,.07);}
+
+/* ---------- 通用排版 ---------- */
+section{padding-top:78px;}
+h2{
+  font-size:30px; margin:0 0 6px; letter-spacing:.01em; display:flex; align-items:center; gap:14px;
+}
+h2 .num{
+  flex:0 0 auto; font-size:12.5px; font-weight:700; color:var(--sea);
+  background:var(--sponge); border-radius:8px; padding:4px 9px; letter-spacing:.08em;
+  box-shadow:0 3px 0 #d9a800; transform:rotate(-2deg);
+}
+h2+.lead{color:#5C6B73; font-size:15px; margin:8px 0 26px; max-width:820px;}
+h3{font-size:20px; margin:40px 0 12px; letter-spacing:.01em;}
+h4{font-size:16px; margin:24px 0 8px; color:var(--sea);}
+p{margin:10px 0;}
+ul,ol{margin:10px 0 10px 22px; padding:0;}
+li{margin:6px 0;}
+.lead-strong{font-weight:600; color:var(--ink);}
+
+/* ---------- 组件 ---------- */
+.card{background:#fff; border:1px solid rgba(6,35,56,.07); border-radius:var(--r); padding:22px 24px; box-shadow:var(--shadow-sm);}
+.grid{display:grid; gap:18px;}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr));}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr));}
+.callout{
+  border-left:4px solid var(--aqua); background:#EAF7F9; border-radius:0 14px 14px 0;
+  padding:16px 20px; margin:20px 0; font-size:14.5px;
+}
+.callout.warn{border-left-color:var(--coral); background:#FFF0EB;}
+.callout.note{border-left-color:var(--sponge); background:#FFF9E3;}
+.callout b{display:block; font-size:12px; letter-spacing:.14em; margin-bottom:4px; opacity:.75;}
+.tag{display:inline-block; font-size:11.5px; padding:3px 10px; border-radius:99px; background:#EAF1F4; color:#3A5560; margin:0 6px 6px 0; letter-spacing:.03em;}
+.tag.y{background:#FFF3C4; color:#8A6A00;}
+.tag.o{background:#FFE7DE; color:#B3401F;}
+.tag.g{background:#E4F6EC; color:#1F7B4E;}
+.tag.b{background:#E6F1FA; color:#1F5F8B;}
+.tag.p{background:#EFE9FB; color:#5B3FB0;}
+table{width:100%; border-collapse:separate; border-spacing:0; font-size:13.8px; margin:16px 0; background:#fff; border-radius:14px; overflow:hidden; box-shadow:var(--shadow-sm);}
+th{background:var(--sea); color:#fff; text-align:left; padding:11px 14px; font-weight:600; font-size:12.5px; letter-spacing:.06em;}
+td{padding:10px 14px; border-top:1px solid rgba(6,35,56,.07); vertical-align:top;}
+tbody tr:nth-child(even) td{background:#FBFDFE;}
+tbody tr:hover td{background:#F2FAFC;}
+td b{color:var(--sea);}
+code{background:#F0F3F5; padding:1.5px 6px; border-radius:5px; font-size:12.5px; font-family:ui-monospace,Menlo,Consolas,monospace; color:#0A5570;}
+pre{background:#07263C; color:#CFE9F3; padding:16px 18px; border-radius:12px; overflow:auto; font-size:12.5px; line-height:1.7;}
+pre code{background:none; color:inherit; padding:0;}
+
+figure{margin:22px 0;}
+figure img{border-radius:16px; border:3px solid #fff; box-shadow:var(--shadow);}
+figcaption{font-size:12.5px; color:#6E7C84; margin-top:9px; text-align:center; letter-spacing:.02em;}
+.fig-tall img{max-height:520px; width:auto; margin:0 auto;}
+
+/* 建筑卡 */
+.building{
+  background:#fff; border-radius:20px; overflow:hidden; box-shadow:var(--shadow-sm);
+  border:1px solid rgba(6,35,56,.07); display:flex; flex-direction:column;
+}
+.building img{height:210px; object-fit:cover; width:100%;}
+.building .bd{padding:18px 20px 20px;}
+.building h4{margin:0 0 4px; font-size:17px; color:var(--ink);}
+.building .en{font-size:11px; letter-spacing:.14em; color:#8FA3AD; text-transform:uppercase; margin-bottom:10px;}
+.building p{font-size:13.6px; color:#48585F; margin:6px 0;}
+.building .kv{font-size:12.5px; color:#6E7C84; margin-top:10px; border-top:1px dashed #DCE5E9; padding-top:10px;}
+
+/* NPC 卡 */
+.npc{border-radius:18px; padding:20px 22px; background:#fff; box-shadow:var(--shadow-sm); border-top:5px solid var(--sea);}
+.npc h4{margin:0 0 2px; font-size:18px; color:var(--ink); display:flex; align-items:baseline; gap:8px;}
+.npc h4 em{font-style:normal; font-size:11px; letter-spacing:.12em; color:#93A6AF; font-weight:400;}
+.npc .core{font-size:13px; color:#4E5F67; margin:8px 0 10px; padding:10px 12px; background:#F7FAFB; border-radius:10px;}
+.npc.sq{border-top-color:#7FA8A0;}
+.npc.kr{border-top-color:var(--coral);}
+.npc.sb{border-top-color:var(--sponge);}
+.npc.pt{border-top-color:var(--pink);}
+.bubble{
+  position:relative; background:#fff; border:2.5px solid var(--ink); border-radius:16px;
+  padding:10px 14px; font-size:13.5px; margin:10px 0 16px; box-shadow:3px 3px 0 rgba(14,27,36,.12);
+}
+.bubble::after{
+  content:""; position:absolute; left:22px; bottom:-11px; width:14px; height:14px;
+  background:#fff; border-right:2.5px solid var(--ink); border-bottom:2.5px solid var(--ink);
+  transform:rotate(45deg);
+}
+.bubble em{display:block; font-size:11px; color:#95A7AF; font-style:normal; margin-bottom:2px; letter-spacing:.1em;}
+
+/* 矩阵 */
+.matrix td{font-size:12.6px; padding:9px 10px; text-align:center;}
+.matrix td:first-child{text-align:left; font-weight:600; white-space:nowrap;}
+.m-good{background:#E7F7EE !important; color:#17724A;}
+.m-mid{background:#FFF9E3 !important; color:#8A6A00;}
+.m-cold{background:#EFF3F5 !important; color:#5A6E77;}
+.m-bad{background:#FFEDE6 !important; color:#B3401F;}
+
+/* 抽卡器 */
+.demo{background:linear-gradient(160deg,#0A3550,#0B5E86 55%,#1287A8); border-radius:22px; padding:26px; color:#fff; box-shadow:var(--shadow); position:relative; overflow:hidden;}
+.demo::before{content:""; position:absolute; width:340px;height:340px;border-radius:50%; background:rgba(63,208,216,.16); top:-140px; right:-80px; filter:blur(10px);}
+.demo h4{color:#fff; margin:0 0 4px; font-size:17px;}
+.demo .sub{font-size:12.5px; color:#A9D3E3; margin-bottom:18px;}
+.gacha-stage{display:flex; gap:22px; align-items:center; flex-wrap:wrap;}
+.gacha-card{
+  flex:1 1 300px; min-height:190px; border-radius:16px; background:rgba(255,255,255,.1);
+  border:1px dashed rgba(255,255,255,.35); display:flex; flex-direction:column;
+  align-items:center; justify-content:center; text-align:center; padding:20px;
+  transition:.35s; position:relative;
+}
+.gacha-card.revealed{background:rgba(255,255,255,.96); color:var(--ink); border:2px solid var(--sponge); box-shadow:0 0 0 4px rgba(255,210,63,.25),0 14px 34px rgba(0,0,0,.3);}
+.gacha-card .face{font-size:44px; line-height:1; margin-bottom:10px;}
+.gacha-card .nm{font-size:20px; font-weight:700; letter-spacing:.03em;}
+.gacha-card .ds{font-size:12.8px; color:#5F7079; margin-top:6px; max-width:280px;}
+.gacha-card .rar{margin-top:10px; font-size:11px; letter-spacing:.1em;}
+.gacha-card .hint{font-size:12.5px; color:#BFE2EE;}
+.btn{
+  border:0; cursor:pointer; font-family:inherit; font-weight:700; font-size:14px;
+  padding:12px 22px; border-radius:99px; background:var(--sponge); color:#3A2E00;
+  box-shadow:0 4px 0 #C99B00; transition:.14s; letter-spacing:.04em;
+}
+.btn:hover{transform:translateY(-1px); box-shadow:0 6px 0 #C99B00;}
+.btn:active{transform:translateY(3px); box-shadow:0 1px 0 #C99B00;}
+.btn.ghost{background:rgba(255,255,255,.14); color:#fff; box-shadow:none; border:1px solid rgba(255,255,255,.4);}
+.odds{font-size:11.5px; color:#9FC9DA; margin-top:16px; line-height:1.9;}
+.odds span{display:inline-block; margin-right:12px;}
+
+/* 汉堡演示 */
+.burger-demo{display:flex; gap:26px; align-items:center; flex-wrap:wrap; background:#fff; border-radius:20px; padding:22px; box-shadow:var(--shadow-sm);}
+.burger-stage{position:relative; width:300px; height:300px; flex:0 0 300px; border-radius:50%; background:radial-gradient(circle at 50% 45%,#DFF6FA,#BFE9F0); display:flex; align-items:center; justify-content:center; overflow:hidden;}
+.burger-stage img{width:210px; transition:transform .35s cubic-bezier(.34,1.56,.64,1); user-select:none;}
+.bite-info{flex:1 1 260px;}
+.bite-dots{display:flex; gap:6px; margin:10px 0 14px;}
+.bite-dots i{width:18px; height:18px; border-radius:50%; background:#E7EEF1; display:block; transition:.2s;}
+.bite-dots i.on{background:var(--coral); transform:scale(1.1);}
+.crumb{position:absolute; width:7px; height:7px; border-radius:2px; background:#C98B4B; pointer-events:none;}
+
+/* 清单 */
+.check{list-style:none; margin-left:0;}
+.check li{position:relative; padding-left:30px; font-size:14px; margin:9px 0;}
+.check li::before{content:"✓"; position:absolute; left:0; top:1px; width:20px; height:20px; border-radius:6px; background:#E4F6EC; color:#1F7B4E; font-size:12px; display:flex; align-items:center; justify-content:center; font-weight:700;}
+.flow{display:grid; gap:10px; margin:18px 0;}
+.flow-row{display:flex; align-items:center; gap:12px; flex-wrap:wrap;}
+.flow-node{background:#fff; border:1.5px solid #D7E5EA; border-radius:12px; padding:10px 16px; font-size:13.5px; box-shadow:0 2px 0 rgba(6,35,56,.05);}
+.flow-node.hl{border-color:var(--sponge); background:#FFF9E3; font-weight:600;}
+.flow-arrow{color:var(--aqua); font-weight:700;}
+.kpi{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin:18px 0;}
+.kpi div{background:#fff; border-radius:14px; padding:14px 16px; box-shadow:var(--shadow-sm);}
+.kpi b{display:block; font-size:22px; color:var(--sea); line-height:1.2;}
+.kpi span{font-size:11.5px; color:#7C8C94; letter-spacing:.04em;}
+footer{margin-top:90px; padding:30px 0 10px; border-top:1px solid #E2DBCC; font-size:12.5px; color:#8A969C;}
+
+@media (max-width:1080px){
+  .side{display:none;}
+  .inner{padding:0 22px 80px;}
+  .g2,.g3{grid-template-columns:1fr;}
+  .kpi{grid-template-columns:repeat(2,1fr);}
+  .cover{height:70vh;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<aside class="side">
+  <div class="brand"><span class="dot"></span><b>比奇堡的一天</b></div>
+  <div class="brand-sub">Bikini Bottom · v1.1</div>
+  <div class="nav-group">总览</div>
+  <nav class="nav">
+    <a href="#s0">封面与一页纸摘要</a>
+    <a href="#s1">体验愿景与设计支柱</a>
+    <a href="#s2">视觉与听觉基调</a>
+  </nav>
+  <div class="nav-group">体验主链</div>
+  <nav class="nav">
+    <a href="#s3">开场：正在前往比奇堡</a>
+    <a href="#s4">身份分配系统（含抽卡演示）</a>
+    <a href="#s5">比奇堡地图与六大建筑</a>
+    <a href="#s6">主 NPC 人物设定</a>
+    <a href="#s7">彩蛋 NPC 与态度矩阵</a>
+    <a href="#s8">核心玩法：蟹堡王</a>
+    <a href="#s9">蟹黄堡 3D 与啃咬动效</a>
+  </nav>
+  <div class="nav-group">系统与落地</div>
+  <nav class="nav">
+    <a href="#s10">多人在线与社交</a>
+    <a href="#s11">UI / UX 规范</a>
+    <a href="#s12">技术实现方案</a>
+    <a href="#s13">Demo 范围与里程碑</a>
+    <a href="#s14">待定问题与扩展池</a>
+    <a href="#s15">IP 与合规说明</a>
+    <a href="#s16">附录：台词库与物品表</a>
+  </nav>
+  <div class="side-foot">
+    阅读对象：制作人 / 前端与后端工程 / 美术 / QA<br>
+    文档状态：v1.1 已拍板（8/8 待定问题）<br>
+    内容基准：参考《海绵宝宝》动画设定整理
+  </div>
+</aside>
+
+<div class="main">
+<header class="cover" id="s0">
+  <img src="images/01-opening.png" alt="下潜进入比奇堡的开场画面">
+  <div class="kicker">Product &amp; Experience Design Document</div>
+  <h1>比奇堡的一天<small>A DAY IN BIKINI BOTTOM</small></h1>
+  <p class="tagline">你从海面下沉，海水一寸寸爬满屏幕。等光透进来的时候，你已经不是游客了——<br>你是比奇堡的居民，有自己的名字、自己的身份，和一条必须排队的蟹黄堡队伍。</p>
+  <div class="meta">
+    <span>多人在线 · 第三人称</span><span>6 座可进入建筑</span><span>身份随机分配系统</span><span>3D 蟹黄堡</span><span>v1.1 · 需求与体验设计</span>
+  </div>
+</header>
+
+<div class="inner">
+
+<!-- ============ 一页纸摘要 ============ -->
+<section id="s0b">
+  <h2><span class="num">00</span>一页纸摘要</h2>
+  <p class="lead">如果你只读一页，请读这一页。这里定义了这个产品是什么、玩家在 5 分钟里会经历什么、以及 Demo 必须证明哪几件事。</p>
+
+  <div class="card">
+    <p><b class="lead-strong">一句话定义：</b>一个以《海绵宝宝》比奇堡为舞台的<strong>多人在线海底漫步网站</strong>。用户打开即被随机分配为一名比奇堡居民，以第三人称在其中生活 10–20 分钟：进别人的家、被章鱼哥嫌弃、跟海绵宝宝一起唱歌、在蟹堡王排队买一个能 3D 旋转、能一口口吃掉的蟹黄堡，并和同屏的其他居民打个招呼。</p>
+    <p><b class="lead-strong">它不是什么：</b>不是游戏（没有战斗、没有任务链、没有成长数值）、不是聊天室（不开放自由打字）、不是开放世界（Demo 只有一条贝壳街 + 六栋建筑内景）。它的对手不是游戏，而是"点开就关掉的品牌互动 H5"。</p>
+    <p><b class="lead-strong">Demo 要证明的三件事：</b></p>
+    <ol>
+      <li><b>开场 5 秒能让人"沉下去"</b>——海水铺满屏幕那一刻的沉浸感，是这个产品的第一道门槛。</li>
+      <li><b>NPC 真的有性格</b>——章鱼哥的冷漠必须让人"有点被冒犯但又想笑"，而不是一个复读机。</li>
+      <li><b>蟹黄堡值得排队</b>——排队的过程不无聊，拿到手之后"转着看、咬着吃"的手感成立。</li>
+    </ol>
+  </div>
+
+  <div class="kpi">
+    <div><b>5 秒</b><span>开场沉浸窗口</span></div>
+    <div><b>10–20 分钟</b><span>单次体验时长目标</span></div>
+    <div><b>6 座</b><span>可进入建筑</span></div>
+    <div><b>12%</b><span>彩蛋身份总概率</span></div>
+  </div>
+
+  <div class="callout note">
+    <b>本文档的使用方式</b>
+    全文的体验描述都可以改，但有三类内容改动成本最高，建议先确认：<b>① 身份分配的概率与稀有度</b>（影响玩家晒图动机与服务器设计）；<b>② 蟹堡王排队参数</b>（决定"等待是否有趣"）；<b>③ NPC 台词量级</b>（每个 NPC 至少 30 条台词才能撑住 15 分钟不重复）。
+  </div>
+</section>
+
+<!-- ============ 1 愿景 ============ -->
+<section id="s1">
+  <h2><span class="num">01</span>体验愿景与设计支柱</h2>
+  <p class="lead">好的主题衍生作品，不是"把角色贴到页面上"，而是"让用户短暂地成为这个世界的一部分"。这个项目的核心情绪是：<strong>被一个有点荒诞、有点吵闹、但莫名温暖的小镇接纳。</strong></p>
+
+  <h3>1.1 核心情绪曲线</h3>
+  <p>一次完整访问应该像一集 11 分钟的动画短片，情绪有起伏而不是平铺：</p>
+  <table>
+    <thead><tr><th style="width:14%">阶段</th><th style="width:20%">玩家在做什么</th><th style="width:33%">目标情绪</th><th>设计手段</th></tr></thead>
+    <tbody>
+      <tr><td><b>0–1 分钟</b><br>下潜</td><td>看开场动画、等待加载</td><td>好奇 + 轻微失重感</td><td>海水从底部涨满屏幕、光柱、气泡音；文案只有一句"正在前往比奇堡"</td></tr>
+      <tr><td><b>1–3 分钟</b><br>被认领</td><td>抽取身份、看到自己的样子</td><td>惊喜 / 一点点"我居然是它"的荒谬感</td><td>泡泡破裂式开卡；身份卡带稀有度与一句专属台词</td></tr>
+      <tr><td><b>3–8 分钟</b><br>闲逛</td><td>走进三栋房子、乱点物品</td><td>探索欲 + 被 NPC"怼"的乐趣</td><td>每个物品都有反馈；章鱼哥的冷漠形成反差喜感</td></tr>
+      <tr><td><b>8–15 分钟</b><br>排队</td><td>在蟹堡王取号、等叫号、搭话</td><td>轻微焦躁 → 拿到食物的满足</td><td>等待期间有可看的内容（煎肉饼表演、章鱼哥吐槽）</td></tr>
+      <tr><td><b>15–20 分钟</b><br>吃</td><td>堂食或边走边吃，和陌生人招手</td><td>治愈、想截图分享</td><td>蟹黄堡 3D 旋转 + 六口吃完的动效；同屏玩家招手回礼</td></tr>
+    </tbody>
+  </table>
+
+  <h3>1.2 五条设计支柱</h3>
+  <div class="grid g2">
+    <div class="card">
+      <h4>① 身份即角色，不是"游客皮肤"</h4>
+      <p>用户不是"来参观比奇堡的人"，而是"本来就在这儿住的人"。所以：没有"欢迎光临"的官方口吻，NPC 认识你、也未必喜欢你；分配到的身份会改变 NPC 的态度、可触发的彩蛋、甚至移动速度。</p>
+    </div>
+    <div class="card">
+      <h4>② 人设不容妥协</h4>
+      <p>章鱼哥必须真的冷漠、蟹老板必须真的贪财、痞老板必须真的想偷配方。宁可让用户"有点被冒犯"，也不要把所有 NPC 磨平成同一种热情客服。</p>
+    </div>
+    <div class="card">
+      <h4>③ 每扇门都能推，每个东西都能碰</h4>
+      <p>六栋建筑全部可进入；每栋内部至少 8 个可交互物品，且每个物品都有独立反馈（台词 / 动画 / 音效 / 小彩蛋），不做"装饰性家具"。</p>
+    </div>
+    <div class="card">
+      <h4>④ 低压力社交</h4>
+      <p>能看到别人、能打招呼，但不能自由打字。社交设计的目标是"在场感"，不是"社交压力"。陌生人之间的互动上限是一次招手和一个气泡。</p>
+    </div>
+    <div class="card">
+      <h4>⑤ 把一件事做穿：蟹黄堡</h4>
+      <p>整个 Demo 只有一样"可以吃的东西"，所以它必须做到极致：能转、能看、能咬、能掉渣、能吃出满足感。这是全站唯一的重资产动画。</p>
+    </div>
+    <div class="card">
+      <h4>⑥（约束）不做的事</h4>
+      <p>这个项目<strong>不是一款游戏，是一个"可走进去的动画片 / 互动体验"</strong>。所以不做战斗、不做任务、不做养成、不做自由聊天、不做无缝大世界，<b>尤其不做任何以"留存 / 奖励 / 进度"为目标的系统</b>：每日签到、连续登录、成就、排行榜、体力 / 货币都一律不做（见 Q4）。任何"再加一个系统"的提议，先问它是否强化上面五条；凡是把用户往"每天回来打卡"方向推的，直接否。</p>
+    </div>
+  </div>
+
+  <h3>1.3 目标用户与场景</h3>
+  <table>
+    <thead><tr><th style="width:22%">用户类型</th><th style="width:26%">进入场景</th><th>他们想要什么 / 我们要给什么</th></tr></thead>
+    <tbody>
+      <tr><td><b>童年情怀党</b>（20–35 岁）</td><td>社交平台看到截图 / 朋友转发</td><td>想要"回到小时候"的一击。给：开场动画、原作级建筑还原、章鱼哥的经典冷漠。</td></tr>
+      <tr><td><b>角色厨</b></td><td>想抽到某个角色</td><td>想要"我是珊迪 / 我是痞老板"。给：稀有身份、专属彩蛋、可截图的身份卡。</td></tr>
+      <tr><td><b>闲逛型用户</b></td><td>碎片时间、通勤</td><td>想要不费脑子的 5 分钟。给：不需要教程，进门就能走，任意点击都有反馈。</td></tr>
+    </tbody>
+  </table>
+  <p class="lead" style="margin-top:14px">明确排除：硬核玩家、需要长期目标留存的用户。这类用户会在 20 分钟内离开，这是设计意图，不是失败。</p>
+</section>
+
+<!-- ============ 2 视觉 ============ -->
+<section id="s2">
+  <h2><span class="num">02</span>视觉与听觉基调</h2>
+  <p class="lead">整体原则：<strong>2D 手绘卡通的"纸质"质感 + 3D 空间的"可走进去"的纵深</strong>。用 3D 建场景、用卡通着色（Cel Shading）把 3D 压回 2D 的观感，让画面看起来像一集动画，但你能在里面走动。</p>
+
+  <h3>2.1 标准色板</h3>
+  <table>
+    <thead><tr><th style="width:22%">命名</th><th style="width:16%">色值</th><th style="width:30%">用途</th><th>禁用场景</th></tr></thead>
+    <tbody>
+      <tr><td><b>深海蓝</b> Deep Sea</td><td><code>#062338</code></td><td>远景水体、UI 深色底、加载遮罩</td><td>不要用于大面积室内</td></tr>
+      <tr><td><b>比奇堡蓝</b> Bikini Blue</td><td><code>#0B5E86</code></td><td>中景海水、雾色、卡片阴影</td><td>—</td></tr>
+      <tr><td><b>浅海青</b> Shallow Aqua</td><td><code>#3FD0D8</code></td><td>高光、交互描边、气泡、进度条</td><td>不要做文字色（对比度不足）</td></tr>
+      <tr><td><b>海绵黄</b> Sponge Yellow</td><td><code>#FFD23F</code></td><td>主 CTA、身份卡、高亮标签</td><td>不要用于"警告"语义</td></tr>
+      <tr><td><b>蟹壳红</b> Crab Red</td><td><code>#FF6B4A</code></td><td>蟹堡王招牌、进度危险态、咬痕</td><td>—</td></tr>
+      <tr><td><b>海星粉</b> Star Pink</td><td><code>#FF8FB1</code></td><td>派大星 / 珍珍相关元素</td><td>—</td></tr>
+      <tr><td><b>沙底米</b> Sand Beige</td><td><code>#F6E3C5</code></td><td>海底沙地、纸张底色、内景地面</td><td>—</td></tr>
+    </tbody>
+  </table>
+  <p class="lead">单帧主色不超过 <b>5 个</b>；同一屏内保证一个"黄"或"红"作为视觉锚点，其余压成蓝绿系。这条规则用来避免卡通配色常见的"脏"。</p>
+
+  <h3>2.2 画面参考</h3>
+  <figure>
+    <img src="images/02-map.png" alt="比奇堡全景概念图">
+    <figcaption>概念图 A · 比奇堡街区全景（六栋建筑的空间关系基准：凤梨屋—石像屋—石头屋三连排，圆顶树屋在街区尽头，蟹堡王与海之霸相邻）</figcaption>
+  </figure>
+
+  <div class="callout">
+    <b>关于这批概念图</b>
+    本文档中的图片均为 AI 生成的<b>风格方向稿</b>，用于对齐"该长什么样"，不作为最终美术资产。正式开发时需以原创绘制 / 建模替换，详见第 15 节 IP 说明。
+  </div>
+
+  <h3>2.3 动效与音效原则</h3>
+  <table>
+    <thead><tr><th style="width:20%">类别</th><th style="width:30%">规范</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td>缓动</td><td>出入场用 <code>cubic-bezier(.34,1.56,.64,1)</code></td><td>轻微过冲，模拟卡通"挤压—拉伸"（Squash &amp; Stretch）</td></tr>
+      <tr><td>角色移动</td><td>4.2 m/s；加速 0.15s，停止 0.1s</td><td>不要做真实惯性，卡通角色需要"立刻响应"</td></tr>
+      <tr><td>相机</td><td>第三人称跟随，距离 4.5m，高度 2.2m，阻尼 0.12</td><td>鼠标右键 / 拖拽旋转视角，滚轮缩放 3–8m</td></tr>
+      <tr><td>转场</td><td>进门：白→黑的 0.6s 气泡遮罩</td><td>用气泡填充做转场，是全片统一的语言（原作也用气泡转场）</td></tr>
+      <tr><td>音效</td><td>环境层 + 事件层双轨；事件音延迟 &lt; 80ms</td><td>水下环境底噪、气泡、脚步（沙滩 / 木地板两套）</td></tr>
+      <tr><td>音乐</td><td>原创"海底风"轻快配乐，60–90 BPM</td><td><b>不可使用原作主题曲</b>（音乐版权不可用）；但海绵宝宝哼歌等段落的<b>旋律气质</b>可贴近原作听感，不算搬运</td></tr>
+      <tr><td>配音</td><td>尽量仿造原作中文译制版的语气 / 口头禅 / 节奏，不要完全原创</td><td>Q7 已定：角色台词用<b>"风格近似"的演绎</b>——章鱼哥的慵懒不耐、蟹老板的精明呱噪、海绵宝宝的元气上扬、派大星的呆萌拖音；不直接搬运原版音轨（见 15.1 声音肖像权）</td></tr>
+    </tbody>
+  </table>
+</section>
+<!-- ============ 3 开场 ============ -->
+<section id="s3">
+  <h2><span class="num">03</span>开场：正在前往比奇堡</h2>
+  <p class="lead">这是全站的第一印象，也是唯一一个"不可跳过也要让人愿意看完"的环节。设计目标是：<strong>让海水的上升有重量感，让那句文案有仪式感。</strong></p>
+
+  <figure class="fig-tall">
+    <img src="images/01-opening.png" alt="从海面下潜的第一人称镜头，光柱、气泡与远处的比奇堡">
+    <figcaption>概念图 B · 开场所见：从海面向下望，光柱穿透水体，气泡向上翻涌，比奇堡在远处的蓝色雾里</figcaption>
+  </figure>
+
+  <h3>3.1 分镜与时间轴</h3>
+  <table>
+    <thead><tr><th style="width:12%">段落</th><th style="width:14%">时间</th><th style="width:38%">画面</th><th>声音 / 文案</th></tr></thead>
+    <tbody>
+      <tr><td><b>S0 黑场</b></td><td>0.0–0.4s</td><td>纯深海蓝。屏幕中央一个极小的光点（水面反光）</td><td>静音 0.2s，随后极轻的水下低频（30Hz 循环）</td></tr>
+      <tr><td><b>S1 涨水</b></td><td>0.4–1.4s</td><td>海水从屏幕<strong>底部</strong>以不规则浪面上升，占满 35%；浪面有顶点波动与泡沫边缘</td><td>水声由弱到强；3 颗气泡从下往上穿过</td></tr>
+      <tr><td><b>S2 铺满</b></td><td>1.4–3.6s</td><td>水继续上涨至<strong>铺满全屏</strong>；镜头开始轻微下潜（视差），光柱出现，气泡群由 3 颗增至 60 颗</td><td>水声达到峰值后压低，留下"咕噜"底噪</td></tr>
+      <tr><td><b>S3 文案</b></td><td>3.6–5.4s</td><td>屏幕中央淡入文案（见 3.2）；字下方有一枚跳动的加载泡泡</td><td>气泡爆破音效 1 次，文案出现</td></tr>
+      <tr><td><b>S4 真实加载</b></td><td>与 S2/S3 并行</td><td>进度以"泡泡数量"表示（每 10% 多一颗泡泡）；加载完成则"最后一颗泡泡"上浮至顶</td><td>网络慢时循环播放海浪声，不显示百分比（避免焦虑）</td></tr>
+      <tr><td><b>S5 潜入</b></td><td>0.9s</td><td>镜头加速下潜，气泡向后飞掠，画面被气泡遮罩吞没</td><td>"噗通"一声 + 瞬间静音 0.15s</td></tr>
+      <tr><td><b>S6 落地</b></td><td>0.8s</td><td>贝壳街淡入；玩家角色从上方落下，落地弹一下（挤压 0.12s）</td><td>环境音渐入；身份卡在 0.8s 后飘下</td></tr>
+    </tbody>
+  </table>
+
+  <h3>3.2 文案规范</h3>
+  <div class="card">
+    <p style="font-size:26px; letter-spacing:.12em; text-align:center; margin:18px 0 6px; font-weight:700;">正在前往比奇堡</p>
+    <p style="text-align:center; letter-spacing:.3em; font-size:12px; color:#8FA3AD; margin:0 0 16px;">B I K I N I &nbsp; B O T T O M</p>
+    <ul style="margin-bottom:0">
+      <li>主文案只有这一句，<strong>不加副标题、不加"加载中"、不加百分比</strong>。</li>
+      <li>字体：圆体 / 手写感中文字重 700，字距 +12%，白色 + 深海蓝描边 2px（保证任何背景下可读）。</li>
+      <li>出现方式：逐字淡入（每字间隔 60ms），整体轻微上浮 6px。</li>
+      <li>如果加载超过 12 秒：文案下方追加一行小字「海流有点乱，我们再潜一次…」（文案层兜底，不弹错误框）。</li>
+    </ul>
+  </div>
+
+  <h3>3.3 技术要点与边界情况</h3>
+  <table>
+    <thead><tr><th style="width:24%">项目</th><th>规格</th></tr></thead>
+    <tbody>
+      <tr><td>水面实现</td><td>片元着色器：两层正弦叠加的浪面 + 焦散噪声贴图滚动；浪面高度 0 → 1.0 由 <code>uRise</code> 控制</td></tr>
+      <tr><td>气泡粒子</td><td>InstancedMesh，60 个，单个 8 顶点；随机半径 2–14px，上升速度 40–90px/s，左右正弦漂移</td></tr>
+      <tr><td>光柱</td><td>3 条半透明锥体 + 叠加混合，缓慢摆动；开启 Bloom（强度 0.6，阈值 0.85）</td></tr>
+      <tr><td>性能预算</td><td>开场阶段独占 GPU：目标 60fps（中端安卓 30fps 兜底）；开场资源 &lt; 1.5MB</td></tr>
+      <tr><td>可跳过</td><td>任意点击 / 按键 → 直接跳到 S4 完成态，但保留 0.9s 的 S5 潜入（不能瞬间切场景）</td></tr>
+      <tr><td>失败兜底</td><td>WebGL 不可用 → 降级为静态图 + CSS 气泡动画 + 文案（仍完成"到达"叙事）</td></tr>
+      <tr><td>reduced-motion</td><td>系统开启"减少动态效果"时：取消镜头下潜与粒子，仅保留 0.6s 淡入</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============ 4 身份 ============ -->
+<section id="s4">
+  <h2><span class="num">04</span>身份分配系统</h2>
+  <p class="lead">这是整个产品最有传播力的一环：<strong>"你会是谁"</strong>。设计上有两个必须同时满足的矛盾目标——大多数人应该抽到"普通居民"（保证世界真实、人人都是路人），但少数人必须抽到彩蛋角色（保证有惊喜、有晒图）。</p>
+
+  <h3>4.1 分配流程</h3>
+  <div class="flow">
+    <div class="flow-row"><span class="flow-node">进入贝壳街</span><span class="flow-arrow">→</span><span class="flow-node">0.8s 后，一枚泡泡从上方飘下</span><span class="flow-arrow">→</span><span class="flow-node">点击泡泡（或 3s 自动）</span><span class="flow-arrow">→</span><span class="flow-node hl">泡泡破裂，展开身份卡</span></div>
+    <div class="flow-row"><span class="flow-node">身份卡：头像 + 名字 + 稀有度 + 一句专属台词</span><span class="flow-arrow">→</span><span class="flow-node">"这是我"（确认）</span><span class="flow-arrow">→</span><span class="flow-node">角色模型就位，HUD 出现身份徽章</span></div>
+  </div>
+  <p>关键细节：<b>不要在开场前告诉用户"你会被分配角色"</b>。让它在落地后突然发生，惊喜感来自"我已经在这儿了，然后有人告诉我我是谁"。</p>
+
+  <h3>4.2 概率与稀有度</h3>
+  <table>
+    <thead><tr><th style="width:22%">身份</th><th style="width:12%">概率</th><th style="width:12%">稀有度</th><th style="width:26%">外观特征</th><th>设计意图</th></tr></thead>
+    <tbody>
+      <tr><td><b>普通比奇堡居民</b></td><td><b>88%</b></td><td>★☆☆</td><td>随机鱼形（12 种体型 × 8 种配色），随机职业标签（邮差 / 超市店员 / 水母田向导…）</td><td>世界的主体。让"人人都是路人"这件事本身成立</td></tr>
+      <tr><td><b>珊迪</b> Sandy</td><td>4%</td><td>★★☆</td><td>潜水服 + 玻璃头盔，头盔内有水（水下世界的反差细节）</td><td>人气最高，给足"我抽到珊迪了"的炫耀空间</td></tr>
+      <tr><td><b>珍珍</b> Pearl</td><td>3%</td><td>★★☆</td><td>灰色鲸鱼少女，金色马尾 + 粉色蝴蝶结</td><td>青春期中二感，台词最好笑</td></tr>
+      <tr><td><b>痞老板</b> Plankton</td><td>2.5%</td><td>★★★</td><td>绿色单眼桡足类，体型只有常人 1/6，头顶两根触角</td><td>最稀有的"反派体验"：所有人都防着你</td></tr>
+      <tr><td><b>泡芙老师</b> Mrs. Puff</td><td>1.5%</td><td>★★☆</td><td>河豚，一受惊就膨胀成球</td><td>隐藏彩蛋：靠近蟹老板会触发"约会"尴尬对话</td></tr>
+      <tr><td><b>小蜗</b> Gary</td><td>1%</td><td>★★★</td><td>蜗牛，移动速度 −40%，只能"喵"</td><td>极稀有恶搞：全程只能发出"喵"，字幕会翻译你的心声</td></tr>
+    </tbody>
+  </table>
+  <p class="lead">注：章鱼哥、蟹老板、海绵宝宝、派大星<strong>不进入分配池</strong>——他们是"这个世界的主人"，玩家不能扮演。<b>小蜗</b>已确认保留（1% 极稀有恶搞位）。<b>身份每次进入都重新随机</b>（见 Q2 决策）：不绑定账号、不固定 7 天，刷新 / 重进就是一次全新的"你是谁"，把惊喜权交还给每一次访问。</p>
+
+  <div class="demo">
+    <h4>交互演示 · 身份抽卡</h4>
+    <div class="sub">点击按钮，体验一次真实概率的分配（此处为静态演示，不含保存逻辑）</div>
+    <div class="gacha-stage">
+      <div class="gacha-card" id="gachaCard">
+        <div class="hint">泡泡还在飘……</div>
+      </div>
+      <div style="flex:0 0 auto; display:flex; flex-direction:column; gap:10px;">
+        <button class="btn" id="gachaBtn">抽一个身份</button>
+        <button class="btn ghost" id="gachaReset">清空记录</button>
+      </div>
+    </div>
+    <div class="odds" id="gachaLog">已抽 0 次 · 彩蛋身份 0 次</div>
+    <div class="odds">
+      <span>普通居民 88%</span><span>珊迪 4%</span><span>珍珍 3%</span><span>痞老板 2.5%</span><span>泡芙老师 1.5%</span><span>小蜗 1%</span>
+    </div>
+  </div>
+
+  <div class="callout">
+    <b>概率与"是否固定身份"的取舍（v1.1 已定）</b>
+    稀有身份的价值来自"稀缺 + 可晒"。但 Q2 已明确：<strong>身份每次进入都重新随机，不做唯一、不固定 7 天</strong>。这意味着：
+    <br>· 不再需要"重抽券 / 7 天冷却"那套留存机制——它本质是游戏化留存，与 Q4「不打算做成游戏」冲突；
+    <br>· 稀缺性改由<b>单局概率</b>保证（彩蛋池合计 12%），同一局内抽到即稀有，截完图再进来又能抽；
+    <br>· 代价是"永远抽不到某角色"的怨念消失，但换来零心理负担的反复访问——对"可走进去的动画片"定位更合适。
+    <br>如后续确实想要"绑定身份"，再单独评估，不作为 v1 范围。
+  </div>
+
+  <h3>4.3 身份带来的差异（不只是外观）</h3>
+  <table>
+    <thead><tr><th style="width:20%">差异维度</th><th style="width:38%">规则</th><th>举例</th></tr></thead>
+    <tbody>
+      <tr><td>移动速度</td><td>普通居民 4.2 m/s；珊迪 4.8；珍珍 4.2（但会时不时停下来照镜子）；痞老板 2.6；小蜗 2.5</td><td>痞老板走得很慢，进蟹堡王要绕开别人的脚</td></tr>
+      <tr><td>NPC 初始态度</td><td>见第 7 节态度矩阵</td><td>章鱼哥对普通居民"冷淡"，对珊迪"勉强客气"</td></tr>
+      <tr><td>专属彩蛋</td><td>每个身份 3 个专属彩蛋，必须是"只有这个身份才能触发"的内容</td><td>痞老板进海之霸时，凯伦会说"老板，你终于回来了"</td></tr>
+      <tr><td>对话开场白</td><td>NPC 的第一句会点名你的身份</td><td>蟹老板："哟，珊迪！你那台新发明卖不卖？"</td></tr>
+      <tr><td>可交互限制</td><td>少数物品有身份门槛</td><td>蟹堡王后厨只有"海绵宝宝的朋友"（任意身份 + 好感达标）能进</td></tr>
+    </tbody>
+  </table>
+
+  <h3>4.4 普通居民的名字生成</h3>
+  <p>用「形容词 + 海洋生物 + 姓氏」三段式，制造原作那种荒诞的日常感：</p>
+  <pre><code>形容词池：泡泡 / 咸咸 / 闪闪 / 慢吞吞 / 爱笑 / 有点困 / 鳞片很多 / 刚搬来
+生物池　：鲭鱼 / 鲷鱼 / 小丑鱼 / 海马 / 章鱼 / 水母 / 沙丁鱼 / 鳕鱼
+姓氏池　：麦金利 / 泡泡顿 / 海草曼 / 珊瑚斯基 / 贝壳菲尔德 / 沙丁纳</code></pre>
+  <p>示例：<b>「有点困·鲭鱼·珊瑚斯基」</b>、<b>「刚搬来·海马·贝壳菲尔德」</b>。名字与身份都<strong>每次进入重新随机</strong>；不绑定账号、不跨会话保留（换设备 / 刷新 = 一个新身份）。</p>
+</section>
+
+<!-- ============ 5 地图与建筑 ============ -->
+<section id="s5">
+  <h2><span class="num">05</span>比奇堡地图与六大建筑</h2>
+  <p class="lead">Demo 的空间结构是<strong>「一条街 + 六个盒子」</strong>：一条可以自由行走的贝壳街（Conch Street）串联六栋建筑，进门切换到独立的室内场景。不做无缝大世界，是为了把预算全部压在"门里面"。</p>
+
+  <figure>
+    <img src="images/02-map.png" alt="比奇堡街区地图概念图">
+    <figcaption>概念图 C · 街区总览：左侧三连排（凤梨屋 → 石像屋 → 石头屋）、右侧圆顶树屋、中央蟹堡王与海之霸</figcaption>
+  </figure>
+
+  <h3>5.1 空间关系（以街心喷泉为原点）</h3>
+  <table>
+    <thead><tr><th style="width:20%">建筑</th><th style="width:18%">坐标（米）</th><th style="width:16%">门朝向</th><th style="width:16%">步行距离</th><th>街区描述</th></tr></thead>
+    <tbody>
+      <tr><td>海绵宝宝 · 凤梨屋</td><td>(-18, 0)</td><td>东</td><td>18m</td><td>贝壳街西段，门口有一小片贝壳围栏的花园</td></tr>
+      <tr><td>章鱼哥 · 复活岛石像屋</td><td>(-6, 0)</td><td>东</td><td>6m</td><td>夹在凤梨屋和石头屋中间，门前挂着"请勿打扰"</td></tr>
+      <tr><td>派大星 · 石头屋</td><td>(6, 0)</td><td>西</td><td>6m</td><td>紧邻石像屋，门口永远有一把躺椅</td></tr>
+      <tr><td>珊迪 · 圆顶树屋</td><td>(24, -12)</td><td>西</td><td>27m</td><td>街区东北角，玻璃圆顶反光，需要走一小段坡</td></tr>
+      <tr><td>蟹堡王</td><td>(0, 26)</td><td>南</td><td>26m</td><td>街心喷泉正北，木质龙虾笼造型，门口常年排队</td></tr>
+      <tr><td>海之霸</td><td>(14, 26)</td><td>南</td><td>30m</td><td>蟹堡王右侧 14m，铁桶造型，门口空无一人</td></tr>
+    </tbody>
+  </table>
+  <p class="lead">街区总长 60m × 宽 40m，行走穿越约 15 秒。这个尺度是刻意的：<b>小到能记住，大到不拥挤</b>。40 人同房间时，街心区域的同屏人数约 8–12 人。</p>
+
+  <h3>5.2 六栋建筑</h3>
+
+  <h4>① 海绵宝宝的家 · 凤梨屋</h4>
+  <div class="grid g2" style="align-items:start">
+    <figure style="margin:0">
+      <img src="images/03-pineapple-house.png" alt="凤梨屋外观概念图">
+      <figcaption>概念图 D · 凤梨屋：从船上掉下来的菠萝，蓝框舷窗，贝壳信箱</figcaption>
+    </figure>
+    <div class="card">
+      <p><b>外观：</b>巨型菠萝，菱形果皮纹理，顶部绿色叶冠；正面圆形舱门带舷窗，两侧各两扇圆形蓝框窗；门口贝壳信箱、蜗牛食盆、一小片珊瑚花圃。</p>
+      <p><b>内部：</b>两层。一层客厅（沙发、电视、书架、吹泡泡棒）；二层卧室（床、闹钟、日历、衣柜）；厨房与浴室在一层后侧。</p>
+      <p><b>氛围：</b>干净、明亮、有点过分整洁，墙上贴着"今天是美好的一天"的手写纸条。</p>
+      <p class="kv" style="margin-top:10px"><b>可交互物品：</b>9 件 · <b>常驻 NPC：</b>小蜗（趴在沙发上）<b> · 进入方式：</b>推门（无锁）</p>
+    </div>
+  </div>
+  <table>
+    <thead><tr><th style="width:22%">物品</th><th style="width:20%">交互</th><th>反馈</th></tr></thead>
+    <tbody>
+      <tr><td>小蜗（蜗牛）</td><td>喂食 / 抚摸</td><td>“喵～”（字幕：谢谢，顺便你踩到我的黏液了）；连续喂 3 次触发它爬上你的头</td></tr>
+      <tr><td>电视</td><td>打开</td><td>播放 8 秒"海底冒险"片段（原创低分辨率动画），海绵宝宝会突然从旁边探头</td></tr>
+      <tr><td>吹泡泡棒</td><td>使用</td><td>屏幕产生 12 个可点击的泡泡，点破有音效</td></tr>
+      <tr><td>日历</td><td>查看</td><td>每个日期都画了叉，只有今天画了一个笑脸</td></tr>
+      <tr><td>空手道木人</td><td>踢</td><td>木人反弹，玩家被弹开 1m，珊迪在门外听见会说"姿势不对"</td></tr>
+      <tr><td>衣柜</td><td>打开</td><td>里面是 40 件一模一样的白衬衫 + 40 条一模一样的方裤子</td></tr>
+      <tr><td>冰箱</td><td>打开</td><td>只有一瓶番茄酱和一块标注"派大星的"的三明治</td></tr>
+      <tr><td>床</td><td>躺下</td><td>镜头拉近，闹钟响起，屏幕弹出"该去上班了"（3 秒后自动起身）</td></tr>
+      <tr><td>书架</td><td>翻</td><td>书名随机：《如何做个好朋友》《水母百科》《划船 100 次失败实录》</td></tr>
+    </tbody>
+  </table>
+
+  <h4>② 章鱼哥的家 · 复活岛石像屋</h4>
+  <div class="grid g2" style="align-items:start">
+    <figure style="margin:0">
+      <img src="images/05-moai-house.png" alt="章鱼哥石像屋外观概念图">
+      <figcaption>概念图 E · 石像屋：深蓝灰色复活节岛石像，门边靠着竖笛</figcaption>
+    </figure>
+    <div class="card">
+      <p><b>外观：</b>深蓝灰色摩艾石像头，粗眉、长鼻，两只圆窗像眼睛；木门、石阶、门口的"请勿打扰"牌（翻面写着"尤其是你"）。</p>
+      <p><b>内部：</b>一层客厅 + 浴室，二层画室。墙上挂满自画像（每幅都把自己画得更瘦更高），一台留声机，一支竖笛。地板有地毯，家具都擦得很亮。</p>
+      <p><b>氛围：</b>整洁、阴暗、有一点点自怜。空气里像有淡淡的古龙水味。</p>
+      <p class="kv" style="margin-top:10px"><b>可交互物品：</b>8 件 · <b>常驻 NPC：</b>章鱼哥（画室）<b> · 进入方式：</b>敲门 3 次才开（第 1、2 次只有冷漠回应）</p>
+    </div>
+  </div>
+  <table>
+    <thead><tr><th style="width:22%">物品</th><th style="width:20%">交互</th><th>反馈</th></tr></thead>
+    <tbody>
+      <tr><td>竖笛</td><td>吹</td><td>吹出跑调的音；章鱼哥冲进来抢走："它不是这么吹的——算了，别碰我的东西。"</td></tr>
+      <tr><td>自画像</td><td>查看</td><td>“《自画像，第 47 号》。你看得出来吧，我天生就该站在这里被欣赏。”</td></tr>
+      <tr><td>留声机</td><td>播放</td><td>播放 6 秒爵士单簧管（原创），章鱼哥会闭眼点头，被你看到立刻恢复臭脸</td></tr>
+      <tr><td>浴室</td><td>打开门</td><td>浴缸里有一只橡皮鸭，写着"不属于你"</td></tr>
+      <tr><td>画架</td><td>看画布</td><td>画布上是海绵宝宝的头（被涂改成怪物），下面签名"艺术"</td></tr>
+      <tr><td>冰箱</td><td>打开</td><td>只有一罐过期酸奶和三根芹菜</td></tr>
+      <tr><td>请勿打扰牌</td><td>翻面</td><td>背面："还是打扰了。"</td></tr>
+      <tr><td>沙发</td><td>坐下</td><td>章鱼哥："那是我的位置。……算了，你坐着吧。别说话。"</td></tr>
+    </tbody>
+  </table>
+
+  <h4>③ 派大星的家 · 石头屋</h4>
+  <div class="grid g2" style="align-items:start">
+    <figure style="margin:0">
+      <img src="images/04-rock-house.png" alt="派大星石头屋外观概念图">
+      <figcaption>概念图 F · 石头屋：一块红棕色圆石，顶上天线，门口永远躺着</figcaption>
+    </figure>
+    <div class="card">
+      <p><b>外观：</b>一块红棕色半圆巨石，顶部一根歪掉的天线；门口一块平躺的木板当门，沙子从缝里流出来；门口有沙滩椅、贝壳风铃。</p>
+      <p><b>内部：</b>一个空间。所有家具都是沙子做的：沙发、电视、台灯。<b>没有任何抽屉</b>。地上有一盒"秘密盒子"。</p>
+      <p><b>氛围：</b>懒、暖、地上永远有一层沙。走在里面脚步声会变闷。</p>
+      <p class="kv" style="margin-top:10px"><b>可交互物品：</b>8 件 · <b>常驻 NPC：</b>派大星（沙发上）<b> · 进入方式：</b>直接进（门本来就没关）</p>
+    </div>
+  </div>
+  <table>
+    <thead><tr><th style="width:22%">物品</th><th style="width:20%">交互</th><th>反馈</th></tr></thead>
+    <tbody>
+      <tr><td>沙沙发</td><td>坐下</td><td>整个人陷进沙里 0.4s，派大星："舒服吧？我做的。"</td></tr>
+      <tr><td>秘密盒子</td><td>打开</td><td>里面是一根绳子。派大星大笑："你居然真的打开了！"（第 2 次打开是同一根绳子）</td></tr>
+      <tr><td>沙子电视</td><td>打开</td><td>屏幕是沙子，但真的有画面（用沙粒拼出的动画）</td></tr>
+      <tr><td>冰箱</td><td>打开</td><td>只有番茄酱，和一罐"不知道什么时候的"果酱</td></tr>
+      <tr><td>石头床</td><td>躺下</td><td>直接睡着，3 秒后自动醒，字幕"刚刚过去了 8 小时"</td></tr>
+      <tr><td>墙上的画</td><td>查看</td><td>一张蜡笔画：他和海绵宝宝手拉手，下面写着"最好的朋友"（拼错两个字母）</td></tr>
+      <tr><td>天线</td><td>转</td><td>远处电视信号变清晰，派大星欢呼</td></tr>
+      <tr><td>地板</td><td>挖掘</td><td>挖出一枚硬币，派大星："那是我的！……好吧送你了。"</td></tr>
+    </tbody>
+  </table>
+
+  <h4>④ 珊迪的家 · 圆顶树屋</h4>
+  <div class="grid g2" style="align-items:start">
+    <figure style="margin:0">
+      <img src="images/06-treedome.png" alt="珊迪圆顶树屋外观概念图">
+      <figcaption>概念图 G · 圆顶树屋：玻璃穹顶里有一棵橡树，气压锁门</figcaption>
+    </figure>
+    <div class="card">
+      <p><b>外观：</b>半球形玻璃穹顶 + 铆钉金属骨架，里面一棵巨大的橡树；底部一圈气闸门（转盘式）。玻璃外壁有水珠和反光。</p>
+      <p><b>内部：</b>草坪、橡树、野餐桌、跑步轮、空手道木桩、显微镜与各种发明。<b>里面是空气</b>，所以海洋生物进来必须戴水头盔——这是一个必须做出来的细节。</p>
+      <p><b>氛围：</b>明亮、干净、有青草味，和外面的海底形成强烈反差（光线从冷蓝变成暖黄）。</p>
+      <p class="kv" style="margin-top:10px"><b>可交互物品：</b>9 件 · <b>常驻 NPC：</b>珊迪（树下工作台）<b> · 进入方式：</b>转气闸转盘 3 秒（有蓄力音效）</p>
+    </div>
+  </div>
+  <table>
+    <thead><tr><th style="width:22%">物品</th><th style="width:20%">交互</th><th>反馈</th></tr></thead>
+    <tbody>
+      <tr><td>空气阀</td><td>操作</td><td>进门必须戴头盔，屏幕边缘出现玻璃弧度与水泡（视觉提示你"在空气里"）</td></tr>
+      <tr><td>跑步轮</td><td>使用</td><td>跑 3 秒，珊迪计时："比我上次快 0.2 秒，不错嘛！"</td></tr>
+      <tr><td>空手道木桩</td><td>踢</td><td>正确姿势（按节奏）会击碎木板，珊迪吹口哨</td></tr>
+      <tr><td>显微镜</td><td>看</td><td>看到放大的水母细胞，附一句珊迪的科研笔记</td></tr>
+      <tr><td>橡树</td><td>爬</td><td>可以爬到树屋平台，看到整个比奇堡（唯一的高点视野）</td></tr>
+      <tr><td>坚果储藏罐</td><td>打开</td><td>满满一罐橡果，珊迪："别客气，德州人待客就是这样。"</td></tr>
+      <tr><td>发明台</td><td>按按钮</td><td>随机一个发明启动（吹风机 / 翻译机 / 缩小枪），有 30% 概率把玩家弹飞</td></tr>
+      <tr><td>吉他</td><td>弹</td><td>德州乡村小调，珊迪跟着哼</td></tr>
+      <tr><td>气闸出口</td><td>离开</td><td>头盔卸下，画面从暖黄回到冷蓝（转场 0.5s）</td></tr>
+    </tbody>
+  </table>
+
+  <h4>⑤ 蟹堡王</h4>
+  <div class="grid g2" style="align-items:start">
+    <figure style="margin:0">
+      <img src="images/07-krusty-krab-exterior.png" alt="蟹堡王外观概念图">
+      <figcaption>概念图 H · 蟹堡王：木质龙虾笼造型，红屋顶，门口永远有一条绳子围出的队伍</figcaption>
+    </figure>
+    <div class="card">
+      <p><b>外观：</b>木造船体 + 红色鱼鳞屋顶，烟囱冒烟，墙上挂大铁锚，门口救生圈；玻璃舷窗能看到里面的烤架。</p>
+      <p><b>内部：</b>左侧排队区（地面有黄线）、正面点餐台与收银机、后方开放式烤架（海绵宝宝在此翻肉饼）、右侧堂食区 8 张圆桌、墙上菜单牌、角落一台点唱机。</p>
+      <p><b>氛围：</b>吵、热、油烟味、永远有人在排队。收银机"叮"的声音是全店 BGM。</p>
+      <p class="kv" style="margin-top:10px"><b>可交互物品：</b>10 件 · <b>常驻 NPC：</b>海绵宝宝（烤架）、章鱼哥（收银台）、蟹老板（办公室，偶尔出来巡场）<b> · 进入方式：</b>推门（门铃"叮咚"）</p>
+    </div>
+  </div>
+  <figure>
+    <img src="images/08-krusty-krab-interior.png" alt="蟹堡王内部概念图">
+    <figcaption>概念图 I · 蟹堡王内部：点餐台、黄铜收银机、开放式烤架、红色吧凳与排队区（这张图是内景氛围的主基准）</figcaption>
+  </figure>
+  <table>
+    <thead><tr><th style="width:22%">物品</th><th style="width:20%">交互</th><th>反馈</th></tr></thead>
+    <tbody>
+      <tr><td>点餐台 / 叫号屏</td><td>取号</td><td>弹出号码牌（如 "07"），屏幕滚动显示"正在制作"；详见第 8 节</td></tr>
+      <tr><td>烤架</td><td>观看</td><td>海绵宝宝表演翻肉饼（3 段循环动画），点击可递给他铲子</td></tr>
+      <tr><td>收银机</td><td>按</td><td>"叮！"章鱼哥："别按那个。"</td></tr>
+      <tr><td>菜单牌</td><td>查看</td><td>蟹黄堡 / 海霸糊（划掉）/ 蟹黄堡套餐 / 儿童餐（送玩具）</td></tr>
+      <tr><td>秘方保险柜</td><td>尝试打开</td><td>蟹老板瞬间出现挡住："你在看什么？"（好感 −5）</td></tr>
+      <tr><td>点唱机</td><td>播放</td><td>播放 8 秒原创"煎肉饼之歌"，全场 NPC 一起摇摆</td></tr>
+      <tr><td>桌椅</td><td>坐下</td><td>进入堂食模式，详见第 8.3 节</td></tr>
+      <tr><td>后厨门</td><td>进入</td><td>需要好感 ≥ 30，否则海绵宝宝："抱歉！只有员工能进——不过你可以站这儿看！"</td></tr>
+      <tr><td>厕所门</td><td>打开</td><td>门牌写"员工专用"，打开后是一堵墙（经典笑点）</td></tr>
+      <tr><td>垃圾桶</td><td>翻</td><td>蟹老板："那里面也是我的财产。"</td></tr>
+    </tbody>
+  </table>
+
+  <h4>⑥ 海之霸（痞老板的餐厅）</h4>
+  <div class="grid g2" style="align-items:start">
+    <figure style="margin:0">
+      <img src="images/09-chum-bucket.png" alt="海之霸外观概念图">
+      <figcaption>概念图 J · 海之霸：一个生锈的铁桶，门口的招牌已经歪了</figcaption>
+    </figure>
+    <div class="card">
+      <p><b>外观：</b>巨大铁桶，铆钉、锈迹、歪斜烟囱；门口招牌掉了两个字母；地上一罐罐废弃实验品。</p>
+      <p><b>内部：</b>一张长桌、一台"海霸糊"机器（会自己震动）、墙上挂着凯伦（一台带脸的电脑）、角落一堆失败发明（缩小枪、机械臂、克隆机）。</p>
+      <p><b>氛围：</b>惨、安静、有电流嗡嗡声。<b>没有一个客人</b>——这本身就是一个笑点，如果玩家进来，痞老板会激动到语无伦次。</p>
+      <p class="kv" style="margin-top:10px"><b>可交互物品：</b>8 件 · <b>常驻 NPC：</b>痞老板、凯伦（电脑）<b> · 进入方式：</b>推门（门会掉下来）</p>
+    </div>
+  </div>
+  <table>
+    <thead><tr><th style="width:22%">物品</th><th style="width:20%">交互</th><th>反馈</th></tr></thead>
+    <tbody>
+      <tr><td>凯伦（电脑老婆）</td><td>对话</td><td>毒舌吐槽痞老板："他又在擦那个招牌了，擦了 20 年。"</td></tr>
+      <tr><td>海霸糊机器</td><td>按按钮</td><td>吐出一坨灰色糊状物，屏幕提示"建议不要食用"（吃了会掉 10 点饱食度并变绿 3 秒）</td></tr>
+      <tr><td>失败发明堆</td><td>翻找</td><td>随机获得一件道具（缩小枪可把玩家缩小 30 秒，体验"痞老板视角"）</td></tr>
+      <tr><td>配方保险箱</td><td>查看</td><td>空的。里面贴着一张便条："下次一定。"</td></tr>
+      <tr><td>招牌</td><td>扶正</td><td>扶正后 3 秒又掉下来（物理笑点）</td></tr>
+      <tr><td>菜单</td><td>查看</td><td>只有一道菜："海霸糊（今日特价：免费）"</td></tr>
+      <tr><td>监控屏</td><td>查看</td><td>对着蟹堡王的监控画面，痞老板在旁边做笔记</td></tr>
+      <tr><td>椅子</td><td>坐下</td><td>椅子散架，痞老板："那是我爷爷的椅子！……算了，也没人坐过。"</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <b>非目标建筑（明确不做，避免范围蔓延）</b>
+    蟹老板的船锚屋、泡芙老师的划浪学校、水母田、酷乐湖、手套乐园、商场 —— 这些是"世界感"的组成部分，但 Demo 阶段只用<b>远景贴片 + 一块路牌</b>暗示它们存在（例如街尾一块指向"水母田 →"的歪路牌，点击只会得到一句"今天太远了"）。
+  </div>
+</section>
+<!-- ============ 6 主 NPC ============ -->
+<section id="s6">
+  <h2><span class="num">06</span>主 NPC 人物设定</h2>
+  <p class="lead">这一节是整份文档里最重要的部分。<strong>四个主角 NPC 的"不好相处"必须被精确地写出来</strong>——他们的性格不是配色和台词，而是"什么情况下他们会拒绝你"。</p>
+
+  <figure>
+    <img src="images/11-main-npcs.png" alt="四位主要 NPC 概念图">
+    <figcaption>概念图 K · 四位主角（左起：海绵宝宝、派大星、章鱼哥、蟹老板）——体型比例与站位基准</figcaption>
+  </figure>
+
+  <div class="callout note">
+    <b>NPC 设计的通用规则（四个角色都适用）</b>
+    <ol style="margin-bottom:0">
+      <li><b>每人至少 30 条台词</b>，按"心情"分 3 组（友好 / 中立 / 不耐烦），每组 ≥ 10 条。</li>
+      <li><b>拒绝也是一种交互</b>：不给予任务、不提供奖励、不允许进入，都可以是"内容"，只要拒绝的方式符合角色。</li>
+      <li><b>连续交互要有衰减</b>：同一 NPC 在 30 秒内被重复搭话 3 次以上，切到"不耐烦组"，且不重复同一句。</li>
+      <li><b>不许说客服话术</b>：禁用"欢迎光临""有什么可以帮您""感谢您的体验"。NPC 不认识"用户体验"这个词。</li>
+    </ol>
+  </div>
+
+  <h3>6.1 章鱼哥 · Squidward Tentacles</h3>
+  <div class="npc sq">
+    <h4>章鱼哥 <em>SQUIDWARD · 收银员 / 自封艺术家</em></h4>
+    <div class="core"><b>性格内核：</b>他相信自己是被困在收银台后面的艺术家。冷漠不是因为讨厌你，而是因为他觉得"和你说话"这件事本身在消耗他宝贵的创作时间。他的刻薄是有礼貌的刻薄——用词讲究，语气不耐烦。</div>
+    <p><b>说话规则：</b>① 句子短，多用停顿和省略号；② 讽刺使用"夸张的礼貌"（"哦，当然。当然。请便。"）；③ 从不主动提问，除非是"你还不走？"；④ 被夸会短暂得意，然后立刻否认。</p>
+    <div class="bubble"><em>第一次搭话</em>……有事？没事的话，我在练习。</div>
+    <div class="bubble"><em>被连续打扰 3 次</em>你还在这儿。真好。比奇堡最不缺的就是"还在这儿"的人。</div>
+    <div class="bubble"><em>你夸他的画</em>（停顿）……你懂艺术？<br>（0.5 秒后）算了，你只是客气。别碰画框。</div>
+    <p class="kv" style="border:0; padding:0; margin-top:12px"><b>口头禅：</b>“我没空。”“随便你。”“……真好。”<br>
+    <b>专属动作：</b>抱臂、翻白眼、叹气时肩膀下沉 3cm、擦杯子（擦到杯子反光）<br>
+    <b>对他人的固定态度：</b>海绵宝宝 → 忍耐极限；派大星 → 完全放弃；蟹老板 → 雇主要尊重（但翻白眼）；珊迪 → 少见的客气；痞老板 → 直接关门。</p>
+  </div>
+
+  <h3>6.2 蟹老板 · Mr. Krabs</h3>
+  <div class="npc kr">
+    <h4>蟹老板 <em>MR. KRABS · 蟹堡王老板</em></h4>
+    <div class="core"><b>性格内核：</b>他不是"喜欢钱"，他是<b>用钱理解世界</b>。所有对话最后都会绕回价格、成本、利润。他对女儿珍珍是无限的软；对其他所有人，先谈钱，再谈感情。</div>
+    <p><b>说话规则：</b>① 每 3 句话必提一次钱（价格 / 成本 / 折扣 / 小费）；② 笑的时候是"啊哈哈哈哈"式的海盗笑；③ 会突然压低声音说"这是商业机密"；④ 对免费的东西极度敏感。</p>
+    <div class="bubble"><em>第一次搭话</em>欢迎！蟹黄堡五块一个，套餐八块，加海霸糊……不，我们不加那玩意儿。</div>
+    <div class="bubble"><em>你想进后厨</em>后厨？那是配方区。你知道那个配方值多少钱吗？……我也不知道，但肯定很多！</div>
+    <div class="bubble"><em>你是珍珍时</em>我的小宝贝！今天想吃什么？随便点！……（小声）别告诉你妈。</div>
+    <p class="kv" style="border:0; padding:0; margin-top:12px"><b>口头禅：</b>“钱！”“这是成本！”“啊哈哈哈哈！”<br>
+    <b>专属动作：</b>搓钳子、眼睛变成硬币形状（音效"叮"）、把掉在地上的硬币捡起来吹一吹<br>
+    <b>对他人的固定态度：</b>珍珍 → 溺爱；海绵宝宝 → 好员工（但不能加薪）；章鱼哥 → 免费劳动力的珍惜；痞老板 → 报警；珊迪 → 想买她的发明。</p>
+  </div>
+
+  <h3>6.3 海绵宝宝 · SpongeBob SquarePants</h3>
+  <div class="npc sb">
+    <h4>海绵宝宝 <em>SPONGEBOB · 蟹堡王主厨</em></h4>
+    <div class="core"><b>性格内核：</b>他是真的、毫不掺假的快乐。热情不是表演，所以有时候会让人（尤其章鱼哥）招架不住。他对所有人都友好——包括痞老板，这恰恰是最让痞老板挫败的地方。</div>
+    <p><b>说话规则：</b>① 感叹号密度高，句尾常带"啦""哦""耶"；② 会把普通的事说成"我一生中最棒的一天"；③ 突然开始唱歌（每 5 次对话触发 1 次，唱 2 句原创旋律）；④ 把对方的名字重复一遍再说话。</p>
+    <div class="bubble"><em>第一次搭话</em>哦！你好呀！我是海绵宝宝！你今天过得怎么样？我今天是超级棒的一天！</div>
+    <div class="bubble"><em>被拒绝帮助</em>没关系！那我就在这儿等着，你需要我的时候我就——（一直站着）</div>
+    <div class="bubble"><em>唱歌触发</em>♪ 煎肉饼，煎肉饼，翻个面，再煎一遍～ ♪</div>
+    <p class="kv" style="border:0; padding:0; margin-top:12px"><b>口头禅：</b>“我准备好了！”“这是我一生中最棒的一天！”<br>
+    <b>专属动作：</b>原地弹跳、眼睛放大、手指比划、突然抱住对方（会穿过模型，允许穿模）<br>
+    <b>对他人的固定态度：</b>所有人 → 友好；章鱼哥 → 崇拜（"章鱼哥是我最好的邻居！"）；痞老板 → 依然友好（"痞老板，你要不要来一个蟹黄堡？"）</p>
+  </div>
+
+  <h3>6.4 派大星 · Patrick Star</h3>
+  <div class="npc pt">
+    <h4>派大星 <em>PATRICK · 海绵宝宝最好的朋友</em></h4>
+    <div class="core"><b>性格内核：</b>他不是"笨"，他是<b>按另一套逻辑运行</b>。他会突然说出很深刻的话，然后立刻忘掉。他的忠诚是绝对的，反应永远慢半拍。</div>
+    <p><b>说话规则：</b>① 回答问题经常完全跑题；② 常用"我觉得……"开头但结论荒谬；③ 每 6 次对话有 1 次说出意外的哲学句子；④ 反应延迟 0.6 秒（表情先呆住，再笑）。</p>
+    <div class="bubble"><em>第一次搭话</em>……（停顿 0.6 秒）哦！你好。我刚才在想，如果我把手举起来，是不是就能碰到上面？</div>
+    <div class="bubble"><em>你问路</em>蟹堡王？我知道！往那边走，然后……然后你就到了。或者不到。</div>
+    <div class="bubble"><em>哲学时刻</em>你知道吗，石头不会说话，但它们一直在听。</div>
+    <p class="kv" style="border:0; padding:0; margin-top:12px"><b>口头禅：</b>“我饿了。”“我们去抓水母吧！”<br>
+    <b>专属动作：</b>躺平、突然坐起、用手指戳别人、笑得往后倒<br>
+    <b>对他人的固定态度：</b>海绵宝宝 → 生死之交；章鱼哥 → "他其实人很好"（真诚地这么认为，让章鱼哥更气）；痞老板 → 记不住名字</p>
+  </div>
+</section>
+
+<!-- ============ 7 彩蛋 + 矩阵 ============ -->
+<section id="s7">
+  <h2><span class="num">07</span>彩蛋 NPC 与态度矩阵</h2>
+  <p class="lead">彩蛋 NPC 的价值不在于"多一个角色"，而在于<strong>让同一个场景对不同身份的人呈现不同的样子</strong>。这一节定义"谁见了谁会怎样"。</p>
+
+  <figure>
+    <img src="images/12-egg-npcs.png" alt="彩蛋 NPC 概念图">
+    <figcaption>概念图 L · 三位彩蛋角色（左起：珍珍、珊迪、痞老板）——体型差是这三个身份最重要的辨识点</figcaption>
+  </figure>
+
+  <div class="grid g3">
+    <div class="npc" style="border-top-color:#B9BEC2">
+      <h4>珍珍 <em>PEARL</em></h4>
+      <p style="font-size:13.4px;color:#4E5F67">蟹老板的女儿，鲸鱼少女。世界围绕"商场、音乐、朋友、不要让我爸出现"运转。她其实很善良，只是在青春期。</p>
+      <div class="bubble" style="margin-bottom:8px"><em>对普通居民</em>哦，你也来买东西？……这里没什么可买的，这整条街都超土。</div>
+      <div class="bubble" style="margin-bottom:8px"><em>对痞老板</em>（大笑）你这么小！你是来送外卖的吗？</div>
+      <div class="bubble" style="margin-bottom:0"><em>专属彩蛋</em>在蟹堡王遇到蟹老板 → 父女互相装不认识，然后蟹老板偷偷给她免单。</div>
+    </div>
+    <div class="npc" style="border-top-color:#D9A93C">
+      <h4>珊迪 <em>SANDY</em></h4>
+      <p style="font-size:13.4px;color:#4E5F67">来自德州的松鼠科学家。直爽、爱运动、爱解释原理。对任何现象都想"做个实验"。</p>
+      <div class="bubble" style="margin-bottom:8px"><em>对普通居民</em>嗨呀！你来得正好，帮我扶一下这个——不，别松手，别松手！</div>
+      <div class="bubble" style="margin-bottom:8px"><em>对痞老板</em>（立刻戴手套）站住。上次那个缩小枪的事，我们还没算完。</div>
+      <div class="bubble" style="margin-bottom:0"><em>专属彩蛋</em>进她家不戴头盔 → 弹出"脱水警告"，被强行塞进头盔，画面出现玻璃弧与水泡。</div>
+    </div>
+    <div class="npc" style="border-top-color:#3F8C5A">
+      <h4>痞老板 <em>PLANKTON</em></h4>
+      <p style="font-size:13.4px;color:#4E5F67">只有一只眼睛的桡足类，海之霸老板，20 年如一日想偷配方，从未成功。自信、算计、失败后立刻重整旗鼓。</p>
+      <div class="bubble" style="margin-bottom:8px"><em>对普通居民</em>你！对，就是你！想不想……赚点小钱，顺便毁掉一个竞争对手？</div>
+      <div class="bubble" style="margin-bottom:8px"><em>对珊迪</em>（后退）科学怪人！我什么都没做！那个机器不是我放的！</div>
+      <div class="bubble" style="margin-bottom:0"><em>专属彩蛋</em>玩家自己就是痞老板 → 凯伦：「老板，你终于回来了。招牌又掉了。」</div>
+    </div>
+  </div>
+
+  <h3>7.1 态度矩阵（NPC × 玩中身份）</h3>
+  <p class="lead">读法：单元格是 NPC 对"你这个身份"的<b>初始态度档位</b>，下方为一句示例台词。好感会随交互变化，但初始态度决定第一印象。</p>
+  <table class="matrix">
+    <thead>
+      <tr>
+        <th style="width:14%">NPC ＼ 你的身份</th>
+        <th style="width:17%">普通居民</th>
+        <th style="width:17%">珊迪</th>
+        <th style="width:17%">珍珍</th>
+        <th style="width:17%">痞老板</th>
+        <th style="width:18%">泡芙 / 小蜗</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>章鱼哥</td>
+        <td class="m-cold">冷淡<br><small>“又一个邻居。真好。”</small></td>
+        <td class="m-mid">勉强客气<br><small>“至少你还会讲道理。”</small></td>
+        <td class="m-cold">无视<br><small>“青少年。下一个。”</small></td>
+        <td class="m-bad">敌视<br><small>“把门关上。现在。”</small></td>
+        <td class="m-cold">冷淡<br><small>“你们这些老师不上课吗？”</small></td>
+      </tr>
+      <tr>
+        <td>蟹老板</td>
+        <td class="m-mid">生意关系<br><small>“五块。先付钱。”</small></td>
+        <td class="m-mid">兴趣<br><small>“你那发明卖不卖？”</small></td>
+        <td class="m-good">溺爱<br><small>“随便点！都免费！”</small></td>
+        <td class="m-bad">驱赶<br><small>“滚出我的店！”</small></td>
+        <td class="m-good">殷勤<br><small>“泡芙老师！今天算我的！”</small></td>
+      </tr>
+      <tr>
+        <td>海绵宝宝</td>
+        <td class="m-good">热情<br><small>“你好呀！我最好的新朋友！”</small></td>
+        <td class="m-good">崇拜<br><small>“珊迪！你又在做科学吗？”</small></td>
+        <td class="m-good">友好<br><small>“珍珍！你爸今天心情超好！”</small></td>
+        <td class="m-good">依然友好<br><small>“痞老板！要不要来个蟹黄堡？”</small></td>
+        <td class="m-good">热情<br><small>“小蜗！喵！”</small></td>
+      </tr>
+      <tr>
+        <td>派大星</td>
+        <td class="m-good">友好<br><small>“你也是来躺着的吗？”</small></td>
+        <td class="m-good">朋友<br><small>“珊迪会空手道，我不会。”</small></td>
+        <td class="m-mid">记不住<br><small>“你是……蟹老板的……谁？”</small></td>
+        <td class="m-mid">记不住<br><small>“小绿点？你好，小绿点。”</small></td>
+        <td class="m-good">友好<br><small>“蜗牛会喵，这很正常。”</small></td>
+      </tr>
+      <tr>
+        <td>珍珍</td>
+        <td class="m-mid">普通<br><small>“哦。嗨。”</small></td>
+        <td class="m-good">姐妹<br><small>“珊迪！你太酷了！”</small></td>
+        <td class="m-good">自来熟<br><small>“等等，你也抽到珍珍？”</small></td>
+        <td class="m-bad">嘲笑<br><small>“你这么小，怎么点餐？”</small></td>
+        <td class="m-mid">普通<br><small>“老师好……”</small></td>
+      </tr>
+      <tr>
+        <td>珊迪</td>
+        <td class="m-good">热情<br><small>“来得正好，帮我扶一下！”</small></td>
+        <td class="m-good">同行<br><small>“两个德州人？这镇子完了。”</small></td>
+        <td class="m-mid">友好<br><small>“你爸又给你免单了？”</small></td>
+        <td class="m-bad">警觉<br><small>“把手举起来，痞老板。”</small></td>
+        <td class="m-good">友好<br><small>“泡芙老师！来做个实验？”</small></td>
+      </tr>
+      <tr>
+        <td>痞老板</td>
+        <td class="m-mid">招募<br><small>“想不想赚点小钱？”</small></td>
+        <td class="m-bad">恐惧<br><small>“别过来！我这没做什么！”</small></td>
+        <td class="m-mid">无视<br><small>“小女孩，别挡着我。”</small></td>
+        <td class="m-good">自我<br><small>“我？我当然是我。你是谁？”</small></td>
+        <td class="m-mid">无视<br><small>“让让，你踩到我了。”</small></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>7.2 彩蛋触发清单（可扩展）</h3>
+  <table>
+    <thead><tr><th style="width:16%">身份</th><th style="width:26%">触发条件</th><th>彩蛋内容</th></tr></thead>
+    <tbody>
+      <tr><td><b>痞老板</b></td><td>进入蟹堡王</td><td>全场安静 1 秒；蟹老板从办公室冲出来大喊"出去！"；海绵宝宝热情招呼他排队（反差笑点）</td></tr>
+      <tr><td><b>痞老板</b></td><td>靠近秘方保险柜</td><td>镜头拉近、心跳音效、屏幕出现"距离梦想还有 0.5 米"的提示；一旦碰到就会被蟹老板拎起来</td></tr>
+      <tr><td><b>珊迪</b></td><td>走进海之霸</td><td>凯伦立刻报警："检测到珊迪·奇克斯。"痞老板吓得躲进桶里</td></tr>
+      <tr><td><b>珊迪</b></td><td>在海之霸按发明按钮</td><td>发明反向启动，把痞老板的机器炸掉，获得"德州式解决方案"成就</td></tr>
+      <tr><td><b>珍珍</b></td><td>在蟹堡王点餐</td><td>蟹老板免单，章鱼哥翻白眼："又一个。"；如果点两份会被章鱼哥记在小本子上</td></tr>
+      <tr><td><b>珍珍</b></td><td>进入派大星家</td><td>派大星把她认成"会说话的石头"，两人对话完全对不上，持续 20 秒</td></tr>
+      <tr><td><b>泡芙老师</b></td><td>靠近蟹老板</td><td>两人同时脸红、说话结巴，章鱼哥在旁边发出"啧"的一声</td></tr>
+      <tr><td><b>小蜗</b></td><td>任何 NPC 附近</td><td>NPC 会低头看你："……这 snail 是玩家？"；章鱼哥："终于有个安静的了。"</td></tr>
+      <tr><td><b>任意身份</b></td><td>与同身份玩家相遇</td><td>两人头顶出现相同颜色的光，气泡："我们……是同一个人？"</td></tr>
+      <tr><td><b>任意身份</b></td><td>连续 3 天进入</td><td>章鱼哥会主动开口："你又来了。……我给你留了个杯子。"（唯一一次温柔）</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout warn">
+    <b>风险提示：稀有身份可能带来的社交霸凌</b>
+    如果"痞老板"玩家被全场 NPC 和玩家一起敌视，体验会变成纯粹的负面。建议：<b>① 敌视台词必须好笑，不能有攻击性；② 痞老板拥有唯一一个"反击"按钮（按一下喷雾，附近人咳嗽 2 秒）；③ 任何玩家都不能对他人做负面动作。</b>
+  </div>
+</section>
+
+<!-- ============ 8 蟹堡王玩法 ============ -->
+<section id="s8">
+  <h2><span class="num">08</span>核心玩法：在蟹堡王吃一个蟹黄堡</h2>
+  <p class="lead">这是 Demo 唯一的"玩法"。它的乐趣不在"拿到食物"，而在<strong>排队的那 90 秒里发生的事</strong>，以及<strong>拿到之后那 30 秒的吃</strong>。</p>
+
+  <h3>8.1 完整流程与状态机</h3>
+  <div class="flow">
+    <div class="flow-row"><span class="flow-node">推门（门铃"叮咚"）</span><span class="flow-arrow">→</span><span class="flow-node">走到点餐台（黄线外）</span><span class="flow-arrow">→</span><span class="flow-node hl">按 E 取号</span><span class="flow-arrow">→</span><span class="flow-node">等待叫号</span></div>
+    <div class="flow-row"><span class="flow-node">叫号（屏幕 + 广播"07 号！"）</span><span class="flow-arrow">→</span><span class="flow-node">到柜台领取</span><span class="flow-arrow">→</span><span class="flow-node hl">选择：堂食 / 外带</span><span class="flow-arrow">→</span><span class="flow-node">吃 / 边走边吃</span><span class="flow-arrow">→</span><span class="flow-node">离开</span></div>
+  </div>
+
+  <table>
+    <thead><tr><th style="width:16%">状态</th><th style="width:26%">进入条件</th><th style="width:32%">玩家可见反馈</th><th>退出条件</th></tr></thead>
+    <tbody>
+      <tr><td><code>IDLE</code></td><td>进入餐厅</td><td>黄线外有脚印提示</td><td>走到点餐台 2m 内</td></tr>
+      <tr><td><code>QUEUE_JOIN</code></td><td>按 E</td><td>弹出号码牌动画（号码牌是一条小鱼干造型）</td><td>取号成功</td></tr>
+      <tr><td><code>WAITING</code></td><td>取号成功</td><td>HUD 右上显示"前方 3 人 · 约 60 秒"；可自由走动</td><td>叫到号 / 离开餐厅</td></tr>
+      <tr><td><code>CALLED</code></td><td>队首且制作完成</td><td>屏幕闪烁 + 广播 + 章鱼哥喊你名字（身份名，不是昵称）</td><td>30 秒内到柜台</td></tr>
+      <tr><td><code>PICKUP</code></td><td>在柜台按 E</td><td>托盘出现，汉堡 3D 展示开始</td><td>选择堂食 / 外带</td></tr>
+      <tr><td><code>DINE_IN</code></td><td>选堂食并入座</td><td>镜头切近景，桌上托盘可旋转</td><td>吃完 / 站起</td></tr>
+      <tr><td><code>TAKEAWAY</code></td><td>选外带</td><td>纸袋抱在手上，移速 −15%</td><td>吃完 / 丢弃</td></tr>
+      <tr><td><code>EXPIRED</code></td><td>叫号后 180 秒未取</td><td>章鱼哥："你的汉堡凉了。归我了。"（汉堡消失）</td><td>重新排队</td></tr>
+    </tbody>
+  </table>
+
+  <h3>8.2 排队参数（可直接作为配置表）</h3>
+  <table>
+    <thead><tr><th style="width:26%">参数</th><th style="width:14%">默认值</th><th style="width:16%">可调范围</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td><code>queue_capacity</code></td><td>12</td><td>6–20</td><td>队列满时新玩家会被告知"队太长了，去逛逛吧"</td></tr>
+      <tr><td><code>service_interval</code></td><td>20s</td><td>8–45s</td><td>每份汉堡的制作时间（Demo 演示用 8s，正式 20s）</td></tr>
+      <tr><td><code>max_wait_display</code></td><td>按人数×间隔</td><td>—</td><td>显示为"约 X 秒"，向上取整到 15 秒</td></tr>
+      <tr><td><code>pickup_timeout</code></td><td>180s</td><td>60–300s</td><td>超时汉堡作废，玩家可重新排队</td></tr>
+      <tr><td><code>daily_limit</code></td><td>1</td><td>1–3</td><td>每人每天 1 个；第 2 次点单章鱼哥会说"你今天已经吃过了"</td></tr>
+      <tr><td><code>patty_satiety</code></td><td>+60</td><td>30–100</td><td>饱食度，满 100 不能再点</td></tr>
+      <tr><td><code>satiety_decay</code></td><td>−1 / 6s</td><td>—</td><td>回落到 60 以下才能再点第二个（次日）</td></tr>
+    </tbody>
+  </table>
+
+  <h3>8.3 等待期不能是空白</h3>
+  <p>排队的 90 秒必须有事可看。设计三个"等待内容"，玩家可以任选：</p>
+  <div class="grid g3">
+    <div class="card"><h4>看海绵宝宝煎肉饼</h4><p style="font-size:13.5px">烤架前的 3 段循环表演：翻饼、撒盐、把饼抛到空中接住。点击"递铲子"可以触发他教你翻饼（30 秒小互动，纯观赏无判定）。</p></div>
+    <div class="card"><h4>和章鱼哥搭话</h4><p style="font-size:13.5px">他站在收银台，你可以问他"还要等多久"。他会给出并不可靠的答案，每次都不一样，且越来越不耐烦。</p></div>
+    <div class="card"><h4>看别的玩家</h4><p style="font-size:13.5px">队伍里其他玩家可以互相招手。如果有人和你同身份，队伍里会冒出一句"我们是不是同一个人？"。</p></div>
+  </div>
+
+  <h3>8.4 堂食 vs 外带（必须做出差异，否则选择无意义）</h3>
+  <table>
+    <thead><tr><th style="width:16%"></th><th style="width:42%">堂食 Dine-in</th><th>外带 Takeaway</th></tr></thead>
+    <tbody>
+      <tr><td><b>动线</b></td><td>走到空桌 → 按 E 坐下 → 托盘放桌</td><td>柜台接纸袋 → 抱在怀里 → 走出餐厅</td></tr>
+      <tr><td><b>相机</b></td><td>切到近景（距离 1.8m，俯角 25°），可拖拽环绕</td><td>保持第三人称，纸袋遮挡下半屏</td></tr>
+      <tr><td><b>移动</b></td><td>不可移动（站起即中断）</td><td>可移动，速度 4.2 → 3.6 m/s</td></tr>
+      <tr><td><b>专属反馈</b></td><td>吃的时候周围 NPC 会看你；章鱼哥："在这儿吃可以，别掉渣。"</td><td>街上会掉渣，引来小鱼抢食；边走边吃第三口会触发"满足地闭眼"导致撞到路灯</td></tr>
+      <tr><td><b>完成后</b></td><td>获得"堂食勋章"，桌上留下空盘（30 秒后消失）</td><td>获得"街边美食家"印章，纸袋可以扔进垃圾桶（蟹老板会捡走）</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============ 9 汉堡 3D ============ -->
+<section id="s9">
+  <h2><span class="num">09</span>蟹黄堡：3D 旋转与一口口吃掉</h2>
+  <p class="lead">全站唯一的"重资产"。要求：<strong>看起来能吃、转起来有分量、咬下去有脆响</strong>。这三件事任何一件没做到，蟹堡王就白盖了。</p>
+
+  <div class="grid g2" style="align-items:center">
+    <figure style="margin:0">
+      <img src="images/10-krabby-patty.png" alt="蟹黄堡 3D 展示概念图">
+      <figcaption>概念图 M · 蟹黄堡展示态：悬浮 + 缓慢自转 + 底部光晕（正式版为实时 3D 模型）</figcaption>
+    </figure>
+    <div class="card">
+      <h4 style="margin-top:0">模型规格</h4>
+      <p style="font-size:13.8px">6 层结构，每层独立 mesh（便于逐层被咬掉）：<br>
+      ① 上层面包（芝麻 24 颗，可单独掉）<br>
+      ② 生菜（褶皱片，法线贴图）<br>
+      ③ 番茄片 ×2<br>
+      ④ 芝士（融化边缘，半透明）<br>
+      ⑤ 肉饼（厚 1.2 单位，带烤痕）<br>
+      ⑥ 下层面包</p>
+      <p style="font-size:13.8px; margin-bottom:0"><b>面数：</b>≤ 12k tris　<b>贴图：</b>1024² × 1 张（KTX2）<br>
+      <b>着色：</b>卡通 3 阶色阶 + 描边 0.02　<b>总内存：</b>&lt; 3MB</p>
+    </div>
+  </div>
+
+  <h3>9.1 旋转交互</h3>
+  <table>
+    <thead><tr><th style="width:22%">行为</th><th style="width:34%">规则</th><th>手感目标</th></tr></thead>
+    <tbody>
+      <tr><td>自动旋转</td><td>无操作时 12°/s 匀速绕 Y 轴</td><td>"展示品"的从容感，不能太快</td></tr>
+      <tr><td>拖拽旋转</td><td>水平拖拽 → Y 轴；垂直拖拽 → X 轴（限制 ±25°）</td><td>需要能翻过来看底部（"底部也有肉饼"这种细节要被看到）</td></tr>
+      <tr><td>惯性</td><td>松手后保留角速度，阻尼 0.92/帧</td><td>像转一个真实的托盘</td></tr>
+      <tr><td>缩放</td><td>滚轮 / 双指 0.8×–1.8×</td><td>能凑近看芝麻</td></tr>
+      <tr><td>复位</td><td>3 秒无操作缓慢回正 + 恢复自转</td><td>不需要用户手动"归位"</td></tr>
+    </tbody>
+  </table>
+
+  <h3>9.2 啃咬规则</h3>
+  <table>
+    <thead><tr><th style="width:18%">项目</th><th>规格</th></tr></thead>
+    <tbody>
+      <tr><td>总口数</td><td><b>6 口</b>吃完（每口移除约 16.7% 体积）</td></tr>
+      <tr><td>触发方式</td><td>点击 / 长按 / 按空格；每口冷却 1.1s（防止连点变机械）</td></tr>
+      <tr><td>咬痕实现</td><td>预烘焙 6 组"咬痕遮罩"（SDF），逐级切换；不实时布尔运算（性能考虑）</td></tr>
+      <tr><td>碎屑</td><td>每口 12 颗粒子，重力 −9.8，1.2s 落地消失；面包屑 / 生菜叶两种材质</td></tr>
+      <tr><td>音效</td><td>每口不同："咔嚓—咀嚼咀嚼—吞咽"三段，音高随机 ±5%</td></tr>
+      <tr><td>反馈层</td><td>第 2 口：嘴角沾酱；第 3 口：闭眼满足表情（0.8s）；第 5 口：打嗝气泡；第 6 口：空盘 + "今天也是完美的一天"</td></tr>
+      <tr><td>镜头</td><td>每口轻微前推 0.03 单位并回弹（模拟"咬"的力度）</td></tr>
+      <tr><td>中断</td><td>站起 / 走出餐厅 → 汉堡保留剩余状态，可回来继续吃</td></tr>
+    </tbody>
+  </table>
+
+  <div class="demo" style="background:linear-gradient(160deg,#0A3550,#0B5E86)">
+    <h4>交互演示 · 咬六口</h4>
+    <div class="sub">这是网页版的可点击原型（2D 近似）：每点一次咬一口，观察体积、碎屑与计数变化。</div>
+    <div class="burger-demo" style="background:rgba(255,255,255,.06)">
+      <div class="burger-stage" id="burgerStage">
+        <img src="images/10-krabby-patty.png" alt="蟹黄堡" id="burgerImg">
+      </div>
+      <div class="bite-info">
+        <div style="color:#fff; font-size:20px; font-weight:700;">蟹黄堡 <span style="font-size:12px;font-weight:400;color:#9FC9DA;">KRABBY PATTY</span></div>
+        <div class="bite-dots" id="biteDots"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div id="biteText" style="color:#CFE9F3; font-size:13.5px; min-height:44px;">完整的一个。还热着。</div>
+        <div style="display:flex; gap:10px; margin-top:6px;">
+          <button class="btn" id="biteBtn">咬一口</button>
+          <button class="btn ghost" id="biteReset">换一个新的</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <b>为什么不实时做"咬掉一块"的网格运算</b>
+    实时布尔 + 重拓扑在中低端手机上会掉到 20fps 以下。预烘焙 6 组遮罩的观感差异在正常观看距离下几乎不可辨，但成本差 10 倍。这是本项目最重要的一条性能取舍。
+  </div>
+
+  <h3>9.3 小玩法：后厨"翻肉饼"（Q5 已定）</h3>
+  <p>Q5 决定在蟹堡王加一个<strong>轻量小玩法</strong>——站在后厨指定位置，可以替海绵宝宝翻 30 秒肉饼。定位很关键：它是"多了一个可以玩的小玩具"，<b>不是任务、不是进度、不绑定任何奖励或成就</b>，纯娱乐、随时进出。这与 Q4「不打算做成游戏」不冲突，因为这里没有任何留存钩子。</p>
+  <table>
+    <thead><tr><th style="width:20%">项目</th><th>规格</th></tr></thead>
+    <tbody>
+      <tr><td>触发</td><td>走到后厨"翻锅位"（与排队领取分离，不占用点餐流）；点击锅铲进入 30 秒迷你循环</td></tr>
+      <tr><td>玩法</td><td>肉饼每 1.5s 翻面一次，按 <code>空格</code> / 点击时机落在"焦黄区间"得分；纯手感反馈，无通关 / 失败</td></tr>
+      <tr><td>表现</td><td>海绵宝宝在旁边喊"翻！翻！翻得好！"；翻得好镜头给肉饼特写 + "滋啦"声</td></tr>
+      <tr><td>边界</td><td>不奖励汉堡、不加经验、不记录成绩（记录会立刻变成"刷分"= 游戏化）；退出即清场</td></tr>
+      <tr><td>身份差异</td><td>痞老板身份翻肉饼时，凯伦会吐槽"老板你又在偷学配方"；珊迪身份可解锁"科学翻面法"搞笑台词</td></tr>
+    </tbody>
+  </table>
+  <div class="callout note">
+    <b>和 Q4 的边界</b>：小玩法可以"有趣"，但不可以"有目标"。一旦它开始记录"你最高翻了多少个""连续几天来翻"，它就从玩具变成了留存系统，必须砍掉。
+  </div>
+</section>
+<!-- ============ 10 多人 ============ -->
+<section id="s10">
+  <h2><span class="num">10</span>多人在线与社交</h2>
+  <p class="lead">目标不是"社交"，是<strong>"这个镇子上还有别人"的在场感</strong>。所以：看得到、碰得到、打得了招呼，但不能自由聊天。</p>
+
+  <figure>
+    <img src="images/13-dialogue-scene.png" alt="第三人称与 NPC 交互的概念图">
+    <figcaption>概念图 N · 第三人称交互视角：玩家背影 + 头顶昵称 + 气泡台词 + 三个动作图标（招手 / 说话 / 给东西）</figcaption>
+  </figure>
+
+  <h3>10.1 房间与容量</h3>
+  <table>
+    <thead><tr><th style="width:22%">项目</th><th style="width:18%">规格</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td>单房间人数</td><td>40</td><td>超过则开新房间（同街区多房间，用"街区 A/B/C"区分）</td></tr>
+      <tr><td>同屏渲染上限</td><td>20</td><td>超出部分只显示昵称小点，不渲染模型</td></tr>
+      <tr><td>内景人数</td><td>跟主房间共享</td><td>进建筑不切换房间，只切换场景，避免"朋友突然消失"</td></tr>
+      <tr><td>空房策略</td><td>&lt; 3 人持续 5 分钟 → 合房</td><td>合房时用气泡遮罩转场，不打断体验</td></tr>
+    </tbody>
+  </table>
+
+  <h3>10.2 同步方案</h3>
+  <table>
+    <thead><tr><th style="width:20%">数据</th><th style="width:16%">频率</th><th>实现</th></tr></thead>
+    <tbody>
+      <tr><td>位置 / 朝向</td><td>10Hz</td><td>客户端上报 → 服务端校验（位移 &gt; 8m/次则拉回）→ 广播；其他玩家用插值 + 100ms 缓冲</td></tr>
+      <tr><td>动画状态</td><td>事件驱动</td><td>走 / 跑 / 坐 / 吃 / 招手，只在状态切换时发一次</td></tr>
+      <tr><td>表情气泡</td><td>事件驱动</td><td>服务端节流：同一玩家 3 秒 1 次</td></tr>
+      <tr><td>NPC 状态</td><td>服务端权威</td><td>NPC 心情、队伍进度由服务端计算，客户端只做表现</td></tr>
+      <tr><td>场景切换</td><td>事件驱动</td><td>进门时广播 <code>player_enter_scene</code>，其他玩家看到"某人走进了凤梨屋"</td></tr>
+    </tbody>
+  </table>
+
+  <h3>10.3 社交动作（全部预设，不可自由输入）</h3>
+  <table>
+    <thead><tr><th style="width:18%">动作</th><th style="width:14%">快捷键</th><th style="width:28%">表现</th><th>限制</th></tr></thead>
+    <tbody>
+      <tr><td>招手</td><td><code>1</code></td><td>举手挥 2 下，头顶冒出"嗨！"气泡</td><td>对同一玩家 10 秒内 1 次（防刷屏）</td></tr>
+      <tr><td>点头</td><td><code>2</code></td><td>头部上下 2 次</td><td>无</td></tr>
+      <tr><td>转圈</td><td><code>3</code></td><td>原地转 360°（小蜗身份转得很慢，是笑点）</td><td>无</td></tr>
+      <tr><td>表情气泡</td><td><code>4</code> 轮盘</td><td>6 个固定表情：笑 / 疑问 / 惊讶 / 无语 / 爱心 / 饿</td><td>3 秒 1 次</td></tr>
+      <tr><td>预设短句</td><td>轮盘内</td><td>4 句：你好呀 / 你也是刚来的？/ 蟹堡王排队好长 / 我先走啦</td><td>全房间广播有 5 秒冷却</td></tr>
+      <tr><td>海底击掌</td><td>双方同时招手</td><td>两人之间出现水花特效 + "啪！"音效（隐藏彩蛋）</td><td>—</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout warn">
+    <b>为什么不做自由聊天（建议保留这个决定）</b>
+    ① 内容审核成本极高（尤其面向未成年用户）；② 会迅速变成广告与骚扰场；③ 与"低压力"的设计支柱冲突。
+    如果后续一定要加，建议只做<b>「好友之间的预设句子组合」</b>，且必须实名/年龄门槛。
+  </div>
+
+  <h3>10.4 昵称与身份展示</h3>
+  <p>头顶显示：<code>身份名字</code>（如"珊迪"）+ 下方 6px 小字昵称。稀有身份额外加一圈<b>微弱呼吸光边</b>（1.5s 周期，透明度 0.15–0.35），不显示概率或"稀有"字样——让懂的人懂，避免攀比。</p>
+
+  <h3>10.5 蟹堡王合影点（Q8 已定）</h3>
+  <p>Q8 决定在蟹堡王门口设一个<strong>拍照点</strong>，作为天然的病毒传播点：多人（或你 + 一个 NPC）站到指定光圈内，屏幕右下角浮出相机 icon，点击即生成一张"比奇堡合影"——自动构图、加上海底光晕与"今天也是完美的一天"水印，可长按保存或分享。</p>
+  <table>
+    <thead><tr><th style="width:20%">项目</th><th>规格</th></tr></thead>
+    <tbody>
+      <tr><td>位置</td><td>蟹堡王正门外 2m 的圆形光圈，靠近即高亮；与排队 / 点餐动线不冲突</td></tr>
+      <tr><td>同框</td><td>光圈内可容纳最多 4 个玩家 + 可选 1 个 NPC（海绵宝宝最常被拉来合影）；实时取当前在场模型</td></tr>
+      <tr><td>出图</td><td>非截图式（避免 UI 穿帮），而是单独渲染一帧干净的"合影视角"，叠加边框 + 海浪滤镜 + 文案水印</td></tr>
+      <tr><td>分享</td><td>本地保存为主；如需外部分享，引导用户自己发（不在站内做转发链，避免诱导分享的游戏化感）</td></tr>
+      <tr><td>彩蛋</td><td>痞老板身份合影时，画面角落会自动多一只偷偷举着相机的凯伦；小蜗合影只显示一团"喵"字云</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============ 11 UI ============ -->
+<section id="s11">
+  <h2><span class="num">11</span>UI / UX 规范</h2>
+  <p class="lead">原则：<strong>UI 要像海底世界的一部分</strong>——圆角、气泡、贝壳、木质纹理，不做科技感面板。任何面板出现都不应该遮住画面中心 40%。</p>
+
+  <h3>11.1 HUD 布局</h3>
+  <table>
+    <thead><tr><th style="width:16%">区域</th><th style="width:26%">内容</th><th>规范</th></tr></thead>
+    <tbody>
+      <tr><td>左下</td><td>身份卡（头像 + 名字 + 身份徽章）</td><td>72×72 圆形头像，点击展开详情（含专属台词与彩蛋进度）</td></tr>
+      <tr><td>右下</td><td>动作轮盘（招手 / 表情 / 短句）</td><td>默认收起为一个小气泡按钮，点击展开扇形；触屏用长按</td></tr>
+      <tr><td>右上</td><td>小地图 + 在线人数</td><td>极简线稿地图，只标 6 栋建筑图标与自己的点；人数显示"这条街上 12 人"</td></tr>
+      <tr><td>顶部中央</td><td>气泡提示（任务性文案）</td><td>只在必要时出现，如"你拿到了 07 号"</td></tr>
+      <tr><td>底部中央</td><td>对话框</td><td>宽 720px，圆角 18px，米色纸底 + 深海蓝文字</td></tr>
+    </tbody>
+  </table>
+
+  <h3>11.2 交互提示三级</h3>
+  <ol>
+    <li><b>远距离（&gt; 8m）</b>：物体不发生任何变化。不要提前高亮，会变成"满地都是可点击"的游戏感。</li>
+    <li><b>中距离（2–8m）</b>：物体边缘出现极淡的呼吸描边（青色，透明度 0.2）。</li>
+    <li><b>近距离（&lt; 2m）</b>：描边变实，物体上方浮出按键提示（PC 显示 <code>E</code>，移动端显示手形图标）。</li>
+  </ol>
+
+  <h3>11.3 对话系统（双层）</h3>
+  <table>
+    <thead><tr><th style="width:22%">层</th><th style="width:26%">内容</th><th>规则</th></tr></thead>
+    <tbody>
+      <tr><td>头顶气泡</td><td>1–2 行，≤ 28 字</td><td>短、快、有性格；3 秒后自动消失；多人同时说话时最多同屏 3 个气泡</td></tr>
+      <tr><td>底部对话框</td><td>完整台词（≤ 90 字）</td><td>点击 / 空格继续；对话中禁止移动（避免走出镜头）</td></tr>
+      <tr><td>选项</td><td>0–3 个</td><td>只在关键节点给选项（如"要不要帮我偷配方？"→ 答应 / 拒绝 / 装没听见）</td></tr>
+    </tbody>
+  </table>
+
+  <h3>11.4 无障碍与移动端</h3>
+  <ul>
+    <li>移动端：左半屏虚拟摇杆，右半屏拖拽转视角；交互提示自动切换为手形图标。</li>
+    <li>键盘：WASD / 方向键移动，<code>E</code> 交互，<code>Esc</code> 关闭面板，<code>Tab</code> 展开身份卡。</li>
+    <li>对比度：所有文字与底色对比度 ≥ 4.5:1；不用纯色块压图。</li>
+    <li>「减少动态效果」：关闭镜头下潜、粒子、屏幕震动，保留淡入淡出。</li>
+    <li>字幕：所有音效关键信息（叫号、门铃）必须有文字提示，不依赖听觉。</li>
+  </ul>
+</section>
+
+<!-- ============ 12 技术 ============ -->
+<section id="s12">
+  <h2><span class="num">12</span>技术实现方案（建议，非强制）</h2>
+  <p class="lead">核心判断：<strong>用 Three.js 做 3D 场景 + 卡通着色，但把"卡通感"交给后处理与描边，而不是靠高模高贴图。</strong>这样在 15MB 的包体预算内可以做出"能走进去的动画片"。</p>
+
+  <h3>12.1 技术栈</h3>
+  <table>
+    <thead><tr><th style="width:18%">层</th><th style="width:34%">选型</th><th>理由</th></tr></thead>
+    <tbody>
+      <tr><td>渲染</td><td>Three.js r160+ / WebGL2</td><td>生态成熟、卡通着色与后处理现成；不选 Unity WebGL（包体 30MB 起，首屏太慢）</td></tr>
+      <tr><td>卡通效果</td><td>MeshToonMaterial + 背面外扩描边（0.02）+ 3 阶 ramp</td><td>成本低，风格稳定；描边用 <code>BackSide</code> 复制体，比后处理边缘检测更"手绘"</td></tr>
+      <tr><td>水体</td><td>顶点波动 + 焦散贴图 + 体积雾（线性雾 30–120m）</td><td>海底氛围的 80% 来自雾和光柱，不是水模型</td></tr>
+      <tr><td>后处理</td><td>Bloom（阈值 0.85，强度 0.6）+ 轻微暗角</td><td>只加这两个，别加景深（手机端太贵）</td></tr>
+      <tr><td>动画</td><td>Mixamo 基础骨骼 + 手工关键帧；NPC 用状态机</td><td>NPC 动作少而准（章鱼哥 4 个动作就够）</td></tr>
+      <tr><td>后端</td><td>Node 20 + Colyseus（或 uWebSockets.js）</td><td>房间模型天然匹配"街区 = 房间"；tick 15Hz</td></tr>
+      <tr><td>状态</td><td>Redis（身份绑定 / 队列 / 每日限制）</td><td>排队与限购必须服务端权威，否则可刷</td></tr>
+      <tr><td>账号</td><td>匿名 deviceId（仅用于房间 / 防刷，可选）</td><td>不做注册；身份由客户端在每次进入时本地随机生成（Q2），不依赖任何账号状态</td></tr>
+      <tr><td>部署</td><td>静态资源 CDN + 单区域游戏服（Demo 1 台 4C8G 足够）</td><td>Demo 阶段不做多区域</td></tr>
+    </tbody>
+  </table>
+
+  <h3>12.2 资源预算</h3>
+  <table>
+    <thead><tr><th style="width:26%">资源</th><th style="width:18%">目标</th><th>控制手段</th></tr></thead>
+    <tbody>
+      <tr><td>首屏包体</td><td>&lt; 8MB</td><td>开场动画单独成 chunk；街区模型 Draco 压缩；纹理 KTX2</td></tr>
+      <tr><td>全量资源</td><td>&lt; 15MB</td><td>内景按需加载（进门时才拉 1–2MB）</td></tr>
+      <tr><td>Draw Call</td><td>&lt; 120 / 帧</td><td>同材质合批；气泡用 InstancedMesh</td></tr>
+      <tr><td>三角面</td><td>&lt; 350k / 场景</td><td>建筑内部用贴图假细节 + 少量实体</td></tr>
+      <tr><td>帧率</td><td>桌面 60 / 中端手机 30</td><td>手机端自动关描边与 Bloom，分辨率缩放 0.8</td></tr>
+    </tbody>
+  </table>
+
+  <h3>12.3 埋点（决定后续怎么改）</h3>
+  <pre><code>enter_opening       开场开始 / 跳过（记录停留时长）
+identity_assigned   身份 id, 是否彩蛋, 进入次数（身份每次随机，无重抽概念）
+building_enter      建筑 id, 停留时长, 进入顺序
+item_interact       物品 id, 交互次数（找出"没人碰"的物品 → 删掉或加强）
+npc_talk            npc id, 台词 id, 是否触发不耐烦组
+queue_join          取号时间 / 制作完成 / 领取（算真实等待）
+patty_bite          第几口放弃（判断"吃不完"发生在第几口）
+wave / emote        社交动作次数（判断社交是否真的发生）
+exit                离开页面时所在场景</code></pre>
+  <p class="lead" style="margin-top:10px">其中最重要的三个指标：<b>开场跳过率</b>（&gt; 35% 说明开场太长）、<b>物品交互为零的比例</b>（&gt; 40% 说明引导不足或物品无趣）、<b>吃汉堡的第几口放弃</b>（如果大量停在 3–4 口，说明 6 口太多）。</p>
+</section>
+
+<!-- ============ 13 里程碑 ============ -->
+<section id="s13">
+  <h2><span class="num">13</span>Demo 范围与里程碑</h2>
+  <p class="lead">「精细版 Demo」的正确含义不是"内容多"，而是<strong>"少数几件事做到没有毛边"</strong>。建议范围：一条街 + 6 栋建筑（其中 2 栋可只做 1 个房间）+ 4 个主角 NPC + 1 个彩蛋 NPC + 完整蟹堡王。</p>
+
+  <h3>13.1 范围切分</h3>
+  <table>
+    <thead><tr><th style="width:16%">优先级</th><th style="width:30%">内容</th><th>取舍说明</th></tr></thead>
+    <tbody>
+      <tr><td><b>P0 必做</b></td><td>开场动画、身份分配、街区行走、章鱼哥 / 海绵宝宝 / 蟹老板 / 派大星、蟹堡王全流程、蟹黄堡 3D + 啃咬、招手</td><td>没有这些，"比奇堡"这个概念不成立</td></tr>
+      <tr><td><b>P1 应做</b></td><td>4 栋住宅内景、珊迪 / 珍珍 / 痞老板 三个彩蛋身份、态度矩阵、海之霸内景</td><td>决定"惊喜密度"，决定传播</td></tr>
+      <tr><td><b>P2 可延</b></td><td>泡芙 / 小蜗身份、水母田远景、手套乐园路牌、表情轮盘、海底击掌</td><td>可以放到 v1.1</td></tr>
+      <tr><td><b>不做</b></td><td>自由聊天、任务系统、成就系统、商城、账号体系、每日签到 / 连续登录、排行榜、货币 / 体力</td><td>核心定位是"互动体验"而非游戏，Q4 已明确不做任何留存钩子型系统</td></tr>
+    </tbody>
+  </table>
+
+  <h3>13.2 五周排期（3 人团队参考）</h3>
+  <table>
+    <thead><tr><th style="width:12%">周</th><th style="width:26%">里程碑</th><th>交付物</th></tr></thead>
+    <tbody>
+      <tr><td>W1</td><td><b>M0 空间成立</b></td><td>街区白模 + 卡通着色管线 + 第三人称相机 + 移动碰撞；能走完一条街</td></tr>
+      <tr><td>W2</td><td><b>M1 开场与身份</b></td><td>下潜开场（含降级方案）+ 身份抽卡 + 角色替换 + HUD</td></tr>
+      <tr><td>W3–W4</td><td><b>M2 蟹堡王</b></td><td>内景 + 排队状态机 + 蟹黄堡模型与 6 口啃咬 + 堂食 / 外带分叉</td></tr>
+      <tr><td>W5</td><td><b>M3 多人</b></td><td>房间同步 + 互相可见 + 招手 + 预设短句；40 人压测</td></tr>
+      <tr><td>W6</td><td><b>M4 打磨</b></td><td>4 个 NPC 台词补足 120 条、彩蛋触发、音效、移动端适配、埋点</td></tr>
+    </tbody>
+  </table>
+
+  <h3>13.3 验收清单</h3>
+  <ul class="check">
+    <li>开场从黑场到落地全程无卡顿；点击可跳过；断网时降级为静态图仍能进入</li>
+    <li>身份抽卡符合概率（1000 次抽样，彩蛋池占比 11%–13%）</li>
+    <li>任意玩家身份下，4 个主角 NPC 的第一句台词均不重复且符合人设</li>
+    <li>6 栋建筑全部可进入、可离开；无卡在门里的情况</li>
+    <li>每个可交互物品点击后都有可见反馈（无"点了没反应"）</li>
+    <li>排队号码与叫号一致；超时作废有明确提示</li>
+    <li>蟹黄堡可 360° 旋转、可缩放；6 口吃完有完整收尾</li>
+    <li>同屏 20 人时帧率 ≥ 30fps（中端手机）</li>
+    <li>招手对同一玩家有冷却；无刷屏</li>
+    <li>所有音效都有对应文字提示（可静音通关）</li>
+  </ul>
+
+  <h3>13.4 成功信号</h3>
+  <div class="grid g3">
+    <div class="card"><h4>沉浸</h4><p style="font-size:13.4px">开场跳过率 &lt; 35%；平均停留 &gt; 9 分钟。</p></div>
+    <div class="card"><h4>惊喜</h4><p style="font-size:13.4px">身份卡截图分享率 &gt; 8%；彩蛋身份相关反馈占比 &gt; 20%。</p></div>
+    <div class="card"><h4>完成</h4><p style="font-size:13.4px">走到蟹堡王并吃到汉堡的用户 &gt; 60%；6 口吃完率 &gt; 70%。</p></div>
+  </div>
+</section>
+
+<!-- ============ 14 待定 ============ -->
+<section id="s14">
+  <h2><span class="num">14</span>待定问题与扩展池</h2>
+  <p class="lead">以下问题需要你决定，我按"影响面大小"排序。每一条都给了建议方案，你可以直接采纳或推翻。</p>
+
+  <div class="callout note" style="margin-bottom:22px">
+    <b>决策状态 · v1.1 已拍板（8/8）</b>
+    以下问题已在 v1.1 全部确认。标注「维持」= 采纳原建议；「推翻」= 按新方向调整。其中 Q4 是总原则：<strong>不打算做成"游戏"的感觉</strong>，这直接影响 Q2 / Q5 的取舍。
+  </div>
+  <table>
+    <thead><tr><th style="width:5%">#</th><th style="width:30%">问题</th><th>已决策（用户拍板）</th></tr></thead>
+    <tbody>
+      <tr><td>Q1</td><td>是否开放自由打字聊天？</td><td><span class="tag b">维持</span> <b>不开放。</b>用预设短句 + 表情轮盘替代。自由输入会带来审核成本与骚扰场，与"低压力"支柱冲突。</td></tr>
+      <tr><td>Q2</td><td>身份是否唯一（一人一号）？</td><td><span class="tag o">推翻</span> <b>不唯一，每次进入随机重新分配。</b>不绑定账号、不做"7 天固定"，刷新 / 重进即一个新身份。最简单、零留存负担，也最符合"不打算做游戏"的定位。</td></tr>
+      <tr><td>Q3</td><td>小蜗这个身份是否保留？</td><td><span class="tag b">维持</span> <b>保留。</b>维持 1% 极稀有恶搞定位，全程"喵"、字幕翻译心声；不替换泡芙老师。</td></tr>
+      <tr><td>Q4</td><td>要不要做"每日签到 / 连续登录"？</td><td><span class="tag o">推翻</span> <b>不做。</b>核心理由：<strong>不打算做成"游戏"的感觉</strong>。任何以"留存 / 奖励 / 进度"为目标的系统（签到、连续登录、成就、任务、养成）一律不做。</td></tr>
+      <tr><td>Q5</td><td>蟹堡王要不要做"打工"玩法？</td><td><span class="tag o">推翻</span> <b>做"翻肉饼"30 秒小玩法。</b>定位是"多了一个可玩的小玩具"，不是任务 / 进度系统，不绑定任何奖励或成就；纯娱乐、随时进出（详见 9.3）。与 Q4 不冲突：它是玩具，不是留存钩子。</td></tr>
+      <tr><td>Q6</td><td>移动端是否为一等公民？</td><td><span class="tag b">维持</span> <b>是。</b>W5 前完成适配与性能兜底，目标中端手机 30fps；移动端流量通常占 70%+。</td></tr>
+      <tr><td>Q7</td><td>音乐与配音？</td><td><span class="tag o">推翻</span> <b>尽量仿造原作配音（中文译制版的语气 / 口头禅 / 节奏），不要完全原创。</b>但受版权约束——用"风格近似"的配音演绎而非直接搬运原版音轨；正式上线前须评估声音肖像权风险（见 15.1）。</td></tr>
+      <tr><td>Q8</td><td>是否做"多人同时吃汉堡"的合影点？</td><td><span class="tag b">维持</span> <b>做。</b>蟹堡王门口设拍照点，多人同框触发相机 icon，可保存合影，是天然传播点（详见 10.5）。</td></tr>
+    </tbody>
+  </table>
+
+  <h3>14.1 内容扩展池（v1.1 之后）</h3>
+  <div class="grid g2">
+    <div class="card">
+      <h4>新地点</h4>
+      <p style="font-size:13.6px">水母田（抓水母小游戏）、酷乐湖（沙滩 + 浪）、手套乐园（摩天轮观景）、划浪学校（泡芙老师的驾校，玩家当学员）、商场（珍珍的圣地）、船锚屋（蟹老板家，珍珍的房间）。</p>
+    </div>
+    <div class="card">
+      <h4>新身份</h4>
+      <p style="font-size:13.6px">泡芙老师、小蜗、蟹老板的妈妈、飞天魔鬼（幽灵船船长）、人鱼战士（超级英雄）、海之霸的凯伦。</p>
+    </div>
+    <div class="card">
+      <h4>新玩法</h4>
+      <p style="font-size:13.6px">每周"配方失窃案"（全员协作找线索）、"水母田之夜"限时活动、NPC 生日会（角色生日当天特殊对话）。</p>
+    </div>
+    <div class="card">
+      <h4>社交扩展</h4>
+      <p style="font-size:13.6px">好友系统（互相关注后可见对方在哪个建筑）、集体合影、给 NPC 送礼（影响好感与台词）。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 15 IP ============ -->
+<section id="s15">
+  <h2><span class="num">15</span>IP 与合规说明</h2>
+  <p class="lead">这一节请务必在上线前确认，它决定这个项目是"作品集"，还是"能公开的东西"。</p>
+
+  <div class="callout warn">
+    <b>核心事实</b>
+    《海绵宝宝》（SpongeBob SquarePants）的角色、名称、形象、场景设计的著作权与商标权归 <b>Paramount / Nickelodeon</b> 及创作者 Stephen Hillenburg 的相关权利方所有。任何公开上线、带商业目的（广告、付费、导流、品牌合作）的使用，都需要正式授权。
+  </div>
+
+  <table>
+    <thead><tr><th style="width:22%">使用场景</th><th style="width:18%">风险</th><th>建议</th></tr></thead>
+    <tbody>
+      <tr><td>本地 / 内部演示 Demo</td><td>低</td><td>可用于作品集、面试、评审，不公开传播</td></tr>
+      <tr><td>公开发布的"同人非商用"页面</td><td>中高</td><td>即使不盈利，公开传播完整角色形象仍有下架风险；需注明非官方、无关联</td></tr>
+      <tr><td>带广告 / 付费 / 品牌合作</td><td>高</td><td><b>必须先取得授权</b>，否则不建议推进</td></tr>
+      <tr><td>商业产品化</td><td>极高</td><td>走正式 IP 授权流程；或彻底原创化（见下）</td></tr>
+    </tbody>
+  </table>
+
+  <h3>15.1 两条备选路径</h3>
+  <div class="grid g2">
+    <div class="card">
+      <h4>路径 A：作为同人作品（推荐用于 Demo 阶段）</h4>
+      <ul style="font-size:13.6px; margin-bottom:0">
+        <li>页面显著位置标注"非官方同人作品，与权利方无关"</li>
+        <li>不投放广告、不收费、不做商业导流</li>
+        <li>音乐不使用原作主题曲；<b>配音采用"风格近似"的演绎而非直接搬运原版音轨</b>（Q7 方向）</li>
+        <li>准备好随时下架的心理预期与技术准备（一键关闭开关）</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>路径 B：原创化改造（推荐用于长期）</h4>
+      <ul style="font-size:13.6px; margin-bottom:0">
+        <li>保留全部机制（身份分配 / 排队 / 3D 食物 / 多人），替换角色与场景为原创"海底小镇"</li>
+        <li>建筑的"形状记忆点"改为原创符号（如灯塔、贝壳屋、沉船）</li>
+        <li>NPC 性格内核保留（冷漠艺术家、贪财老板…），但外形与名字原创</li>
+        <li>这条路可以完整保留本文档 80% 的内容，且可商业化</li>
+      </ul>
+    </div>
+  </div>
+  <div class="callout warn">
+    <b>配音的版权边界（Q7 特别提醒）</b>
+    Q7 决定"尽量仿造原作配音、不要完全原创"。这里要划清两条线：<br>
+    · <b>允许</b>：用新的配音演员，演绎出贴近原作中文译制版的<b>语气、节奏、口头禅风格</b>（这属于表演风格借鉴）；<br>
+    · <b>禁止</b>：① 直接搬运 / 切片原版音轨；② <b>模仿特定配音演员的声线</b>——这可能触及"声音肖像权 / 表演者权"，比角色造型更敏感；③ 在台词里复刻原作受版权保护的歌词或长段台词。<br>
+    建议：正式上线前让配音导演以"神似而非形似"为准则，并在合同中明确演员仅贡献风格化表演，避免指向某位特定配音者。
+  </div>
+  <p class="lead" style="margin-top:14px">本文档中的概念图均为 AI 生成的风格参考，<b>不可直接作为上线资产</b>；正式美术需原创绘制/建模，避免直接复刻受保护的角色造型。</p>
+</section>
+
+<!-- ============ 16 附录 ============ -->
+<section id="s16">
+  <h2><span class="num">16</span>附录</h2>
+
+  <h3>16.1 台词库样例（可直接扩展）</h3>
+  <table>
+    <thead><tr><th style="width:14%">NPC</th><th style="width:12%">状态</th><th>台词</th></tr></thead>
+    <tbody>
+      <tr><td rowspan="4">章鱼哥</td><td>中立</td><td>“有事说事。我五分钟之后要练习。”</td></tr>
+      <tr><td>中立</td><td>“你知道这条街上最吵的是谁吗？你就站在他隔壁。”</td></tr>
+      <tr><td>不耐烦</td><td>“我不是不帮你。我是不想帮。”</td></tr>
+      <tr><td>罕见温柔</td><td>“……你站这儿别动。光线刚好。”（给你画速写）</td></tr>
+      <tr><td rowspan="4">蟹老板</td><td>中立</td><td>“你踩到的那块地板，是我去年换的。花了三块。”</td></tr>
+      <tr><td>推销</td><td>“套餐！套餐划算！多花三块，多得一杯——水。”</td></tr>
+      <tr><td>警觉</td><td>“你在看保险柜？那里面是……账本。对，账本。”</td></tr>
+      <tr><td>对珍珍</td><td>“我的小鲸鱼！爸爸给你留了最好的那个！”</td></tr>
+      <tr><td rowspan="4">海绵宝宝</td><td>热情</td><td>“你知道吗，今天是我在蟹堡王工作的第 1,842 天！我数着呢！”</td></tr>
+      <tr><td>关心</td><td>“你看起来有点累。要不要坐下？我给你拿杯水——海水，我们这儿只有海水。”</td></tr>
+      <tr><td>唱歌</td><td>“♪ 我是个小海绵，住在菠萝里～ ♪”</td></tr>
+      <tr><td>对痞老板</td><td>“痞老板！你来啦！要排队哦，队伍从那边开始！”</td></tr>
+      <tr><td rowspan="3">派大星</td><td>跑题</td><td>“蟹堡王？我知道螃蟹。螃蟹有钳子。你有钳子吗？”</td></tr>
+      <tr><td>哲学</td><td>“有时候我觉得，我们都在一个很大很大的鱼缸里。”</td></tr>
+      <tr><td>忠诚</td><td>“如果有一天你变成石头，我就每天来跟你说话。”</td></tr>
+    </tbody>
+  </table>
+
+  <h3>16.2 可交互物品总表（52 件）</h3>
+  <table>
+    <thead><tr><th style="width:22%">建筑</th><th style="width:10%">数量</th><th>物品清单</th></tr></thead>
+    <tbody>
+      <tr><td>凤梨屋</td><td>9</td><td>小蜗、电视、吹泡泡棒、日历、空手道木人、衣柜、冰箱、床、书架</td></tr>
+      <tr><td>石像屋</td><td>8</td><td>竖笛、自画像、留声机、浴室、画架、冰箱、请勿打扰牌、沙发</td></tr>
+      <tr><td>石头屋</td><td>8</td><td>沙沙发、秘密盒子、沙子电视、冰箱、石头床、墙上的画、天线、地板</td></tr>
+      <tr><td>圆顶树屋</td><td>9</td><td>空气阀、跑步轮、空手道木桩、显微镜、橡树、坚果罐、发明台、吉他、气闸</td></tr>
+      <tr><td>蟹堡王</td><td>10</td><td>点餐台、烤架、收银机、菜单牌、保险柜、点唱机、桌椅、后厨门、厕所门、垃圾桶</td></tr>
+      <tr><td>海之霸</td><td>8</td><td>凯伦、海霸糊机、失败发明堆、配方保险箱、招牌、菜单、监控屏、椅子</td></tr>
+    </tbody>
+  </table>
+
+  <h3>16.3 配图索引</h3>
+  <table>
+    <thead><tr><th style="width:10%">编号</th><th style="width:36%">文件</th><th>用途</th></tr></thead>
+    <tbody>
+      <tr><td>A</td><td><code>01-opening.png</code></td><td>开场下潜镜头（封面 + 第 3 节）</td></tr>
+      <tr><td>C</td><td><code>02-map.png</code></td><td>街区全景（第 2、5 节）</td></tr>
+      <tr><td>D</td><td><code>03-pineapple-house.png</code></td><td>凤梨屋外观</td></tr>
+      <tr><td>F</td><td><code>04-rock-house.png</code></td><td>石头屋外观</td></tr>
+      <tr><td>E</td><td><code>05-moai-house.png</code></td><td>石像屋外观</td></tr>
+      <tr><td>G</td><td><code>06-treedome.png</code></td><td>圆顶树屋外观</td></tr>
+      <tr><td>H</td><td><code>07-krusty-krab-exterior.png</code></td><td>蟹堡王外观</td></tr>
+      <tr><td>I</td><td><code>08-krusty-krab-interior.png</code></td><td>蟹堡王内景</td></tr>
+      <tr><td>J</td><td><code>09-chum-bucket.png</code></td><td>海之霸外观</td></tr>
+      <tr><td>M</td><td><code>10-krabby-patty.png</code></td><td>蟹黄堡展示（第 9 节）</td></tr>
+      <tr><td>K</td><td><code>11-main-npcs.png</code></td><td>四位主角</td></tr>
+      <tr><td>L</td><td><code>12-egg-npcs.png</code></td><td>三位彩蛋角色</td></tr>
+      <tr><td>N</td><td><code>13-dialogue-scene.png</code></td><td>第三人称交互视角</td></tr>
+    </tbody>
+  </table>
+
+  <h3>16.4 名词对照</h3>
+  <table>
+    <thead><tr><th style="width:30%">中文（本文件用）</th><th style="width:36%">英文</th><th>备注</th></tr></thead>
+    <tbody>
+      <tr><td>比奇堡</td><td>Bikini Bottom</td><td>大陆早期译名"裤头村"、台译"比奇堡"</td></tr>
+      <tr><td>蟹堡王</td><td>The Krusty Krab</td><td>蟹老板开的快餐店</td></tr>
+      <tr><td>海之霸</td><td>The Chum Bucket</td><td>痞老板的餐厅，专营"海霸糊"</td></tr>
+      <tr><td>蟹黄堡</td><td>Krabby Patty</td><td>核心道具，配方是全镇最大秘密</td></tr>
+      <tr><td>贝壳街</td><td>Conch Street</td><td>四位主角住宅所在街道</td></tr>
+      <tr><td>圆顶树屋</td><td>Treedome</td><td>珊迪的家，内部充满空气</td></tr>
+      <tr><td>凤梨屋 / 石像屋 / 石头屋</td><td>Pineapple House / Moai Head / Rock House</td><td>海绵宝宝 / 章鱼哥 / 派大星的家</td></tr>
+    </tbody>
+  </table>
+
+  <footer>
+    《比奇堡的一天》产品需求与体验设计文档 · v1.1<br>
+    本文档为同人创作向的需求草案，用于内部讨论与评审；概念图由 AI 生成，仅作风格参考。<br>
+    第 14 节 8 个待定问题已于 v1.1 全部拍板（Q1 不开放聊天 / Q2 每次随机 / Q3 保留小蜗 / Q4 不做游戏化留存 / Q5 加翻肉饼小玩法 / Q6 移动端一等公民 / Q7 仿原作配音 / Q8 加合影点）。下一步建议：进入 M0 白模阶段，按 P0 必做清单落地。
+  </footer>
+</section>
+
+</div><!-- /inner -->
+</div><!-- /main -->
+</div><!-- /wrap -->
+
+<script>
+/* ---------- 目录高亮 ---------- */
+(function(){
+  var links = Array.prototype.slice.call(document.querySelectorAll('.nav a'));
+  var secs = links.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  function onScroll(){
+    var y = window.scrollY + 140, cur = 0;
+    for (var i=0;i<secs.length;i++){ if (secs[i] && secs[i].offsetTop <= y) cur = i; }
+    links.forEach(function(a,i){ a.classList.toggle('active', i===cur); });
+  }
+  window.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+})();
+
+/* ---------- 身份抽卡 ---------- */
+(function(){
+  var pool = [
+    {p:88, name:'普通比奇堡居民', face:'🐟', rar:'★☆☆ 常见', desc:'你是这条街上 88% 的人之一。名字随机，职业随机，但你确实住在这儿。', color:'#8FB8CC'},
+    {p:4,  name:'珊迪 · Sandy', face:'🐿️', rar:'★★☆ 稀有', desc:'德州的松鼠科学家，穿着潜水服和玻璃头盔。移动速度最快，NPC 对你格外客气。', color:'#FFD23F'},
+    {p:3,  name:'珍珍 · Pearl', face:'🐳', rar:'★★☆ 稀有', desc:'蟹老板的女儿。走到哪儿都在想商场。蟹老板见到你会立刻免单。', color:'#FF8FB1'},
+    {p:2.5,name:'痞老板 · Plankton', face:'🟢', rar:'★★★ 极稀有', desc:'只有一只眼睛，身高是别人的六分之一。全镇都防着你，包括海绵宝宝（但他还是对你很好）。', color:'#3F8C5A'},
+    {p:1.5,name:'泡芙老师 · Mrs. Puff', face:'🐡', rar:'★★☆ 稀有', desc:'驾校老师，一受惊就膨胀成球。靠近蟹老板会触发一段谁都不想看的尴尬。', color:'#7FB2D8'},
+    {p:1,  name:'小蜗 · Gary', face:'🐌', rar:'★★★ 极稀有', desc:'你只能"喵"。字幕会翻译你的心声。移动速度 −40%，章鱼哥会因此对你态度最好。', color:'#C7A1E8'}
+  ];
+  var total = pool.reduce(function(s,x){return s+x.p;},0);
+  function pick(){
+    var r = Math.random()*total, acc = 0;
+    for (var i=0;i<pool.length;i++){ acc += pool[i].p; if (r <= acc) return pool[i]; }
+    return pool[0];
+  }
+  var card = document.getElementById('gachaCard'),
+      btn = document.getElementById('gachaBtn'),
+      reset = document.getElementById('gachaReset'),
+      log = document.getElementById('gachaLog'),
+      n = 0, rare = 0, busy = false;
+
+  btn && btn.addEventListener('click', function(){
+    if (busy) return; busy = true;
+    card.classList.remove('revealed');
+    card.innerHTML = '<div class="hint">泡泡正在下沉……</div>';
+    setTimeout(function(){
+      var it = pick(); n++; if (it.p < 10) rare++;
+      card.classList.add('revealed');
+      card.innerHTML = '<div class="face">'+it.face+'</div>'+
+        '<div class="nm" style="color:'+it.color+'">'+it.name+'</div>'+
+        '<div class="rar" style="color:#8A969C">'+it.rar+'</div>'+
+        '<div class="ds">'+it.desc+'</div>';
+      log.textContent = '已抽 ' + n + ' 次 · 彩蛋身份 ' + rare + ' 次';
+      busy = false;
+    }, 620);
+  });
+  reset && reset.addEventListener('click', function(){
+    n = 0; rare = 0; busy = false;
+    card.classList.remove('revealed');
+    card.innerHTML = '<div class="hint">泡泡还在飘……</div>';
+    log.textContent = '已抽 0 次 · 彩蛋身份 0 次';
+  });
+})();
+
+/* ---------- 蟹黄堡啃咬 ---------- */
+(function(){
+  var img = document.getElementById('burgerImg'),
+      stage = document.getElementById('burgerStage'),
+      dots = document.querySelectorAll('#biteDots i'),
+      txt = document.getElementById('biteText'),
+      btn = document.getElementById('biteBtn'),
+      reset = document.getElementById('biteReset');
+  if(!img) return;
+  var bites = 0;
+  var lines = [
+    '完整的一个。还热着。',
+    '第一口：面包、肉汁和一点芝士。周围有人回头看你。',
+    '第二口：嘴角沾了点酱。章鱼哥"啧"了一声。',
+    '第三口：闭眼，0.8 秒的满足。这是今天最好的三秒。',
+    '第四口：生菜掉了两片，一只小鱼冲过来抢走了。',
+    '第五口：打了个嗝，气泡从头顶飘上去。',
+    '吃完了。盘子里只剩一点芝麻。"今天也是完美的一天。"'
+  ];
+
+  function crumbs(){
+    for (var i=0;i<12;i++){
+      var c = document.createElement('span');
+      c.className = 'crumb';
+      c.style.left = (110 + Math.random()*90) + 'px';
+      c.style.top  = (120 + Math.random()*60) + 'px';
+      c.style.background = Math.random() > .5 ? '#C98B4B' : '#7FBF6A';
+      stage.appendChild(c);
+      (function(el){
+        var vx = (Math.random()-.5)*5, vy = -3 - Math.random()*3, x = 0, y = 0, t = 0;
+        var timer = setInterval(function(){
+          t++; vy += .9; x += vx; y += vy;
+          el.style.transform = 'translate('+x+'px,'+y+'px) rotate('+t*30+'deg)';
+          el.style.opacity = Math.max(0, 1 - t/22);
+          if (t > 22){ clearInterval(timer); el.remove(); }
+        }, 16);
+      })(c);
+    }
+  }
+
+  btn && btn.addEventListener('click', function(){
+    if (bites >= 6) return;
+    bites++;
+    // 体积递减 + 旋转一点，模拟"被咬掉一侧"
+    var scale = 1 - bites * 0.085;
+    img.style.transform = 'scale(' + scale + ') rotate(' + (bites * -6) + 'deg)';
+    img.style.filter = 'saturate(' + (1 - bites*0.03) + ')';
+    dots.forEach(function(d,i){ d.classList.toggle('on', i < bites); });
+    txt.textContent = lines[bites];
+    crumbs();
+    if (bites === 6){
+      img.style.opacity = '.18';
+      btn.textContent = '吃完了';
+      btn.disabled = true;
+      btn.style.opacity = '.5';
+      btn.style.cursor = 'default';
+    }
+  });
+
+  reset && reset.addEventListener('click', function(){
+    bites = 0;
+    img.style.transform = 'none';
+    img.style.opacity = '1';
+    img.style.filter = 'none';
+    dots.forEach(function(d){ d.classList.remove('on'); });
+    txt.textContent = lines[0];
+    btn.textContent = '咬一口';
+    btn.disabled = false;
+    btn.style.opacity = '1';
+    btn.style.cursor = 'pointer';
+  });
+})();
+</script>
+</body>
+</html>
