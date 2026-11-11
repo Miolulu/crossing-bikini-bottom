@@ -200,7 +200,7 @@
 
   /* 号码屏 / 制作进度 */
   #ticketNr{position:absolute;left:250px;top:150px;font-size:14px;font-weight:700;color:#062338;
-    background:#fff;padding:6px 12px;border-radius:10px;z-index:6;box-shadow:0 4px 10px rgba(0,0,0,.25);
+    background:#fff;padding:6px 12px;border-radius:10px;z-index:2000;box-shadow:0 4px 10px rgba(0,0,0,.25);
     min-width:236px;text-align:center;}
   #ticketNr b{color:#c0392b;}
   #ticketNr.rolling{background:#FFF3C4;}
@@ -208,9 +208,9 @@
   @keyframes nrRoll{0%{transform:translateY(-7px);opacity:.25;filter:blur(1px)}
     100%{transform:translateY(7px);opacity:1;filter:blur(0)}}
   #makeBar{position:absolute;left:250px;top:196px;width:270px;height:16px;border-radius:10px;
-    background:rgba(6,35,56,.5);z-index:6;display:none;overflow:hidden;}
+    background:rgba(6,35,56,.5);z-index:2000;display:none;overflow:hidden;}
   #makeFill{height:100%;width:0;background:linear-gradient(90deg,#FFD23F,#ff8c42);transition:width .2s;}
-  #makeTxt{position:absolute;left:250px;top:216px;font-size:12px;color:#fff;z-index:6;display:none;
+  #makeTxt{position:absolute;left:250px;top:216px;font-size:12px;color:#fff;z-index:2000;display:none;
     text-shadow:0 1px 3px rgba(0,0,0,.6);}
   #burgerReady{position:absolute;left:790px;top:246px;width:82px;height:70px;display:none;
     z-index:35;cursor:pointer;flex-direction:column;align-items:center;justify-content:center;
