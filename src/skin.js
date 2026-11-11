@@ -37,19 +37,56 @@
     });
   }
 
-  /* --- 2. 角色立绘替换 emoji 圆盘 --- */
+  /* --- 2. 角色立绘替换 emoji 圆盘 ---
+     主角 = D-01 生成立绘（更大 + 金色标记）；bot 居民 = 12 位手绘居民随机换装；
+     六位主要 NPC = 对应立绘；其余兜底走大号 SVG。 */
+  var RESIDENTS=['G-14-01-suit_sardine.png','G-14-02-puffer_stripes.png',
+    'G-14-03-angelfish_hat.png','G-14-04-old_flounder.png',
+    'G-14-05-tuna_lifeguard.png','G-14-06-shrimp_sweater.png',
+    'G-14-07-octopus_news.png','G-14-08-grouper_hawaii.png',
+    'G-14-09-seahorse_postal.png','G-14-10-skay_mustache.png',
+    'G-14-11-catfish_farmer.png','G-14-12-blowfish_grandma.png'];
   function dressActors(root){
     if(!root)return;
-    var list=root.querySelectorAll?root.querySelectorAll('.actor .disc,#iplayer .disc,#player .disc'):[];
-    if(root.matches&&root.matches('.actor .disc,#iplayer .disc,#player .disc'))list=[root].concat([].slice.call(list));
+    var sel='.actor .disc,#iplayer .disc,#player .disc';
+    var list=root.querySelectorAll?root.querySelectorAll(sel):[];
+    if(root.matches&&root.matches(sel))list=[root].concat([].slice.call(list));
     [].slice.call(list).forEach(function(d){
       if(d.dataset.bbDressed)return;
-      var key=(d.textContent||'').trim().replace(/\uFE0F/g,'');
-      var f=CHAR?CHAR(key):null;
+      var host=d.parentNode;
+      var isPlayer=host&&(host.id==='player'||host.id==='iplayer');
+      var isBot=!!(host&&host.classList&&host.classList.contains('bot'));
+      var f;
+      if(isPlayer)f='D-01-player-portrait.png';
+      else if(isBot)f=RESIDENTS[(Math.random()*RESIDENTS.length)|0];
+      else f=CHAR?CHAR((d.textContent||'').trim().replace(/\uFE0F/g,'')):null;
       var html=f?'<img class="bbCharImg" alt="" src="../assets/characters/'+f+'">'
-                :(CHAR_SVG?CHAR_SVG(key,88):'');
+                :(CHAR_SVG?CHAR_SVG((d.textContent||'').trim(),88):'');
       if(!html)return;
       d.innerHTML=html;d.dataset.bbDressed='1';
+      if(isPlayer&&!d.parentNode.querySelector('.bbMarker')){
+        var m=document.createElement('div');m.className='bbMarker';
+        m.innerHTML='<svg viewBox="0 0 36 26"><path d="M4 2h28L20 22z" fill="#FBE34B" stroke="#162C36" stroke-width="3" stroke-linejoin="round"/></svg>';
+        d.parentNode.appendChild(m);
+      }
+    });
+  }
+
+  /* --- 2.5 房间道具化：图标按物件高度放大、微旋转、贴地阴影（莉娜式散布观感） --- */
+  function propify(){
+    [].slice.call(document.querySelectorAll('#room .obj')).forEach(function(el){
+      if(el.dataset.bbProp==='1')return;
+      el.dataset.bbProp='1';
+      var ic=el.querySelector('.ic');if(!ic)return;
+      var t=(ic.textContent||'').trim().replace(/\uFE0F/g,'');
+      if(!t)return;
+      var h=parseFloat(el.style.height)||52;
+      var hh=hash(el.id||t+el.style.left);
+      var size=Math.round(h*0.92+(hh%3)*6);
+      if(ICON)ic.innerHTML=ICON(t,size);
+      el.style.transform='rotate('+(((hh>>4)%7)-3)+'deg)';
+      var sh=document.createElement('div');sh.className='bbPropShadow';
+      el.appendChild(sh);
     });
   }
 
@@ -182,6 +219,13 @@
     [].slice.call(document.querySelectorAll('#world .actor')).forEach(function(a){
       if(a.style.top)a.style.zIndex=String(100+Math.round((parseFloat(a.style.top)||0)/10));
     });
+    /* 室内同样按 y 景深：物件/座椅/NPC/玩家统一尺度，玩家走到物件前方会遮住它 */
+    var ip=document.getElementById('iplayer');
+    if(ip&&ip.style.top)ip.style.zIndex=String(100+Math.round((parseFloat(ip.style.top)||0)/10));
+    [].slice.call(document.querySelectorAll(
+      '#room .obj,#room .seat,#roomDecor .actor,#roomNpcs .actor')).forEach(function(el){
+      if(el.style.top)el.style.zIndex=String(100+Math.round((parseFloat(el.style.top)||0)/10));
+    });
   }
 
   /* --- 8. 免责角标 --- */
@@ -195,6 +239,7 @@
   /* --- 7. 引导与观察器 --- */
   function pass(root){
     if(busy)return;
+    propify();
     dressActors(root);
     iconize(root);
   }

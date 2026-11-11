@@ -734,11 +734,9 @@
       "dir": "characters",
       "files": [
         "D-01-player-portrait.png",
-        "D-01-player-token.png",
-        "D-01-player-walk.png",
-        "D-01-player-sit.png"
+        "D-01-player-token.png"
       ],
-      "status": "pending",
+      "status": "delivered",
       "required": true,
       "code_only": false,
       "default": "png",
@@ -749,9 +747,10 @@
           768
         ],
         "bg": "transparent",
-        "ratio": 0.667
+        "ratio": 0.667,
+        "note": "walk / sit 两帧本轮未交付（行走=CSS 呼吸+位移，坐下=缩放态），见 docs/资产契约修订-v5.md"
       },
-      "generated_by": "",
+      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v6 主角单人（hand_drawn_2D_cartoon_illustra_2026-11-11T06-47-55.png），cut_residents.py 切分",
       "params_ref": "",
       "note": "walk 可为 4 帧 sprite sheet；sit 可并入"
     },
@@ -1750,6 +1749,33 @@
       "generated_by": "",
       "params_ref": "",
       "note": "由代码绘制，严禁排产生图"
+    },
+    {
+      "id": "G-14",
+      "dir": "characters",
+      "status": "delivered",
+      "name": "12 位比奇堡居民形象（世界 bot 居民随机换装）",
+      "files": [
+        "G-14-01-suit_sardine.png",
+        "G-14-02-puffer_stripes.png",
+        "G-14-03-angelfish_hat.png",
+        "G-14-04-old_flounder.png",
+        "G-14-05-tuna_lifeguard.png",
+        "G-14-06-shrimp_sweater.png",
+        "G-14-07-octopus_news.png",
+        "G-14-08-grouper_hawaii.png",
+        "G-14-09-seahorse_postal.png",
+        "G-14-10-skay_mustache.png",
+        "G-14-11-catfish_farmer.png",
+        "G-14-12-blowfish_grandma.png"
+      ],
+      "spec": {
+        "canvas": "tight-alpha",
+        "bg": "transparent",
+        "note": "12 位居民一次群像生成后切分，宽高比随各角色身形（不做统一画幅约束）"
+      },
+      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v6 居民群像（hand_drawn_2D_cartoon_illustra_2026-11-11T06-47-38.png），cut_residents.py 程序化切分",
+      "params_ref": "assets/art-params.md"
     }
   ]
 }
