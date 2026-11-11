@@ -322,6 +322,20 @@ body #viewport{background:linear-gradient(180deg,var(--water-deep) 0%,var(--wate
 #dlg .box{background:var(--paper)!important;color:var(--ink)!important;
   border:4px solid var(--ink)!important;border-radius:20px!important;
   box-shadow:0 8px 0 var(--ink)!important;}
+/* 纸底对话面板：全部文字改深色，选项做成纸片按钮（此前白字压奶油底不可读） */
+#dlg .who{color:#8a5f2c!important;font-size:13.5px!important;}
+#dlg .who small{color:#8b7a5f!important;font-weight:700!important;}
+#dlg .text{color:var(--ink)!important;font-weight:600;font-size:15.5px!important;}
+#dlg .opt{background:#FFF9EA!important;color:var(--ink)!important;
+  border:2.5px solid var(--ink)!important;border-radius:12px!important;
+  font-weight:800!important;box-shadow:0 3px 0 rgba(22,44,54,.35)!important;}
+#dlg .opt:hover{background:var(--banana)!important;border-color:var(--ink)!important;
+  transform:translateX(4px);}
+#dlg .opt:active{box-shadow:0 1px 0 rgba(22,44,54,.35)!important;transform:translate(2px,2px);}
+#dlg .opt .k{background:var(--ink)!important;color:var(--banana)!important;font-weight:900!important;}
+#dlg .opt.end{background:var(--banana)!important;color:var(--ink)!important;text-align:center;}
+#dlg .fx{color:#8a5f2c!important;font-weight:700;}
+#dlg .portrait{border-color:var(--ink)!important;box-shadow:0 5px 0 var(--ink)!important;}
 
 /* 小玩法 UI */
 #mgHud,#mgBanner,.mgHScore,.kCombo,.blowHint,.blowFound{

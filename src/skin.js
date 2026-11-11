@@ -102,7 +102,7 @@
     'moai_f1|clarinet':{s:'E-07-clarinet-front'},
     'moai_f1|lamp':{s:'E-08-lamp',on:'E-09-lamp-on'},
     'moai_f1|gramophone':{s:'E-10-gramophone'},
-    'moai_f1|cushion':{s:'E-08-cushion'},
+    'moai_f1|cushion':{s:'E-09-cushion'},
     'moai_f1|selfportrait':{s:'E-10-selfportrait'},
     'moai_f1|coffee':{s:'E-05-cup'},
     'moai_f2|paintbox':{s:'E-09-paintbox'},

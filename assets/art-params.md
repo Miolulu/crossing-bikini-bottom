@@ -177,3 +177,32 @@ and never overlap, listed in reading order from left to right and top to bottom:
 `syncObjState()` 挂在 140ms 心跳上，读取 `.on` class、`getRummageState()`、`quest.step`（收银机结账后开抽屉）自动换图；
 无独立亮态的开关（点唱机/留声机/唱片机/机械臂/旗帜）用 `.bbFx` 浮动徽标（♪/⚙/≈）。
 未命中映射的物件（蟹堡王帽）保持 icons.js SVG 兜底。`E-04-portrait` 已改名 `E-04-captain_frame`。
+
+---
+
+## 十一、蟹黄堡检视立绘（E-11）
+
+**来源**：一次 3×2 图集出图 `A_tidy_3x2_grid_of_exactly_6_s_2026-11-11T09-09-00.png`（1536×1024，纯白底、无相框）。
+第一张同构图（`…T09-07-47.png`）作废：AI 给每个汉堡套了**木质相框 + 米白底**，米白底不与画布边缘连通，
+边缘洪泛清不掉，只能弃用。负面词补：`NO frame, NO border, NO wooden panel, NO plaque, NO backdrop board, NO vignette`。
+
+**主体句**：
+```
+A tidy 3x2 grid of exactly 6 separate hand-drawn cartoon items on one sheet, 3 columns by 2 rows,
+every item completely isolated in the middle of its own square cell with very wide empty plain white
+space around it, nothing touching, nothing overlapping, each item floating alone with NO frame,
+NO border, NO wooden panel, NO plaque, NO backdrop board, NO vignette, listed in reading order:
+1) a whole krabby-patty style burger; 2) the same burger with two bites missing from the right side;
+3) the same burger with a big bite gone from the right; 4) the same burger cut in half, left half only;
+5) the same burger cut in half again, mostly eaten; 6) a small puddle of glossy pink sauce with a few
+drips, no plate, no dish.
+```
+
+**切分**：工作区 `cut_burger.py`（3×2 直接按格裁 → 格内边缘洪泛 `near=225` → 紧裁 → 320 方形画布 7% 边距）。
+**换色**：`recolor_burger.py` 把淡海藻绿面包 HLS 色相搬到 34°（烤面包金），
+条件 `62°≤H≤170° 且 S<0.50 且 L>0.42`，保住生菜的饱和绿；输出覆盖 `assets/props/E-11-burger-0..3.png`。
+**落盘**：`E-11-burger-0..3`（完整 → 两口 → 剩半个）+ `E-11-sauce`，统一 320×320 透明底。
+
+**接线**：`#focus` 里原来的 5 个 CSS `div.layer` 已删除，换成 `<img id="bbBurgerImg">`；
+`BURGER_STAGES` 数组 + `setBurgerStage(n)` 按 `biteCount` 换图，第 4 口吃光隐藏汉堡、显示 `E-11-sauce`
+（`#secretSauce .pool img` 带呼吸光晕）。原来的 SVG `#biteClip` 圆形减法遮罩与 `BITE_SPOTS` 一并移除。

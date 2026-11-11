@@ -1,1878 +1,1908 @@
 {
-  "schema": "bikini-assets/v1",
-  "project": "比奇堡沉浸式连通世界",
-  "version": "1.0",
-  "updated": "2026-11-10",
-  "corresponding": "Demo v1.0 / 方案 v2.8 / 提示词包 v1.2",
-  "spec_doc": "docs/美术资源需求与交付规范.md",
-  "prompt_pack": "docs/美术资产规格与提示词包.md",
-  "slot_map": "integration/asset-slots.json",
-  "status_enum": [
-    "pending",
-    "delivered",
-    "accepted",
-    "rejected"
+ "schema": "bikini-assets/v1",
+ "project": "比奇堡沉浸式连通世界",
+ "version": "1.0",
+ "updated": "2026-11-10",
+ "corresponding": "Demo v1.0 / 方案 v2.8 / 提示词包 v1.2",
+ "spec_doc": "docs/美术资源需求与交付规范.md",
+ "prompt_pack": "docs/美术资产规格与提示词包.md",
+ "slot_map": "integration/asset-slots.json",
+ "status_enum": [
+  "pending",
+  "delivered",
+  "accepted",
+  "rejected"
+ ],
+ "owners": {
+  "art_ai": {
+   "write": [
+    "assets/**"
+   ],
+   "fields": [
+    "files",
+    "status(pending->delivered)",
+    "generated_by",
+    "params_ref"
+   ]
+  },
+  "integration_ai": {
+   "write": [
+    "src/**",
+    "integration/**",
+    "tools/**",
+    "docs/**",
+    "previews/**"
+   ],
+   "fields": [
+    "status(delivered->accepted|rejected)"
+   ]
+  }
+ },
+ "delivery": {
+  "formats": [
+   "PNG only, sRGB, with alpha"
   ],
-  "owners": {
-    "art_ai": {
-      "write": [
-        "assets/**"
-      ],
-      "fields": [
-        "files",
-        "status(pending->delivered)",
-        "generated_by",
-        "params_ref"
-      ]
-    },
-    "integration_ai": {
-      "write": [
-        "src/**",
-        "integration/**",
-        "tools/**",
-        "docs/**",
-        "previews/**"
-      ],
-      "fields": [
-        "status(delivered->accepted|rejected)"
-      ]
-    }
-  },
-  "delivery": {
-    "formats": [
-      "PNG only, sRGB, with alpha"
+  "naming": "<编号>-<内部代号>[-<状态>][@2x].png",
+  "required_companions": [
+   "assets/manifest.json",
+   "assets/art-params.md"
+  ],
+  "validation": "python3 tools/validate-assets.py",
+  "note": "code_only=true 的条目不需要交付；default=css 的条目已由 CSS 实现，交了才替换"
+ },
+ "counts": {
+  "total": 61,
+  "code_only": 6,
+  "deliverable": 55,
+  "required": 38,
+  "optional": 17,
+  "expected_png": 161
+ },
+ "assets": [
+  {
+   "id": "A-01",
+   "slot": "world.panorama",
+   "name": "连通世界全景",
+   "code": "world_panorama",
+   "dir": "world",
+   "files": [
+    "A-01-world_panorama.png"
+   ],
+   "status": "accepted",
+   "required": true,
+   "code_only": false,
+   "default": "png",
+   "template": "A",
+   "spec": {
+    "size": [
+     2600,
+     1370
     ],
-    "naming": "<编号>-<内部代号>[-<状态>][@2x].png",
-    "required_companions": [
-      "assets/manifest.json",
-      "assets/art-params.md"
+    "bg": "solid #1AA3C4",
+    "ratio": 1.898
+   },
+   "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
+   "params_ref": "assets/art-params.md",
+   "note": "六栋错落散布 + S 形弯曲小路；禁止一字排开；建议另出 @2x"
+  },
+  {
+   "id": "A-02",
+   "slot": "world.skyline",
+   "name": "远景天际线视差层",
+   "code": "skyline_far",
+   "dir": "world",
+   "files": [
+    "A-02-skyline_far.png"
+   ],
+   "status": "pending",
+   "required": false,
+   "code_only": false,
+   "default": "png",
+   "template": "A",
+   "spec": {
+    "size": [
+     2600,
+     400
     ],
-    "validation": "python3 tools/validate-assets.py",
-    "note": "code_only=true 的条目不需要交付；default=css 的条目已由 CSS 实现，交了才替换"
+    "bg": "transparent",
+    "ratio": 6.5
+   },
+   "generated_by": "",
+   "params_ref": "",
+   "note": "长条、左右可平铺"
   },
-  "counts": {
-    "total": 61,
-    "code_only": 6,
-    "deliverable": 55,
-    "required": 38,
-    "optional": 17,
-    "expected_png": 161
+  {
+   "id": "A-03",
+   "slot": "world.foreground",
+   "name": "近景海草视差层",
+   "code": "foreground_seaweed",
+   "dir": "world",
+   "files": [
+    "A-03-foreground_seaweed.png"
+   ],
+   "status": "pending",
+   "required": false,
+   "code_only": false,
+   "default": "png",
+   "template": "A",
+   "spec": {
+    "size": [
+     1024,
+     256
+    ],
+    "bg": "transparent",
+    "ratio": 4.0
+   },
+   "generated_by": "",
+   "params_ref": "",
+   "note": "左右无缝平铺"
   },
-  "assets": [
-    {
-      "id": "A-01",
-      "slot": "world.panorama",
-      "name": "连通世界全景",
-      "code": "world_panorama",
-      "dir": "world",
-      "files": [
-        "A-01-world_panorama.png"
-      ],
-      "status": "accepted",
-      "required": true,
-      "code_only": false,
-      "default": "png",
-      "template": "A",
-      "spec": {
-        "size": [
-          2600,
-          1370
-        ],
-        "bg": "solid #1AA3C4",
-        "ratio": 1.898
-      },
-      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
-      "params_ref": "assets/art-params.md",
-      "note": "六栋错落散布 + S 形弯曲小路；禁止一字排开；建议另出 @2x"
-    },
-    {
-      "id": "A-02",
-      "slot": "world.skyline",
-      "name": "远景天际线视差层",
-      "code": "skyline_far",
-      "dir": "world",
-      "files": [
-        "A-02-skyline_far.png"
-      ],
-      "status": "pending",
-      "required": false,
-      "code_only": false,
-      "default": "png",
-      "template": "A",
-      "spec": {
-        "size": [
-          2600,
-          400
-        ],
-        "bg": "transparent",
-        "ratio": 6.5
-      },
-      "generated_by": "",
-      "params_ref": "",
-      "note": "长条、左右可平铺"
-    },
-    {
-      "id": "A-03",
-      "slot": "world.foreground",
-      "name": "近景海草视差层",
-      "code": "foreground_seaweed",
-      "dir": "world",
-      "files": [
-        "A-03-foreground_seaweed.png"
-      ],
-      "status": "pending",
-      "required": false,
-      "code_only": false,
-      "default": "png",
-      "template": "A",
-      "spec": {
-        "size": [
-          1024,
-          256
-        ],
-        "bg": "transparent",
-        "ratio": 4.0
-      },
-      "generated_by": "",
-      "params_ref": "",
-      "note": "左右无缝平铺"
-    },
-    {
-      "id": "B-01",
-      "slot": "building.pineapple",
-      "name": "圆润黄色果形小屋",
-      "code": "pineapple_house",
-      "dir": "buildings",
-      "files": [
-        "B-01-pineapple_house-right.png"
-      ],
-      "status": "accepted",
-      "required": true,
-      "code_only": false,
-      "default": "png",
-      "template": "B",
-      "spec": {
-        "size": [
-          512,
-          512
-        ],
-        "bg": "transparent",
-        "ratio": 0.65,
-        "canvas": "tight-alpha",
-        "note": "v5 改为按主体紧裁的透明画布（原 1:1 画布导致 contain 缩放后建筑偏小，见 docs/资产契约修订-v5.md）"
-      },
-      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
-      "params_ref": "assets/art-params.md",
-      "note": "可另出 -solid 纯色底版本验证抠图"
-    },
-    {
-      "id": "B-02",
-      "slot": "building.moai",
-      "name": "灰色石雕人头像小屋",
-      "code": "moai_house",
-      "dir": "buildings",
-      "files": [
-        "B-02-moai_house-right.png"
-      ],
-      "status": "accepted",
-      "required": true,
-      "code_only": false,
-      "default": "png",
-      "template": "B",
-      "spec": {
-        "size": [
-          512,
-          512
-        ],
-        "bg": "transparent",
-        "ratio": 0.78,
-        "canvas": "tight-alpha",
-        "note": "v5 改为按主体紧裁的透明画布（原 1:1 画布导致 contain 缩放后建筑偏小，见 docs/资产契约修订-v5.md）"
-      },
-      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
-      "params_ref": "assets/art-params.md",
-      "note": "可另出 -solid 纯色底版本验证抠图"
-    },
-    {
-      "id": "B-03",
-      "slot": "building.rock",
-      "name": "半圆褐色石头小屋",
-      "code": "rock_house",
-      "dir": "buildings",
-      "files": [
-        "B-03-rock_house-right.png"
-      ],
-      "status": "accepted",
-      "required": true,
-      "code_only": false,
-      "default": "png",
-      "template": "B",
-      "spec": {
-        "size": [
-          512,
-          512
-        ],
-        "bg": "transparent",
-        "ratio": 1.11,
-        "canvas": "tight-alpha",
-        "note": "v5 改为按主体紧裁的透明画布（原 1:1 画布导致 contain 缩放后建筑偏小，见 docs/资产契约修订-v5.md）"
-      },
-      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
-      "params_ref": "assets/art-params.md",
-      "note": "可另出 -solid 纯色底版本验证抠图"
-    },
-    {
-      "id": "B-04",
-      "slot": "building.treedome",
-      "name": "绿色半球圆顶树屋",
-      "code": "treedome",
-      "dir": "buildings",
-      "files": [
-        "B-04-treedome-right.png"
-      ],
-      "status": "accepted",
-      "required": true,
-      "code_only": false,
-      "default": "png",
-      "template": "B",
-      "spec": {
-        "size": [
-          512,
-          512
-        ],
-        "bg": "transparent",
-        "ratio": 0.83,
-        "canvas": "tight-alpha",
-        "note": "v5 改为按主体紧裁的透明画布（原 1:1 画布导致 contain 缩放后建筑偏小，见 docs/资产契约修订-v5.md）"
-      },
-      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
-      "params_ref": "assets/art-params.md",
-      "note": "可另出 -solid 纯色底版本验证抠图"
-    },
-    {
-      "id": "B-05",
-      "slot": "building.krusty",
-      "name": "红色船形木屋餐厅",
-      "code": "krusty_krab",
-      "dir": "buildings",
-      "files": [
-        "B-05-krusty_krab-right.png"
-      ],
-      "status": "accepted",
-      "required": true,
-      "code_only": false,
-      "default": "png",
-      "template": "B",
-      "spec": {
-        "size": [
-          512,
-          512
-        ],
-        "bg": "transparent",
-        "ratio": 0.99,
-        "canvas": "tight-alpha",
-        "note": "v5 改为按主体紧裁的透明画布（原 1:1 画布导致 contain 缩放后建筑偏小，见 docs/资产契约修订-v5.md）"
-      },
-      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
-      "params_ref": "assets/art-params.md",
-      "note": "锁风格首张，先跑这张"
-    },
-    {
-      "id": "B-06",
-      "slot": "building.chum",
-      "name": "暗橄榄绿锈桶小屋",
-      "code": "chum_bucket",
-      "dir": "buildings",
-      "files": [
-        "B-06-chum_bucket-right.png"
-      ],
-      "status": "accepted",
-      "required": true,
-      "code_only": false,
-      "default": "png",
-      "template": "B",
-      "spec": {
-        "size": [
-          512,
-          512
-        ],
-        "bg": "transparent",
-        "ratio": 0.62,
-        "canvas": "tight-alpha",
-        "note": "v5 改为按主体紧裁的透明画布（原 1:1 画布导致 contain 缩放后建筑偏小，见 docs/资产契约修订-v5.md）"
-      },
-      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
-      "params_ref": "assets/art-params.md",
-      "note": "可另出 -solid 纯色底版本验证抠图"
-    },
-    {
-      "id": "B-07",
-      "slot": "building.anchor",
-      "name": "远景船锚形小屋",
-      "code": "anchor_house",
-      "dir": "buildings",
-      "files": [
-        "B-07-anchor_house-right.png"
-      ],
-      "status": "pending",
-      "required": false,
-      "code_only": false,
-      "default": "png",
-      "template": "B",
-      "spec": {
-        "size": [
-          512,
-          512
-        ],
-        "bg": "transparent",
-        "ratio": 1.0
-      },
-      "generated_by": "",
-      "params_ref": "",
-      "note": "可另出 -solid 纯色底版本验证抠图"
-    },
-    {
-      "id": "G-01-krusty_hall",
-      "slot": "room.krusty_hall",
-      "name": "船形餐厅 · 前厅",
-      "code": "krusty_hall",
-      "dir": "rooms",
-      "files": [
-        "G-01-krusty_hall.png"
-      ],
-      "status": "accepted",
-      "required": true,
-      "code_only": false,
-      "default": "png",
-      "template": "C",
-      "spec": {
-        "size": [
-          1200,
-          760
-        ],
-        "bg": "solid theme color",
-        "ratio": 1.579
-      },
-      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
-      "params_ref": "assets/art-params.md",
-      "note": "主题色板 蓝木；同栋子房间只改【主题】与【主题纹样】两个槽位；预留大面积空白地面"
-    },
-    {
-      "id": "G-01-krusty_kitchen",
-      "slot": "room.krusty_kitchen",
-      "name": "船形餐厅 · 后厨",
-      "code": "krusty_kitchen",
-      "dir": "rooms",
-      "files": [
-        "G-01-krusty_kitchen.png"
-      ],
-      "status": "accepted",
-      "required": true,
-      "code_only": false,
-      "default": "png",
-      "template": "C",
-      "spec": {
-        "size": [
-          1200,
-          760
-        ],
-        "bg": "solid theme color",
-        "ratio": 1.579
-      },
-      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
-      "params_ref": "assets/art-params.md",
-      "note": "主题色板 蓝木；同栋子房间只改【主题】与【主题纹样】两个槽位；预留大面积空白地面"
-    },
-    {
-      "id": "G-01-krusty_office",
-      "slot": "room.krusty_office",
-      "name": "船形餐厅 · 办公室",
-      "code": "krusty_office",
-      "dir": "rooms",
-      "files": [
-        "G-01-krusty_office.png"
-      ],
-      "status": "accepted",
-      "required": true,
-      "code_only": false,
-      "default": "png",
-      "template": "C",
-      "spec": {
-        "size": [
-          1200,
-          760
-        ],
-        "bg": "solid theme color",
-        "ratio": 1.579
-      },
-      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
-      "params_ref": "assets/art-params.md",
-      "note": "主题色板 蓝木；同栋子房间只改【主题】与【主题纹样】两个槽位；预留大面积空白地面"
-    },
-    {
-      "id": "G-01-moai_f1",
-      "slot": "room.moai_f1",
-      "name": "石像屋 · 1F 客厅",
-      "code": "moai_f1",
-      "dir": "rooms",
-      "files": [
-        "G-01-moai_f1.png"
-      ],
-      "status": "accepted",
-      "required": true,
-      "code_only": false,
-      "default": "png",
-      "template": "C",
-      "spec": {
-        "size": [
-          1200,
-          760
-        ],
-        "bg": "solid theme color",
-        "ratio": 1.579
-      },
-      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
-      "params_ref": "assets/art-params.md",
-      "note": "主题色板 冷灰；同栋子房间只改【主题】与【主题纹样】两个槽位；预留大面积空白地面"
-    },
-    {
-      "id": "G-01-moai_f2",
-      "slot": "room.moai_f2",
-      "name": "石像屋 · 2F 画室",
-      "code": "moai_f2",
-      "dir": "rooms",
-      "files": [
-        "G-01-moai_f2.png"
-      ],
-      "status": "accepted",
-      "required": true,
-      "code_only": false,
-      "default": "png",
-      "template": "C",
-      "spec": {
-        "size": [
-          1200,
-          760
-        ],
-        "bg": "solid theme color",
-        "ratio": 1.579
-      },
-      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
-      "params_ref": "assets/art-params.md",
-      "note": "主题色板 冷灰；同栋子房间只改【主题】与【主题纹样】两个槽位；预留大面积空白地面"
-    },
-    {
-      "id": "G-01-moai_f3",
-      "slot": "room.moai_f3",
-      "name": "石像屋 · 3F 阁楼卧室",
-      "code": "moai_f3",
-      "dir": "rooms",
-      "files": [
-        "G-01-moai_f3.png"
-      ],
-      "status": "accepted",
-      "required": true,
-      "code_only": false,
-      "default": "png",
-      "template": "C",
-      "spec": {
-        "size": [
-          1200,
-          760
-        ],
-        "bg": "solid theme color",
-        "ratio": 1.579
-      },
-      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
-      "params_ref": "assets/art-params.md",
-      "note": "主题色板 冷灰；同栋子房间只改【主题】与【主题纹样】两个槽位；预留大面积空白地面"
-    },
-    {
-      "id": "G-01-pineapple_main",
-      "slot": "room.pineapple_main",
-      "name": "果形屋 · 客厅",
-      "code": "pineapple_main",
-      "dir": "rooms",
-      "files": [
-        "G-01-pineapple_main.png"
-      ],
-      "status": "accepted",
-      "required": true,
-      "code_only": false,
-      "default": "png",
-      "template": "C",
-      "spec": {
-        "size": [
-          1200,
-          760
-        ],
-        "bg": "solid theme color",
-        "ratio": 1.579
-      },
-      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
-      "params_ref": "assets/art-params.md",
-      "note": "主题色板 菠萝黄；同栋子房间只改【主题】与【主题纹样】两个槽位；预留大面积空白地面"
-    },
-    {
-      "id": "G-01-pineapple_kitchen",
-      "slot": "room.pineapple_kitchen",
-      "name": "果形屋 · 厨房与卧室",
-      "code": "pineapple_kitchen",
-      "dir": "rooms",
-      "files": [
-        "G-01-pineapple_kitchen.png"
-      ],
-      "status": "accepted",
-      "required": true,
-      "code_only": false,
-      "default": "png",
-      "template": "C",
-      "spec": {
-        "size": [
-          1200,
-          760
-        ],
-        "bg": "solid theme color",
-        "ratio": 1.579
-      },
-      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
-      "params_ref": "assets/art-params.md",
-      "note": "主题色板 菠萝黄；同栋子房间只改【主题】与【主题纹样】两个槽位；预留大面积空白地面"
-    },
-    {
-      "id": "G-01-rock_main",
-      "slot": "room.rock_main",
-      "name": "石头屋 · 沙地客厅",
-      "code": "rock_main",
-      "dir": "rooms",
-      "files": [
-        "G-01-rock_main.png"
-      ],
-      "status": "accepted",
-      "required": true,
-      "code_only": false,
-      "default": "png",
-      "template": "C",
-      "spec": {
-        "size": [
-          1200,
-          760
-        ],
-        "bg": "solid theme color",
-        "ratio": 1.579
-      },
-      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
-      "params_ref": "assets/art-params.md",
-      "note": "主题色板 沙褐；同栋子房间只改【主题】与【主题纹样】两个槽位；预留大面积空白地面"
-    },
-    {
-      "id": "G-01-rock_under",
-      "slot": "room.rock_under",
-      "name": "石头屋 · 石头底下",
-      "code": "rock_under",
-      "dir": "rooms",
-      "files": [
-        "G-01-rock_under.png"
-      ],
-      "status": "accepted",
-      "required": true,
-      "code_only": false,
-      "default": "png",
-      "template": "C",
-      "spec": {
-        "size": [
-          1200,
-          760
-        ],
-        "bg": "solid theme color",
-        "ratio": 1.579
-      },
-      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
-      "params_ref": "assets/art-params.md",
-      "note": "主题色板 沙褐；同栋子房间只改【主题】与【主题纹样】两个槽位；预留大面积空白地面"
-    },
-    {
-      "id": "G-01-treedome_main",
-      "slot": "room.treedome_main",
-      "name": "圆顶树屋 · 实验室",
-      "code": "treedome_main",
-      "dir": "rooms",
-      "files": [
-        "G-01-treedome_main.png"
-      ],
-      "status": "accepted",
-      "required": true,
-      "code_only": false,
-      "default": "png",
-      "template": "C",
-      "spec": {
-        "size": [
-          1200,
-          760
-        ],
-        "bg": "solid theme color",
-        "ratio": 1.579
-      },
-      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
-      "params_ref": "assets/art-params.md",
-      "note": "主题色板 树绿；同栋子房间只改【主题】与【主题纹样】两个槽位；预留大面积空白地面"
-    },
-    {
-      "id": "G-01-treedome_airlock",
-      "slot": "room.treedome_airlock",
-      "name": "圆顶树屋 · 气闸与健身区",
-      "code": "treedome_airlock",
-      "dir": "rooms",
-      "files": [
-        "G-01-treedome_airlock.png"
-      ],
-      "status": "accepted",
-      "required": true,
-      "code_only": false,
-      "default": "png",
-      "template": "C",
-      "spec": {
-        "size": [
-          1200,
-          760
-        ],
-        "bg": "solid theme color",
-        "ratio": 1.579
-      },
-      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
-      "params_ref": "assets/art-params.md",
-      "note": "主题色板 树绿；同栋子房间只改【主题】与【主题纹样】两个槽位；预留大面积空白地面"
-    },
-    {
-      "id": "G-01-chum_counter",
-      "slot": "room.chum_counter",
-      "name": "锈桶餐厅 · 点餐台",
-      "code": "chum_counter",
-      "dir": "rooms",
-      "files": [
-        "G-01-chum_counter.png"
-      ],
-      "status": "accepted",
-      "required": true,
-      "code_only": false,
-      "default": "png",
-      "template": "C",
-      "spec": {
-        "size": [
-          1200,
-          760
-        ],
-        "bg": "solid theme color",
-        "ratio": 1.579
-      },
-      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
-      "params_ref": "assets/art-params.md",
-      "note": "主题色板 暗橄榄绿；同栋子房间只改【主题】与【主题纹样】两个槽位；预留大面积空白地面"
-    },
-    {
-      "id": "G-01-chum_lab",
-      "slot": "room.chum_lab",
-      "name": "锈桶餐厅 · 后厨与控制室",
-      "code": "chum_lab",
-      "dir": "rooms",
-      "files": [
-        "G-01-chum_lab.png"
-      ],
-      "status": "accepted",
-      "required": true,
-      "code_only": false,
-      "default": "png",
-      "template": "C",
-      "spec": {
-        "size": [
-          1200,
-          760
-        ],
-        "bg": "solid theme color",
-        "ratio": 1.579
-      },
-      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
-      "params_ref": "assets/art-params.md",
-      "note": "主题色板 暗橄榄绿；同栋子房间只改【主题】与【主题纹样】两个槽位；预留大面积空白地面"
-    },
-    {
-      "id": "G-06",
-      "slot": "room.motif",
-      "name": "六套后墙主题纹样",
-      "code": "room_motif",
-      "dir": "rooms",
-      "files": [
-        "G-06-anchor_wood-motif.png",
-        "G-06-stone_brow-motif.png",
-        "G-06-sand-motif.png",
-        "G-06-leaf-motif.png",
-        "G-06-rivet-motif.png",
-        "G-06-pineapple_grid-motif.png"
-      ],
-      "status": "pending",
-      "required": false,
-      "code_only": false,
-      "default": "css",
-      "template": "C",
-      "spec": {
-        "size": [
-          1024,
-          640
-        ],
-        "bg": "transparent",
-        "ratio": 1.6
-      },
-      "generated_by": "",
-      "params_ref": "",
-      "note": "可选；不交则沿用房间图自带纹样"
-    },
-    {
-      "id": "D-01",
-      "slot": "npc.player",
-      "name": "玩家主角（中性海底居民）",
-      "code": "player",
-      "dir": "characters",
-      "files": [
-        "D-01-player-portrait.png",
-        "D-01-player-token.png"
-      ],
-      "status": "delivered",
-      "required": true,
-      "code_only": false,
-      "default": "png",
-      "template": "D",
-      "spec": {
-        "size": [
-          512,
-          768
-        ],
-        "bg": "transparent",
-        "ratio": 0.667,
-        "note": "walk / sit 两帧本轮未交付（行走=CSS 呼吸+位移，坐下=缩放态），见 docs/资产契约修订-v5.md"
-      },
-      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v6 主角单人（hand_drawn_2D_cartoon_illustra_2026-11-11T06-47-55.png），cut_residents.py 切分",
-      "params_ref": "",
-      "note": "walk 可为 4 帧 sprite sheet；sit 可并入"
-    },
-    {
-      "id": "D-02",
-      "slot": "npc.sponge",
-      "name": "方形多孔主角伙伴",
-      "code": "sponge",
-      "dir": "characters",
-      "files": [
-        "D-02-sponge-portrait.png",
-        "D-02-sponge-token.png"
-      ],
-      "status": "accepted",
-      "required": true,
-      "code_only": false,
-      "default": "png",
-      "template": "D",
-      "spec": {
-        "size": [
-          512,
-          768
-        ],
-        "bg": "transparent",
-        "ratio": 0.667
-      },
-      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v5b 角色重出（群像 06-19-03 + 派大星单人 06-23-39，recut_chars.py 程序化切分）",
-      "params_ref": "assets/art-params.md",
-      "note": "立绘与 token 须像同一角色；统一朝右"
-    },
-    {
-      "id": "D-03",
-      "slot": "npc.squid",
-      "name": "长鼻方脸邻居",
-      "code": "squid",
-      "dir": "characters",
-      "files": [
-        "D-03-squid-portrait.png",
-        "D-03-squid-token.png"
-      ],
-      "status": "accepted",
-      "required": true,
-      "code_only": false,
-      "default": "png",
-      "template": "D",
-      "spec": {
-        "size": [
-          512,
-          768
-        ],
-        "bg": "transparent",
-        "ratio": 0.667
-      },
-      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v5b 角色重出（群像 06-19-03 + 派大星单人 06-23-39，recut_chars.py 程序化切分）",
-      "params_ref": "assets/art-params.md",
-      "note": "立绘与 token 须像同一角色；统一朝右"
-    },
-    {
-      "id": "D-04",
-      "slot": "npc.star",
-      "name": "五角形胖伙伴",
-      "code": "star",
-      "dir": "characters",
-      "files": [
-        "D-04-star-portrait.png",
-        "D-04-star-token.png"
-      ],
-      "status": "accepted",
-      "required": true,
-      "code_only": false,
-      "default": "png",
-      "template": "D",
-      "spec": {
-        "size": [
-          512,
-          768
-        ],
-        "bg": "transparent",
-        "ratio": 0.667
-      },
-      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v5b 角色重出（群像 06-19-03 + 派大星单人 06-23-39，recut_chars.py 程序化切分）",
-      "params_ref": "assets/art-params.md",
-      "note": "立绘与 token 须像同一角色；统一朝右"
-    },
-    {
-      "id": "D-05",
-      "slot": "npc.krabs",
-      "name": "红壳蟹形老板",
-      "code": "krabs",
-      "dir": "characters",
-      "files": [
-        "D-05-krabs-portrait.png",
-        "D-05-krabs-token.png"
-      ],
-      "status": "accepted",
-      "required": true,
-      "code_only": false,
-      "default": "png",
-      "template": "D",
-      "spec": {
-        "size": [
-          512,
-          768
-        ],
-        "bg": "transparent",
-        "ratio": 0.667
-      },
-      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v5b 角色重出（群像 06-19-03 + 派大星单人 06-23-39，recut_chars.py 程序化切分）",
-      "params_ref": "assets/art-params.md",
-      "note": "立绘与 token 须像同一角色；统一朝右"
-    },
-    {
-      "id": "D-06",
-      "slot": "npc.sandy",
-      "name": "圆盔松鼠",
-      "code": "sandy",
-      "dir": "characters",
-      "files": [
-        "D-06-sandy-portrait.png",
-        "D-06-sandy-token.png"
-      ],
-      "status": "accepted",
-      "required": true,
-      "code_only": false,
-      "default": "png",
-      "template": "D",
-      "spec": {
-        "size": [
-          512,
-          768
-        ],
-        "bg": "transparent",
-        "ratio": 0.667
-      },
-      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v5b 角色重出（群像 06-19-03 + 派大星单人 06-23-39，recut_chars.py 程序化切分）",
-      "params_ref": "assets/art-params.md",
-      "note": "立绘与 token 须像同一角色；统一朝右"
-    },
-    {
-      "id": "D-07",
-      "slot": "npc.plankton",
-      "name": "微小浮游体",
-      "code": "plankton",
-      "dir": "characters",
-      "files": [
-        "D-07-plankton-portrait.png",
-        "D-07-plankton-token.png"
-      ],
-      "status": "accepted",
-      "required": true,
-      "code_only": false,
-      "default": "png",
-      "template": "D",
-      "spec": {
-        "size": [
-          512,
-          768
-        ],
-        "bg": "transparent",
-        "ratio": 0.667
-      },
-      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v5b 角色重出（群像 06-19-03 + 派大星单人 06-23-39，recut_chars.py 程序化切分）",
-      "params_ref": "assets/art-params.md",
-      "note": "立绘与 token 须像同一角色；统一朝右"
-    },
-    {
-      "id": "D-08",
-      "slot": "npc.pearl",
-      "name": "灰蓝鲸形少女",
-      "code": "pearl",
-      "dir": "characters",
-      "files": [
-        "D-08-pearl-portrait.png",
-        "D-08-pearl-token.png"
-      ],
-      "status": "pending",
-      "required": true,
-      "code_only": false,
-      "default": "png",
-      "template": "D",
-      "spec": {
-        "size": [
-          512,
-          768
-        ],
-        "bg": "transparent",
-        "ratio": 0.667
-      },
-      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v5b 角色重出（群像 06-19-03 + 派大星单人 06-23-39，recut_chars.py 程序化切分）",
-      "params_ref": "",
-      "note": "立绘与 token 须像同一角色；统一朝右"
-    },
-    {
-      "id": "D-09",
-      "slot": "npc.gary",
-      "name": "圆壳螺旋小蜗牛",
-      "code": "gary",
-      "dir": "characters",
-      "files": [
-        "D-09-gary-portrait.png",
-        "D-09-gary-token.png"
-      ],
-      "status": "pending",
-      "required": true,
-      "code_only": false,
-      "default": "png",
-      "template": "D",
-      "spec": {
-        "size": [
-          512,
-          768
-        ],
-        "bg": "transparent",
-        "ratio": 0.667
-      },
-      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v5b 角色重出（群像 06-19-03 + 派大星单人 06-23-39，recut_chars.py 程序化切分）",
-      "params_ref": "",
-      "note": "立绘与 token 须像同一角色；统一朝右"
-    },
-    {
-      "id": "D-10",
-      "slot": "npc.bot",
-      "name": "6 款 bot 小鱼居民",
-      "code": "bot_fish",
-      "dir": "characters",
-      "files": [
-        "D-10-bot_fish-round.png",
-        "D-10-bot_fish-stripe.png",
-        "D-10-bot_fish-flat.png",
-        "D-10-bot_fish-spike.png",
-        "D-10-bot_fish-stone.png",
-        "D-10-bot_fish-urchin.png"
-      ],
-      "status": "pending",
-      "required": false,
-      "code_only": false,
-      "default": "css",
-      "template": "D",
-      "spec": {
-        "size": [
-          128,
-          128
-        ],
-        "bg": "transparent",
-        "ratio": 1.0
-      },
-      "generated_by": "",
-      "params_ref": "",
-      "note": "着色区单一纯色平涂 + 描边层独立，代码只换色值出变体；当前为彩色圆盘占位"
-    },
-    {
-      "id": "D-11",
-      "slot": "npc.player_sit",
-      "name": "玩家坐姿",
-      "code": "player_sit",
-      "dir": "characters",
-      "files": [
-        "D-11-player_sit.png"
-      ],
-      "status": "pending",
-      "required": false,
-      "code_only": false,
-      "default": "png",
-      "template": "D",
-      "spec": {
-        "size": [
-          512,
-          768
-        ],
-        "bg": "transparent",
-        "ratio": 0.667
-      },
-      "generated_by": "",
-      "params_ref": "",
-      "note": "可并入 D-01"
-    },
-    {
-      "id": "E-02",
-      "slot": "room.krusty_hall.props",
-      "name": "前厅道具组（收银机双态/菜单/小费罐）",
-      "code": "e_02",
-      "dir": "props",
-      "files": [
-        "E-02-register-closed.png",
-        "E-02-register-open.png",
-        "E-02-menu.png",
-        "E-02-tip_jar.png"
-      ],
-      "status": "delivered",
-      "required": true,
-      "code_only": false,
-      "default": "png",
-      "template": "E",
-      "spec": {
-        "size": [
-          256,
-          256
-        ],
-        "bg": "transparent",
-        "ratio": 1.0
-      },
-      "generated_by": "cut_props.py <- 6x 4x4 prop sheets 2026-11-11",
-      "params_ref": "art-params.md §一/§二/§三(道具主体句)",
-      "note": "双态成对，除【状态】槽位外提示词逐字一致；亮态只改明度不画光晕"
-    },
-    {
-      "id": "E-03",
-      "slot": "room.krusty_kitchen.props",
-      "name": "后厨道具组（煎炉/垃圾桶双态、锅铲正反面）",
-      "code": "e_03",
-      "dir": "props",
-      "files": [
-        "E-03-grill-off.png",
-        "E-03-grill-on.png",
-        "E-03-spatula-front.png",
-        "E-03-spatula-back.png",
-        "E-03-sauce.png",
-        "E-03-drink.png",
-        "E-03-bin-closed.png",
-        "E-03-bin-open.png"
-      ],
-      "status": "delivered",
-      "required": true,
-      "code_only": false,
-      "default": "png",
-      "template": "E",
-      "spec": {
-        "size": [
-          256,
-          256
-        ],
-        "bg": "transparent",
-        "ratio": 1.0
-      },
-      "generated_by": "cut_props.py <- 6x 4x4 prop sheets 2026-11-11",
-      "params_ref": "art-params.md §一/§二/§三(道具主体句)",
-      "note": "双态成对，除【状态】槽位外提示词逐字一致；亮态只改明度不画光晕"
-    },
-    {
-      "id": "E-04",
-      "slot": "room.krusty_office.props",
-      "name": "办公室道具组（保险柜双态、账本正反面、画像）",
-      "code": "e_04",
-      "dir": "props",
-      "files": [
-        "E-04-safe-closed.png",
-        "E-04-safe-open.png",
-        "E-04-ledger-front.png",
-        "E-04-ledger-back.png",
-        "E-04-captain_frame.png"
-      ],
-      "status": "delivered",
-      "required": true,
-      "code_only": false,
-      "default": "png",
-      "template": "E",
-      "spec": {
-        "size": [
-          256,
-          256
-        ],
-        "bg": "transparent",
-        "ratio": 1.0
-      },
-      "generated_by": "cut_props.py <- 6x 4x4 prop sheets 2026-11-11",
-      "params_ref": "art-params.md §一/§二/§三(道具主体句)",
-      "note": "双态成对，除【状态】槽位外提示词逐字一致；亮态只改明度不画光晕"
-    },
-    {
-      "id": "E-05",
-      "slot": "world.props",
-      "name": "环境物件组（锚/救生圈/盐/杯/薯条/桶/拖把）",
-      "code": "e_05",
-      "dir": "props",
-      "files": [
-        "E-05-anchor.png",
-        "E-05-lifebuoy.png",
-        "E-05-salt.png",
-        "E-05-cup.png",
-        "E-05-fries.png",
-        "E-05-bucket.png",
-        "E-05-mop.png"
-      ],
-      "status": "delivered",
-      "required": true,
-      "code_only": false,
-      "default": "png",
-      "template": "E",
-      "spec": {
-        "size": [
-          256,
-          256
-        ],
-        "bg": "transparent",
-        "ratio": 1.0
-      },
-      "generated_by": "cut_props.py <- 6x 4x4 prop sheets 2026-11-11",
-      "params_ref": "art-params.md §一/§二/§三(道具主体句)",
-      "note": "双态成对，除【状态】槽位外提示词逐字一致；亮态只改明度不画光晕"
-    },
-    {
-      "id": "E-06",
-      "slot": "room.krusty_hall.props",
-      "name": "点餐道具组（取号机/叫号屏）",
-      "code": "e_06",
-      "dir": "props",
-      "files": [
-        "E-06-ticket_machine.png",
-        "E-06-number_board.png"
-      ],
-      "status": "delivered",
-      "required": true,
-      "code_only": false,
-      "default": "png",
-      "template": "E",
-      "spec": {
-        "size": [
-          256,
-          256
-        ],
-        "bg": "transparent",
-        "ratio": 1.0
-      },
-      "generated_by": "cut_props.py <- 6x 4x4 prop sheets 2026-11-11",
-      "params_ref": "art-params.md §一/§二/§三(道具主体句)",
-      "note": "双态成对，除【状态】槽位外提示词逐字一致；亮态只改明度不画光晕；号码屏内不写数字"
-    },
-    {
-      "id": "E-07",
-      "slot": "props.misc",
-      "name": "私人物品组（竖笛正反面/小蜗）",
-      "code": "e_07",
-      "dir": "props",
-      "files": [
-        "E-07-clarinet-front.png",
-        "E-07-clarinet-back.png",
-        "E-07-snail.png"
-      ],
-      "status": "delivered",
-      "required": true,
-      "code_only": false,
-      "default": "png",
-      "template": "E",
-      "spec": {
-        "size": [
-          256,
-          256
-        ],
-        "bg": "transparent",
-        "ratio": 1.0
-      },
-      "generated_by": "cut_props.py <- 6x 4x4 prop sheets 2026-11-11",
-      "params_ref": "art-params.md §一/§二/§三(道具主体句)",
-      "note": "双态成对，除【状态】槽位外提示词逐字一致；亮态只改明度不画光晕"
-    },
-    {
-      "id": "E-08",
-      "slot": "props.residential",
-      "name": "居住区小物（闹钟/唱片机/冰箱/菠萝床/舷窗/罐/画架/画笔/沙发/台灯/石头电视/糖罐/头盔/显微镜/杠铃/凯伦）",
-      "code": "e_08",
-      "dir": "props",
-      "files": [
-        "E-08-alarm_clock.png",
-        "E-08-record_player.png",
-        "E-08-fridge.png",
-        "E-08-pineapple_bed.png",
-        "E-08-round_window.png",
-        "E-08-jar.png",
-        "E-08-easel.png",
-        "E-08-paint.png",
-        "E-08-sofa.png",
-        "E-08-lamp.png",
-        "E-08-stone_tv.png",
-        "E-08-candy_jar.png",
-        "E-08-air_helmet.png",
-        "E-08-microscope.png",
-        "E-08-barbell.png",
-        "E-08-karen_screen.png"
-      ],
-      "status": "delivered",
-      "required": false,
-      "code_only": false,
-      "default": "png",
-      "template": "E",
-      "spec": {
-        "size": [
-          256,
-          256
-        ],
-        "bg": "transparent",
-        "ratio": 1.0
-      },
-      "generated_by": "cut_props.py <- 6x 4x4 prop sheets 2026-11-11",
-      "params_ref": "art-params.md §一/§二/§三(道具主体句)",
-      "note": "双态成对，除【状态】槽位外提示词逐字一致；亮态只改明度不画光晕"
-    },
-    {
-      "id": "G-02",
-      "slot": "portal",
-      "name": "门 / 楼梯 portal 两型",
-      "code": "g_02",
-      "dir": "props",
-      "files": [
-        "G-02-portal_door.png",
-        "G-02-portal_stairs.png"
-      ],
-      "status": "pending",
-      "required": true,
-      "code_only": false,
-      "default": "png",
-      "template": "G",
-      "spec": {
-        "size": [
-          256,
-          256
-        ],
-        "bg": "transparent",
-        "ratio": 1.0
-      },
-      "generated_by": "",
-      "params_ref": "",
-      "note": "双态成对，除【状态】槽位外提示词逐字一致；亮态只改明度不画光晕；门框不含门牌文字 / 发光"
-    },
-    {
-      "id": "G-04",
-      "slot": "props.rummage",
-      "name": "翻找容器（闭合 / 打开）",
-      "code": "g_04",
-      "dir": "props",
-      "files": [
-        "G-04-drawer-closed.png",
-        "G-04-drawer-open.png",
-        "G-04-safe-closed.png",
-        "G-04-safe-open.png",
-        "G-04-fridge-closed.png",
-        "G-04-fridge-open.png",
-        "G-04-crate-closed.png",
-        "G-04-crate-open.png",
-        "G-04-toolbox-closed.png",
-        "G-04-toolbox-open.png"
-      ],
-      "status": "pending",
-      "required": true,
-      "code_only": false,
-      "default": "png",
-      "template": "G",
-      "spec": {
-        "size": [
-          256,
-          256
-        ],
-        "bg": "transparent",
-        "ratio": 1.0
-      },
-      "generated_by": "",
-      "params_ref": "",
-      "note": "双态成对，除【状态】槽位外提示词逐字一致；亮态只改明度不画光晕"
-    },
-    {
-      "id": "F-16",
-      "slot": "ui.rummage_panel",
-      "name": "翻找面板贴纸",
-      "code": "rummage_panel",
-      "dir": "ui",
-      "files": [
-        "F-16-rummage_panel.png"
-      ],
-      "status": "pending",
-      "required": false,
-      "code_only": false,
-      "default": "css",
-      "template": "F",
-      "spec": {
-        "size": [
-          1024,
-          640
-        ],
-        "bg": "transparent",
-        "ratio": 1.6
-      },
-      "generated_by": "",
-      "params_ref": "",
-      "note": "默认已由 CSS 实现；交了才替换；面板内不写任何文字"
-    },
-    {
-      "id": "F-17",
-      "slot": "ui.spin_card",
-      "name": "旋转检视卡片正反面",
-      "code": "spin_card",
-      "dir": "ui",
-      "files": [
-        "F-17-spin_card.png"
-      ],
-      "status": "pending",
-      "required": false,
-      "code_only": false,
-      "default": "css",
-      "template": "F",
-      "spec": {
-        "size": [
-          1024,
-          640
-        ],
-        "bg": "transparent",
-        "ratio": 1.6
-      },
-      "generated_by": "",
-      "params_ref": "",
-      "note": "默认已由 CSS 实现；交了才替换；面板内不写任何文字"
-    },
-    {
-      "id": "F-18",
-      "slot": "ui.collection_book",
-      "name": "彩蛋藏品册面板",
-      "code": "collection_book",
-      "dir": "ui",
-      "files": [
-        "F-18-collection_book.png"
-      ],
-      "status": "pending",
-      "required": false,
-      "code_only": false,
-      "default": "css",
-      "template": "F",
-      "spec": {
-        "size": [
-          1024,
-          640
-        ],
-        "bg": "transparent",
-        "ratio": 1.6
-      },
-      "generated_by": "",
-      "params_ref": "",
-      "note": "默认已由 CSS 实现；交了才替换；面板内不写任何文字"
-    },
-    {
-      "id": "F-19",
-      "slot": "ui.room_nav",
-      "name": "房间 / 楼层导航贴纸",
-      "code": "room_nav",
-      "dir": "ui",
-      "files": [
-        "F-19-room_nav.png"
-      ],
-      "status": "pending",
-      "required": false,
-      "code_only": false,
-      "default": "css",
-      "template": "F",
-      "spec": {
-        "size": [
-          1024,
-          640
-        ],
-        "bg": "transparent",
-        "ratio": 1.6
-      },
-      "generated_by": "",
-      "params_ref": "",
-      "note": "默认已由 CSS 实现；交了才替换；面板内不写任何文字"
-    },
-    {
-      "id": "G-05",
-      "slot": "ui.egg_icons",
-      "name": "27 枚彩蛋藏品图标",
-      "code": "egg_icons",
-      "dir": "icons",
-      "files": [
-        "G-05-egg-01.png",
-        "G-05-egg-02.png",
-        "G-05-egg-03.png",
-        "G-05-egg-04.png",
-        "G-05-egg-05.png",
-        "G-05-egg-06.png",
-        "G-05-egg-07.png",
-        "G-05-egg-08.png",
-        "G-05-egg-09.png",
-        "G-05-egg-10.png",
-        "G-05-egg-11.png",
-        "G-05-egg-12.png",
-        "G-05-egg-13.png",
-        "G-05-egg-14.png",
-        "G-05-egg-15.png",
-        "G-05-egg-16.png",
-        "G-05-egg-17.png",
-        "G-05-egg-18.png",
-        "G-05-egg-19.png",
-        "G-05-egg-20.png",
-        "G-05-egg-21.png",
-        "G-05-egg-22.png",
-        "G-05-egg-23.png",
-        "G-05-egg-24.png",
-        "G-05-egg-25.png",
-        "G-05-egg-26.png",
-        "G-05-egg-27.png"
-      ],
-      "status": "pending",
-      "required": false,
-      "code_only": false,
-      "default": "css",
-      "template": "H",
-      "spec": {
-        "size": [
-          128,
-          128
-        ],
-        "bg": "transparent",
-        "ratio": 1.0
-      },
-      "generated_by": "",
-      "params_ref": "",
-      "note": "≤3 色、单一符号；默认 CSS 圆底 + 文字兜底，不交也能跑"
-    },
-    {
-      "id": "G-07",
-      "slot": "fx.jelly",
-      "name": "三型水母",
-      "code": "jelly",
-      "dir": "fx",
-      "files": [
-        "G-07-jelly-pink.png",
-        "G-07-jelly-blue.png",
-        "G-07-jelly-gold.png"
-      ],
-      "status": "pending",
-      "required": false,
-      "code_only": false,
-      "default": "css",
-      "template": "I",
-      "spec": {
-        "size": [
-          256,
-          256
-        ],
-        "bg": "transparent",
-        "ratio": 1.0
-      },
-      "generated_by": "",
-      "params_ref": "",
-      "note": "默认 CSS 绘制；只在捉水母玩法开局后显示；不画发光 / 电光"
-    },
-    {
-      "id": "G-09",
-      "slot": "npc.gary",
-      "name": "小蜗造型",
-      "code": "gary_snail",
-      "dir": "characters",
-      "files": [
-        "G-09-gary_snail-token.png",
-        "G-09-gary_snail-portrait.png"
-      ],
-      "status": "pending",
-      "required": false,
-      "code_only": false,
-      "default": "css",
-      "template": "I",
-      "spec": {
-        "size": [
-          128,
-          128
-        ],
-        "bg": "transparent",
-        "ratio": 1.0
-      },
-      "generated_by": "",
-      "params_ref": "",
-      "note": "默认中文色盘兜底；可并入 D-09"
-    },
-    {
-      "id": "G-10",
-      "slot": "world.playspots",
-      "name": "三处玩法场地地面",
-      "code": "field_ground",
-      "dir": "world",
-      "files": [
-        "G-10-field_jelly.png",
-        "G-10-field_bubble.png",
-        "G-10-field_karate.png"
-      ],
-      "status": "pending",
-      "required": false,
-      "code_only": false,
-      "default": "css",
-      "template": "J",
-      "spec": {
-        "size": [
-          256,
-          256
-        ],
-        "bg": "transparent",
-        "ratio": 1.0
-      },
-      "generated_by": "",
-      "params_ref": "",
-      "note": "默认 CSS 绘制；图内不含木牌文字 / UI / 发光 / 水母"
-    },
-    {
-      "id": "G-11",
-      "slot": "fx.bubble",
-      "name": "五段泡泡形态",
-      "code": "bubble_shape",
-      "dir": "fx",
-      "files": [
-        "G-11-bubble-round.png",
-        "G-11-bubble-big.png",
-        "G-11-bubble-krabby.png",
-        "G-11-bubble-boat.png",
-        "G-11-bubble-elephant.png"
-      ],
-      "status": "pending",
-      "required": false,
-      "code_only": false,
-      "default": "css",
-      "template": "J",
-      "spec": {
-        "size": [
-          256,
-          256
-        ],
-        "bg": "transparent",
-        "ratio": 1.0
-      },
-      "generated_by": "",
-      "params_ref": "",
-      "note": "默认 CSS 绘制"
-    },
-    {
-      "id": "G-12",
-      "slot": "fx.karate",
-      "name": "木桩 / 沙袋",
-      "code": "karate_post",
-      "dir": "fx",
-      "files": [
-        "G-12-karate_post.png",
-        "G-12-karate_bag.png"
-      ],
-      "status": "pending",
-      "required": false,
-      "code_only": false,
-      "default": "css",
-      "template": "J",
-      "spec": {
-        "size": [
-          256,
-          256
-        ],
-        "bg": "transparent",
-        "ratio": 1.0
-      },
-      "generated_by": "",
-      "params_ref": "",
-      "note": "默认 CSS 棕色圆角矩形"
-    },
-    {
-      "id": "E-01",
-      "slot": "food.krabby_patty",
-      "name": "蟹黄堡五层与 5 级咬痕（CSS + SVG clipPath evenodd）",
-      "code": "e_01",
-      "dir": "",
-      "files": [],
-      "status": "pending",
-      "required": false,
-      "code_only": true,
-      "default": "css",
-      "template": "",
-      "spec": {
-        "size": [
-          128,
-          128
-        ],
-        "bg": "transparent",
-        "ratio": 1.0
-      },
-      "generated_by": "",
-      "params_ref": "",
-      "note": "由代码绘制，严禁排产生图"
-    },
-    {
-      "id": "G-08",
-      "slot": "cursor.jelly_net",
-      "name": "鱼网光标与网挥动（SVG data-URI + CSS）",
-      "code": "g_08",
-      "dir": "",
-      "files": [],
-      "status": "pending",
-      "required": false,
-      "code_only": true,
-      "default": "css",
-      "template": "",
-      "spec": {
-        "size": [
-          128,
-          128
-        ],
-        "bg": "transparent",
-        "ratio": 1.0
-      },
-      "generated_by": "",
-      "params_ref": "",
-      "note": "由代码绘制，严禁排产生图"
-    },
-    {
-      "id": "G-13",
-      "slot": "ui.mg_session",
-      "name": "小游戏会话 UI：横幅 / HUD / 结算卡 / 蓄力条 / 招式卡",
-      "code": "g_13",
-      "dir": "",
-      "files": [],
-      "status": "pending",
-      "required": false,
-      "code_only": true,
-      "default": "css",
-      "template": "",
-      "spec": {
-        "size": [
-          128,
-          128
-        ],
-        "bg": "transparent",
-        "ratio": 1.0
-      },
-      "generated_by": "",
-      "params_ref": "",
-      "note": "由代码绘制，严禁排产生图"
-    },
-    {
-      "id": "F-01",
-      "slot": "ui.bubble",
-      "name": "NPC 头上气泡框（CSS）",
-      "code": "f_01",
-      "dir": "",
-      "files": [],
-      "status": "pending",
-      "required": false,
-      "code_only": true,
-      "default": "css",
-      "template": "",
-      "spec": {
-        "size": [
-          128,
-          128
-        ],
-        "bg": "transparent",
-        "ratio": 1.0
-      },
-      "generated_by": "",
-      "params_ref": "",
-      "note": "由代码绘制，严禁排产生图"
-    },
-    {
-      "id": "F-07",
-      "slot": "ui.highlight",
-      "name": "悬停高亮 / 呼吸发光引导（CSS）",
-      "code": "f_07",
-      "dir": "",
-      "files": [],
-      "status": "pending",
-      "required": false,
-      "code_only": true,
-      "default": "css",
-      "template": "",
-      "spec": {
-        "size": [
-          128,
-          128
-        ],
-        "bg": "transparent",
-        "ratio": 1.0
-      },
-      "generated_by": "",
-      "params_ref": "",
-      "note": "由代码绘制，严禁排产生图"
-    },
-    {
-      "id": "F-20",
-      "slot": "ui.jelly_counter",
-      "name": "捉水母计数板（CSS）",
-      "code": "f_20",
-      "dir": "",
-      "files": [],
-      "status": "pending",
-      "required": false,
-      "code_only": true,
-      "default": "css",
-      "template": "",
-      "spec": {
-        "size": [
-          128,
-          128
-        ],
-        "bg": "transparent",
-        "ratio": 1.0
-      },
-      "generated_by": "",
-      "params_ref": "",
-      "note": "由代码绘制，严禁排产生图"
-    },
-    {
-      "id": "G-14",
-      "dir": "characters",
-      "status": "delivered",
-      "name": "12 位比奇堡居民形象（世界 bot 居民随机换装）",
-      "files": [
-        "G-14-01-suit_sardine.png",
-        "G-14-02-puffer_stripes.png",
-        "G-14-03-angelfish_hat.png",
-        "G-14-04-old_flounder.png",
-        "G-14-05-tuna_lifeguard.png",
-        "G-14-06-shrimp_sweater.png",
-        "G-14-07-octopus_news.png",
-        "G-14-08-grouper_hawaii.png",
-        "G-14-09-seahorse_postal.png",
-        "G-14-10-skay_mustache.png",
-        "G-14-11-catfish_farmer.png",
-        "G-14-12-blowfish_grandma.png"
-      ],
-      "spec": {
-        "canvas": "tight-alpha",
-        "bg": "transparent",
-        "note": "12 位居民一次群像生成后切分，宽高比随各角色身形（不做统一画幅约束）"
-      },
-      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v6 居民群像（hand_drawn_2D_cartoon_illustra_2026-11-11T06-47-38.png），cut_residents.py 程序化切分",
-      "params_ref": "assets/art-params.md"
-    },
-    {
-      "id": "E-09",
-      "slot": "props.residential.plus",
-      "name": "居住区小物补充与状态变体",
-      "code": "e_09",
-      "dir": "props",
-      "files": [
-        "E-09-cushion.png",
-        "E-09-vinyl.png",
-        "E-09-paintbox.png",
-        "E-09-stone_tv-on.png",
-        "E-09-jellynet.png",
-        "E-09-pine_ornament.png",
-        "E-09-toothbrush.png",
-        "E-09-conch.png",
-        "E-09-sandcastle.png",
-        "E-09-shovel.png",
-        "E-09-newspaper.png",
-        "E-09-cookie.png",
-        "E-09-starfig.png",
-        "E-09-mini_moai.png",
-        "E-09-lamp-on.png",
-        "E-09-drink-on.png",
-        "E-09-karen-on.png",
-        "E-09-nut_jar.png"
-      ],
-      "status": "delivered",
-      "required": true,
-      "code_only": false,
-      "default": "png",
-      "template": "E",
-      "spec": {
-        "size": [
-          256,
-          256
-        ],
-        "bg": "transparent",
-        "ratio": 1.0
-      },
-      "generated_by": "cut_props.py <- 6x 4x4 prop sheets 2026-11-11",
-      "params_ref": "art-params.md §一/§二/§三(道具主体句)",
-      "note": "亮态只改明度不画光晕；-on 变体与母图同提示词仅换状态槽"
-    },
-    {
-      "id": "E-10",
-      "slot": "props.world.chum.misc",
-      "name": "环境/海之霸/杂项小物",
-      "code": "e_10",
-      "dir": "props",
-      "files": [
-        "E-10-flower.png",
-        "E-10-treestump.png",
-        "E-10-acorn.png",
-        "E-10-flag.png",
-        "E-10-gauge.png",
-        "E-10-chum_bucket.png",
-        "E-10-scanner.png",
-        "E-10-plan_map.png",
-        "E-10-test_tube.png",
-        "E-10-flyer.png",
-        "E-10-stool.png",
-        "E-10-whiteboard.png",
-        "E-10-terminal.png",
-        "E-10-calendar.png",
-        "E-10-magazine.png",
-        "E-10-nightstand.png",
-        "E-10-selfportrait.png",
-        "E-10-photo_frame.png",
-        "E-10-cabinet.png",
-        "E-10-rock.png",
-        "E-10-sesame.png",
-        "E-10-jukebox.png",
-        "E-10-serving_window.png",
-        "E-10-pickup_counter.png",
-        "E-10-robot_arm.png",
-        "E-10-gramophone.png",
-        "E-10-curtain-closed.png",
-        "E-10-curtain-open.png",
-        "E-10-coin.png",
-        "E-10-stone_phone.png"
-      ],
-      "status": "delivered",
-      "required": true,
-      "code_only": false,
-      "default": "png",
-      "template": "E",
-      "spec": {
-        "size": [
-          256,
-          256
-        ],
-        "bg": "transparent",
-        "ratio": 1.0
-      },
-      "generated_by": "cut_props.py <- 6x 4x4 prop sheets 2026-11-11",
-      "params_ref": "art-params.md §一/§二/§三(道具主体句)",
-      "note": "含窗帘双态、凯伦亮屏、金币底座、石电话等"
-    }
-  ]
+  {
+   "id": "B-01",
+   "slot": "building.pineapple",
+   "name": "圆润黄色果形小屋",
+   "code": "pineapple_house",
+   "dir": "buildings",
+   "files": [
+    "B-01-pineapple_house-right.png"
+   ],
+   "status": "accepted",
+   "required": true,
+   "code_only": false,
+   "default": "png",
+   "template": "B",
+   "spec": {
+    "size": [
+     512,
+     512
+    ],
+    "bg": "transparent",
+    "ratio": 0.65,
+    "canvas": "tight-alpha",
+    "note": "v5 改为按主体紧裁的透明画布（原 1:1 画布导致 contain 缩放后建筑偏小，见 docs/资产契约修订-v5.md）"
+   },
+   "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
+   "params_ref": "assets/art-params.md",
+   "note": "可另出 -solid 纯色底版本验证抠图"
+  },
+  {
+   "id": "B-02",
+   "slot": "building.moai",
+   "name": "灰色石雕人头像小屋",
+   "code": "moai_house",
+   "dir": "buildings",
+   "files": [
+    "B-02-moai_house-right.png"
+   ],
+   "status": "accepted",
+   "required": true,
+   "code_only": false,
+   "default": "png",
+   "template": "B",
+   "spec": {
+    "size": [
+     512,
+     512
+    ],
+    "bg": "transparent",
+    "ratio": 0.78,
+    "canvas": "tight-alpha",
+    "note": "v5 改为按主体紧裁的透明画布（原 1:1 画布导致 contain 缩放后建筑偏小，见 docs/资产契约修订-v5.md）"
+   },
+   "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
+   "params_ref": "assets/art-params.md",
+   "note": "可另出 -solid 纯色底版本验证抠图"
+  },
+  {
+   "id": "B-03",
+   "slot": "building.rock",
+   "name": "半圆褐色石头小屋",
+   "code": "rock_house",
+   "dir": "buildings",
+   "files": [
+    "B-03-rock_house-right.png"
+   ],
+   "status": "accepted",
+   "required": true,
+   "code_only": false,
+   "default": "png",
+   "template": "B",
+   "spec": {
+    "size": [
+     512,
+     512
+    ],
+    "bg": "transparent",
+    "ratio": 1.11,
+    "canvas": "tight-alpha",
+    "note": "v5 改为按主体紧裁的透明画布（原 1:1 画布导致 contain 缩放后建筑偏小，见 docs/资产契约修订-v5.md）"
+   },
+   "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
+   "params_ref": "assets/art-params.md",
+   "note": "可另出 -solid 纯色底版本验证抠图"
+  },
+  {
+   "id": "B-04",
+   "slot": "building.treedome",
+   "name": "绿色半球圆顶树屋",
+   "code": "treedome",
+   "dir": "buildings",
+   "files": [
+    "B-04-treedome-right.png"
+   ],
+   "status": "accepted",
+   "required": true,
+   "code_only": false,
+   "default": "png",
+   "template": "B",
+   "spec": {
+    "size": [
+     512,
+     512
+    ],
+    "bg": "transparent",
+    "ratio": 0.83,
+    "canvas": "tight-alpha",
+    "note": "v5 改为按主体紧裁的透明画布（原 1:1 画布导致 contain 缩放后建筑偏小，见 docs/资产契约修订-v5.md）"
+   },
+   "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
+   "params_ref": "assets/art-params.md",
+   "note": "可另出 -solid 纯色底版本验证抠图"
+  },
+  {
+   "id": "B-05",
+   "slot": "building.krusty",
+   "name": "红色船形木屋餐厅",
+   "code": "krusty_krab",
+   "dir": "buildings",
+   "files": [
+    "B-05-krusty_krab-right.png"
+   ],
+   "status": "accepted",
+   "required": true,
+   "code_only": false,
+   "default": "png",
+   "template": "B",
+   "spec": {
+    "size": [
+     512,
+     512
+    ],
+    "bg": "transparent",
+    "ratio": 0.99,
+    "canvas": "tight-alpha",
+    "note": "v5 改为按主体紧裁的透明画布（原 1:1 画布导致 contain 缩放后建筑偏小，见 docs/资产契约修订-v5.md）"
+   },
+   "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
+   "params_ref": "assets/art-params.md",
+   "note": "锁风格首张，先跑这张"
+  },
+  {
+   "id": "B-06",
+   "slot": "building.chum",
+   "name": "暗橄榄绿锈桶小屋",
+   "code": "chum_bucket",
+   "dir": "buildings",
+   "files": [
+    "B-06-chum_bucket-right.png"
+   ],
+   "status": "accepted",
+   "required": true,
+   "code_only": false,
+   "default": "png",
+   "template": "B",
+   "spec": {
+    "size": [
+     512,
+     512
+    ],
+    "bg": "transparent",
+    "ratio": 0.62,
+    "canvas": "tight-alpha",
+    "note": "v5 改为按主体紧裁的透明画布（原 1:1 画布导致 contain 缩放后建筑偏小，见 docs/资产契约修订-v5.md）"
+   },
+   "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
+   "params_ref": "assets/art-params.md",
+   "note": "可另出 -solid 纯色底版本验证抠图"
+  },
+  {
+   "id": "B-07",
+   "slot": "building.anchor",
+   "name": "远景船锚形小屋",
+   "code": "anchor_house",
+   "dir": "buildings",
+   "files": [
+    "B-07-anchor_house-right.png"
+   ],
+   "status": "pending",
+   "required": false,
+   "code_only": false,
+   "default": "png",
+   "template": "B",
+   "spec": {
+    "size": [
+     512,
+     512
+    ],
+    "bg": "transparent",
+    "ratio": 1.0
+   },
+   "generated_by": "",
+   "params_ref": "",
+   "note": "可另出 -solid 纯色底版本验证抠图"
+  },
+  {
+   "id": "G-01-krusty_hall",
+   "slot": "room.krusty_hall",
+   "name": "船形餐厅 · 前厅",
+   "code": "krusty_hall",
+   "dir": "rooms",
+   "files": [
+    "G-01-krusty_hall.png"
+   ],
+   "status": "accepted",
+   "required": true,
+   "code_only": false,
+   "default": "png",
+   "template": "C",
+   "spec": {
+    "size": [
+     1200,
+     760
+    ],
+    "bg": "solid theme color",
+    "ratio": 1.579
+   },
+   "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
+   "params_ref": "assets/art-params.md",
+   "note": "主题色板 蓝木；同栋子房间只改【主题】与【主题纹样】两个槽位；预留大面积空白地面"
+  },
+  {
+   "id": "G-01-krusty_kitchen",
+   "slot": "room.krusty_kitchen",
+   "name": "船形餐厅 · 后厨",
+   "code": "krusty_kitchen",
+   "dir": "rooms",
+   "files": [
+    "G-01-krusty_kitchen.png"
+   ],
+   "status": "accepted",
+   "required": true,
+   "code_only": false,
+   "default": "png",
+   "template": "C",
+   "spec": {
+    "size": [
+     1200,
+     760
+    ],
+    "bg": "solid theme color",
+    "ratio": 1.579
+   },
+   "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
+   "params_ref": "assets/art-params.md",
+   "note": "主题色板 蓝木；同栋子房间只改【主题】与【主题纹样】两个槽位；预留大面积空白地面"
+  },
+  {
+   "id": "G-01-krusty_office",
+   "slot": "room.krusty_office",
+   "name": "船形餐厅 · 办公室",
+   "code": "krusty_office",
+   "dir": "rooms",
+   "files": [
+    "G-01-krusty_office.png"
+   ],
+   "status": "accepted",
+   "required": true,
+   "code_only": false,
+   "default": "png",
+   "template": "C",
+   "spec": {
+    "size": [
+     1200,
+     760
+    ],
+    "bg": "solid theme color",
+    "ratio": 1.579
+   },
+   "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
+   "params_ref": "assets/art-params.md",
+   "note": "主题色板 蓝木；同栋子房间只改【主题】与【主题纹样】两个槽位；预留大面积空白地面"
+  },
+  {
+   "id": "G-01-moai_f1",
+   "slot": "room.moai_f1",
+   "name": "石像屋 · 1F 客厅",
+   "code": "moai_f1",
+   "dir": "rooms",
+   "files": [
+    "G-01-moai_f1.png"
+   ],
+   "status": "accepted",
+   "required": true,
+   "code_only": false,
+   "default": "png",
+   "template": "C",
+   "spec": {
+    "size": [
+     1200,
+     760
+    ],
+    "bg": "solid theme color",
+    "ratio": 1.579
+   },
+   "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
+   "params_ref": "assets/art-params.md",
+   "note": "主题色板 冷灰；同栋子房间只改【主题】与【主题纹样】两个槽位；预留大面积空白地面"
+  },
+  {
+   "id": "G-01-moai_f2",
+   "slot": "room.moai_f2",
+   "name": "石像屋 · 2F 画室",
+   "code": "moai_f2",
+   "dir": "rooms",
+   "files": [
+    "G-01-moai_f2.png"
+   ],
+   "status": "accepted",
+   "required": true,
+   "code_only": false,
+   "default": "png",
+   "template": "C",
+   "spec": {
+    "size": [
+     1200,
+     760
+    ],
+    "bg": "solid theme color",
+    "ratio": 1.579
+   },
+   "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
+   "params_ref": "assets/art-params.md",
+   "note": "主题色板 冷灰；同栋子房间只改【主题】与【主题纹样】两个槽位；预留大面积空白地面"
+  },
+  {
+   "id": "G-01-moai_f3",
+   "slot": "room.moai_f3",
+   "name": "石像屋 · 3F 阁楼卧室",
+   "code": "moai_f3",
+   "dir": "rooms",
+   "files": [
+    "G-01-moai_f3.png"
+   ],
+   "status": "accepted",
+   "required": true,
+   "code_only": false,
+   "default": "png",
+   "template": "C",
+   "spec": {
+    "size": [
+     1200,
+     760
+    ],
+    "bg": "solid theme color",
+    "ratio": 1.579
+   },
+   "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
+   "params_ref": "assets/art-params.md",
+   "note": "主题色板 冷灰；同栋子房间只改【主题】与【主题纹样】两个槽位；预留大面积空白地面"
+  },
+  {
+   "id": "G-01-pineapple_main",
+   "slot": "room.pineapple_main",
+   "name": "果形屋 · 客厅",
+   "code": "pineapple_main",
+   "dir": "rooms",
+   "files": [
+    "G-01-pineapple_main.png"
+   ],
+   "status": "accepted",
+   "required": true,
+   "code_only": false,
+   "default": "png",
+   "template": "C",
+   "spec": {
+    "size": [
+     1200,
+     760
+    ],
+    "bg": "solid theme color",
+    "ratio": 1.579
+   },
+   "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
+   "params_ref": "assets/art-params.md",
+   "note": "主题色板 菠萝黄；同栋子房间只改【主题】与【主题纹样】两个槽位；预留大面积空白地面"
+  },
+  {
+   "id": "G-01-pineapple_kitchen",
+   "slot": "room.pineapple_kitchen",
+   "name": "果形屋 · 厨房与卧室",
+   "code": "pineapple_kitchen",
+   "dir": "rooms",
+   "files": [
+    "G-01-pineapple_kitchen.png"
+   ],
+   "status": "accepted",
+   "required": true,
+   "code_only": false,
+   "default": "png",
+   "template": "C",
+   "spec": {
+    "size": [
+     1200,
+     760
+    ],
+    "bg": "solid theme color",
+    "ratio": 1.579
+   },
+   "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
+   "params_ref": "assets/art-params.md",
+   "note": "主题色板 菠萝黄；同栋子房间只改【主题】与【主题纹样】两个槽位；预留大面积空白地面"
+  },
+  {
+   "id": "G-01-rock_main",
+   "slot": "room.rock_main",
+   "name": "石头屋 · 沙地客厅",
+   "code": "rock_main",
+   "dir": "rooms",
+   "files": [
+    "G-01-rock_main.png"
+   ],
+   "status": "accepted",
+   "required": true,
+   "code_only": false,
+   "default": "png",
+   "template": "C",
+   "spec": {
+    "size": [
+     1200,
+     760
+    ],
+    "bg": "solid theme color",
+    "ratio": 1.579
+   },
+   "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
+   "params_ref": "assets/art-params.md",
+   "note": "主题色板 沙褐；同栋子房间只改【主题】与【主题纹样】两个槽位；预留大面积空白地面"
+  },
+  {
+   "id": "G-01-rock_under",
+   "slot": "room.rock_under",
+   "name": "石头屋 · 石头底下",
+   "code": "rock_under",
+   "dir": "rooms",
+   "files": [
+    "G-01-rock_under.png"
+   ],
+   "status": "accepted",
+   "required": true,
+   "code_only": false,
+   "default": "png",
+   "template": "C",
+   "spec": {
+    "size": [
+     1200,
+     760
+    ],
+    "bg": "solid theme color",
+    "ratio": 1.579
+   },
+   "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
+   "params_ref": "assets/art-params.md",
+   "note": "主题色板 沙褐；同栋子房间只改【主题】与【主题纹样】两个槽位；预留大面积空白地面"
+  },
+  {
+   "id": "G-01-treedome_main",
+   "slot": "room.treedome_main",
+   "name": "圆顶树屋 · 实验室",
+   "code": "treedome_main",
+   "dir": "rooms",
+   "files": [
+    "G-01-treedome_main.png"
+   ],
+   "status": "accepted",
+   "required": true,
+   "code_only": false,
+   "default": "png",
+   "template": "C",
+   "spec": {
+    "size": [
+     1200,
+     760
+    ],
+    "bg": "solid theme color",
+    "ratio": 1.579
+   },
+   "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
+   "params_ref": "assets/art-params.md",
+   "note": "主题色板 树绿；同栋子房间只改【主题】与【主题纹样】两个槽位；预留大面积空白地面"
+  },
+  {
+   "id": "G-01-treedome_airlock",
+   "slot": "room.treedome_airlock",
+   "name": "圆顶树屋 · 气闸与健身区",
+   "code": "treedome_airlock",
+   "dir": "rooms",
+   "files": [
+    "G-01-treedome_airlock.png"
+   ],
+   "status": "accepted",
+   "required": true,
+   "code_only": false,
+   "default": "png",
+   "template": "C",
+   "spec": {
+    "size": [
+     1200,
+     760
+    ],
+    "bg": "solid theme color",
+    "ratio": 1.579
+   },
+   "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
+   "params_ref": "assets/art-params.md",
+   "note": "主题色板 树绿；同栋子房间只改【主题】与【主题纹样】两个槽位；预留大面积空白地面"
+  },
+  {
+   "id": "G-01-chum_counter",
+   "slot": "room.chum_counter",
+   "name": "锈桶餐厅 · 点餐台",
+   "code": "chum_counter",
+   "dir": "rooms",
+   "files": [
+    "G-01-chum_counter.png"
+   ],
+   "status": "accepted",
+   "required": true,
+   "code_only": false,
+   "default": "png",
+   "template": "C",
+   "spec": {
+    "size": [
+     1200,
+     760
+    ],
+    "bg": "solid theme color",
+    "ratio": 1.579
+   },
+   "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
+   "params_ref": "assets/art-params.md",
+   "note": "主题色板 暗橄榄绿；同栋子房间只改【主题】与【主题纹样】两个槽位；预留大面积空白地面"
+  },
+  {
+   "id": "G-01-chum_lab",
+   "slot": "room.chum_lab",
+   "name": "锈桶餐厅 · 后厨与控制室",
+   "code": "chum_lab",
+   "dir": "rooms",
+   "files": [
+    "G-01-chum_lab.png"
+   ],
+   "status": "accepted",
+   "required": true,
+   "code_only": false,
+   "default": "png",
+   "template": "C",
+   "spec": {
+    "size": [
+     1200,
+     760
+    ],
+    "bg": "solid theme color",
+    "ratio": 1.579
+   },
+   "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
+   "params_ref": "assets/art-params.md",
+   "note": "主题色板 暗橄榄绿；同栋子房间只改【主题】与【主题纹样】两个槽位；预留大面积空白地面"
+  },
+  {
+   "id": "G-06",
+   "slot": "room.motif",
+   "name": "六套后墙主题纹样",
+   "code": "room_motif",
+   "dir": "rooms",
+   "files": [
+    "G-06-anchor_wood-motif.png",
+    "G-06-stone_brow-motif.png",
+    "G-06-sand-motif.png",
+    "G-06-leaf-motif.png",
+    "G-06-rivet-motif.png",
+    "G-06-pineapple_grid-motif.png"
+   ],
+   "status": "pending",
+   "required": false,
+   "code_only": false,
+   "default": "css",
+   "template": "C",
+   "spec": {
+    "size": [
+     1024,
+     640
+    ],
+    "bg": "transparent",
+    "ratio": 1.6
+   },
+   "generated_by": "",
+   "params_ref": "",
+   "note": "可选；不交则沿用房间图自带纹样"
+  },
+  {
+   "id": "D-01",
+   "slot": "npc.player",
+   "name": "玩家主角（中性海底居民）",
+   "code": "player",
+   "dir": "characters",
+   "files": [
+    "D-01-player-portrait.png",
+    "D-01-player-token.png"
+   ],
+   "status": "delivered",
+   "required": true,
+   "code_only": false,
+   "default": "png",
+   "template": "D",
+   "spec": {
+    "size": [
+     512,
+     768
+    ],
+    "bg": "transparent",
+    "ratio": 0.667,
+    "note": "walk / sit 两帧本轮未交付（行走=CSS 呼吸+位移，坐下=缩放态），见 docs/资产契约修订-v5.md"
+   },
+   "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v6 主角单人（hand_drawn_2D_cartoon_illustra_2026-11-11T06-47-55.png），cut_residents.py 切分",
+   "params_ref": "",
+   "note": "walk 可为 4 帧 sprite sheet；sit 可并入"
+  },
+  {
+   "id": "D-02",
+   "slot": "npc.sponge",
+   "name": "方形多孔主角伙伴",
+   "code": "sponge",
+   "dir": "characters",
+   "files": [
+    "D-02-sponge-portrait.png",
+    "D-02-sponge-token.png"
+   ],
+   "status": "accepted",
+   "required": true,
+   "code_only": false,
+   "default": "png",
+   "template": "D",
+   "spec": {
+    "size": [
+     512,
+     768
+    ],
+    "bg": "transparent",
+    "ratio": 0.667
+   },
+   "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v5b 角色重出（群像 06-19-03 + 派大星单人 06-23-39，recut_chars.py 程序化切分）",
+   "params_ref": "assets/art-params.md",
+   "note": "立绘与 token 须像同一角色；统一朝右"
+  },
+  {
+   "id": "D-03",
+   "slot": "npc.squid",
+   "name": "长鼻方脸邻居",
+   "code": "squid",
+   "dir": "characters",
+   "files": [
+    "D-03-squid-portrait.png",
+    "D-03-squid-token.png"
+   ],
+   "status": "accepted",
+   "required": true,
+   "code_only": false,
+   "default": "png",
+   "template": "D",
+   "spec": {
+    "size": [
+     512,
+     768
+    ],
+    "bg": "transparent",
+    "ratio": 0.667
+   },
+   "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v5b 角色重出（群像 06-19-03 + 派大星单人 06-23-39，recut_chars.py 程序化切分）",
+   "params_ref": "assets/art-params.md",
+   "note": "立绘与 token 须像同一角色；统一朝右"
+  },
+  {
+   "id": "D-04",
+   "slot": "npc.star",
+   "name": "五角形胖伙伴",
+   "code": "star",
+   "dir": "characters",
+   "files": [
+    "D-04-star-portrait.png",
+    "D-04-star-token.png"
+   ],
+   "status": "accepted",
+   "required": true,
+   "code_only": false,
+   "default": "png",
+   "template": "D",
+   "spec": {
+    "size": [
+     512,
+     768
+    ],
+    "bg": "transparent",
+    "ratio": 0.667
+   },
+   "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v5b 角色重出（群像 06-19-03 + 派大星单人 06-23-39，recut_chars.py 程序化切分）",
+   "params_ref": "assets/art-params.md",
+   "note": "立绘与 token 须像同一角色；统一朝右"
+  },
+  {
+   "id": "D-05",
+   "slot": "npc.krabs",
+   "name": "红壳蟹形老板",
+   "code": "krabs",
+   "dir": "characters",
+   "files": [
+    "D-05-krabs-portrait.png",
+    "D-05-krabs-token.png"
+   ],
+   "status": "accepted",
+   "required": true,
+   "code_only": false,
+   "default": "png",
+   "template": "D",
+   "spec": {
+    "size": [
+     512,
+     768
+    ],
+    "bg": "transparent",
+    "ratio": 0.667
+   },
+   "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v5b 角色重出（群像 06-19-03 + 派大星单人 06-23-39，recut_chars.py 程序化切分）",
+   "params_ref": "assets/art-params.md",
+   "note": "立绘与 token 须像同一角色；统一朝右"
+  },
+  {
+   "id": "D-06",
+   "slot": "npc.sandy",
+   "name": "圆盔松鼠",
+   "code": "sandy",
+   "dir": "characters",
+   "files": [
+    "D-06-sandy-portrait.png",
+    "D-06-sandy-token.png"
+   ],
+   "status": "accepted",
+   "required": true,
+   "code_only": false,
+   "default": "png",
+   "template": "D",
+   "spec": {
+    "size": [
+     512,
+     768
+    ],
+    "bg": "transparent",
+    "ratio": 0.667
+   },
+   "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v5b 角色重出（群像 06-19-03 + 派大星单人 06-23-39，recut_chars.py 程序化切分）",
+   "params_ref": "assets/art-params.md",
+   "note": "立绘与 token 须像同一角色；统一朝右"
+  },
+  {
+   "id": "D-07",
+   "slot": "npc.plankton",
+   "name": "微小浮游体",
+   "code": "plankton",
+   "dir": "characters",
+   "files": [
+    "D-07-plankton-portrait.png",
+    "D-07-plankton-token.png"
+   ],
+   "status": "accepted",
+   "required": true,
+   "code_only": false,
+   "default": "png",
+   "template": "D",
+   "spec": {
+    "size": [
+     512,
+     768
+    ],
+    "bg": "transparent",
+    "ratio": 0.667
+   },
+   "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v5b 角色重出（群像 06-19-03 + 派大星单人 06-23-39，recut_chars.py 程序化切分）",
+   "params_ref": "assets/art-params.md",
+   "note": "立绘与 token 须像同一角色；统一朝右"
+  },
+  {
+   "id": "D-08",
+   "slot": "npc.pearl",
+   "name": "灰蓝鲸形少女",
+   "code": "pearl",
+   "dir": "characters",
+   "files": [
+    "D-08-pearl-portrait.png",
+    "D-08-pearl-token.png"
+   ],
+   "status": "pending",
+   "required": true,
+   "code_only": false,
+   "default": "png",
+   "template": "D",
+   "spec": {
+    "size": [
+     512,
+     768
+    ],
+    "bg": "transparent",
+    "ratio": 0.667
+   },
+   "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v5b 角色重出（群像 06-19-03 + 派大星单人 06-23-39，recut_chars.py 程序化切分）",
+   "params_ref": "",
+   "note": "立绘与 token 须像同一角色；统一朝右"
+  },
+  {
+   "id": "D-09",
+   "slot": "npc.gary",
+   "name": "圆壳螺旋小蜗牛",
+   "code": "gary",
+   "dir": "characters",
+   "files": [
+    "D-09-gary-portrait.png",
+    "D-09-gary-token.png"
+   ],
+   "status": "pending",
+   "required": true,
+   "code_only": false,
+   "default": "png",
+   "template": "D",
+   "spec": {
+    "size": [
+     512,
+     768
+    ],
+    "bg": "transparent",
+    "ratio": 0.667
+   },
+   "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v5b 角色重出（群像 06-19-03 + 派大星单人 06-23-39，recut_chars.py 程序化切分）",
+   "params_ref": "",
+   "note": "立绘与 token 须像同一角色；统一朝右"
+  },
+  {
+   "id": "D-10",
+   "slot": "npc.bot",
+   "name": "6 款 bot 小鱼居民",
+   "code": "bot_fish",
+   "dir": "characters",
+   "files": [
+    "D-10-bot_fish-round.png",
+    "D-10-bot_fish-stripe.png",
+    "D-10-bot_fish-flat.png",
+    "D-10-bot_fish-spike.png",
+    "D-10-bot_fish-stone.png",
+    "D-10-bot_fish-urchin.png"
+   ],
+   "status": "pending",
+   "required": false,
+   "code_only": false,
+   "default": "css",
+   "template": "D",
+   "spec": {
+    "size": [
+     128,
+     128
+    ],
+    "bg": "transparent",
+    "ratio": 1.0
+   },
+   "generated_by": "",
+   "params_ref": "",
+   "note": "着色区单一纯色平涂 + 描边层独立，代码只换色值出变体；当前为彩色圆盘占位"
+  },
+  {
+   "id": "D-11",
+   "slot": "npc.player_sit",
+   "name": "玩家坐姿",
+   "code": "player_sit",
+   "dir": "characters",
+   "files": [
+    "D-11-player_sit.png"
+   ],
+   "status": "pending",
+   "required": false,
+   "code_only": false,
+   "default": "png",
+   "template": "D",
+   "spec": {
+    "size": [
+     512,
+     768
+    ],
+    "bg": "transparent",
+    "ratio": 0.667
+   },
+   "generated_by": "",
+   "params_ref": "",
+   "note": "可并入 D-01"
+  },
+  {
+   "id": "E-02",
+   "slot": "room.krusty_hall.props",
+   "name": "前厅道具组（收银机双态/菜单/小费罐）",
+   "code": "e_02",
+   "dir": "props",
+   "files": [
+    "E-02-register-closed.png",
+    "E-02-register-open.png",
+    "E-02-menu.png",
+    "E-02-tip_jar.png"
+   ],
+   "status": "delivered",
+   "required": true,
+   "code_only": false,
+   "default": "png",
+   "template": "E",
+   "spec": {
+    "size": [
+     256,
+     256
+    ],
+    "bg": "transparent",
+    "ratio": 1.0
+   },
+   "generated_by": "cut_props.py <- 6x 4x4 prop sheets 2026-11-11",
+   "params_ref": "art-params.md §一/§二/§三(道具主体句)",
+   "note": "双态成对，除【状态】槽位外提示词逐字一致；亮态只改明度不画光晕"
+  },
+  {
+   "id": "E-03",
+   "slot": "room.krusty_kitchen.props",
+   "name": "后厨道具组（煎炉/垃圾桶双态、锅铲正反面）",
+   "code": "e_03",
+   "dir": "props",
+   "files": [
+    "E-03-grill-off.png",
+    "E-03-grill-on.png",
+    "E-03-spatula-front.png",
+    "E-03-spatula-back.png",
+    "E-03-sauce.png",
+    "E-03-drink.png",
+    "E-03-bin-closed.png",
+    "E-03-bin-open.png"
+   ],
+   "status": "delivered",
+   "required": true,
+   "code_only": false,
+   "default": "png",
+   "template": "E",
+   "spec": {
+    "size": [
+     256,
+     256
+    ],
+    "bg": "transparent",
+    "ratio": 1.0
+   },
+   "generated_by": "cut_props.py <- 6x 4x4 prop sheets 2026-11-11",
+   "params_ref": "art-params.md §一/§二/§三(道具主体句)",
+   "note": "双态成对，除【状态】槽位外提示词逐字一致；亮态只改明度不画光晕"
+  },
+  {
+   "id": "E-04",
+   "slot": "room.krusty_office.props",
+   "name": "办公室道具组（保险柜双态、账本正反面、画像）",
+   "code": "e_04",
+   "dir": "props",
+   "files": [
+    "E-04-safe-closed.png",
+    "E-04-safe-open.png",
+    "E-04-ledger-front.png",
+    "E-04-ledger-back.png",
+    "E-04-captain_frame.png"
+   ],
+   "status": "delivered",
+   "required": true,
+   "code_only": false,
+   "default": "png",
+   "template": "E",
+   "spec": {
+    "size": [
+     256,
+     256
+    ],
+    "bg": "transparent",
+    "ratio": 1.0
+   },
+   "generated_by": "cut_props.py <- 6x 4x4 prop sheets 2026-11-11",
+   "params_ref": "art-params.md §一/§二/§三(道具主体句)",
+   "note": "双态成对，除【状态】槽位外提示词逐字一致；亮态只改明度不画光晕"
+  },
+  {
+   "id": "E-05",
+   "slot": "world.props",
+   "name": "环境物件组（锚/救生圈/盐/杯/薯条/桶/拖把）",
+   "code": "e_05",
+   "dir": "props",
+   "files": [
+    "E-05-anchor.png",
+    "E-05-lifebuoy.png",
+    "E-05-salt.png",
+    "E-05-cup.png",
+    "E-05-fries.png",
+    "E-05-bucket.png",
+    "E-05-mop.png"
+   ],
+   "status": "delivered",
+   "required": true,
+   "code_only": false,
+   "default": "png",
+   "template": "E",
+   "spec": {
+    "size": [
+     256,
+     256
+    ],
+    "bg": "transparent",
+    "ratio": 1.0
+   },
+   "generated_by": "cut_props.py <- 6x 4x4 prop sheets 2026-11-11",
+   "params_ref": "art-params.md §一/§二/§三(道具主体句)",
+   "note": "双态成对，除【状态】槽位外提示词逐字一致；亮态只改明度不画光晕"
+  },
+  {
+   "id": "E-06",
+   "slot": "room.krusty_hall.props",
+   "name": "点餐道具组（取号机/叫号屏）",
+   "code": "e_06",
+   "dir": "props",
+   "files": [
+    "E-06-ticket_machine.png",
+    "E-06-number_board.png"
+   ],
+   "status": "delivered",
+   "required": true,
+   "code_only": false,
+   "default": "png",
+   "template": "E",
+   "spec": {
+    "size": [
+     256,
+     256
+    ],
+    "bg": "transparent",
+    "ratio": 1.0
+   },
+   "generated_by": "cut_props.py <- 6x 4x4 prop sheets 2026-11-11",
+   "params_ref": "art-params.md §一/§二/§三(道具主体句)",
+   "note": "双态成对，除【状态】槽位外提示词逐字一致；亮态只改明度不画光晕；号码屏内不写数字"
+  },
+  {
+   "id": "E-07",
+   "slot": "props.misc",
+   "name": "私人物品组（竖笛正反面/小蜗）",
+   "code": "e_07",
+   "dir": "props",
+   "files": [
+    "E-07-clarinet-front.png",
+    "E-07-clarinet-back.png",
+    "E-07-snail.png"
+   ],
+   "status": "delivered",
+   "required": true,
+   "code_only": false,
+   "default": "png",
+   "template": "E",
+   "spec": {
+    "size": [
+     256,
+     256
+    ],
+    "bg": "transparent",
+    "ratio": 1.0
+   },
+   "generated_by": "cut_props.py <- 6x 4x4 prop sheets 2026-11-11",
+   "params_ref": "art-params.md §一/§二/§三(道具主体句)",
+   "note": "双态成对，除【状态】槽位外提示词逐字一致；亮态只改明度不画光晕"
+  },
+  {
+   "id": "E-08",
+   "slot": "props.residential",
+   "name": "居住区小物（闹钟/唱片机/冰箱/菠萝床/舷窗/罐/画架/画笔/沙发/台灯/石头电视/糖罐/头盔/显微镜/杠铃/凯伦）",
+   "code": "e_08",
+   "dir": "props",
+   "files": [
+    "E-08-alarm_clock.png",
+    "E-08-record_player.png",
+    "E-08-fridge.png",
+    "E-08-pineapple_bed.png",
+    "E-08-round_window.png",
+    "E-08-jar.png",
+    "E-08-easel.png",
+    "E-08-paint.png",
+    "E-08-sofa.png",
+    "E-08-lamp.png",
+    "E-08-stone_tv.png",
+    "E-08-candy_jar.png",
+    "E-08-air_helmet.png",
+    "E-08-microscope.png",
+    "E-08-barbell.png",
+    "E-08-karen_screen.png"
+   ],
+   "status": "delivered",
+   "required": false,
+   "code_only": false,
+   "default": "png",
+   "template": "E",
+   "spec": {
+    "size": [
+     256,
+     256
+    ],
+    "bg": "transparent",
+    "ratio": 1.0
+   },
+   "generated_by": "cut_props.py <- 6x 4x4 prop sheets 2026-11-11",
+   "params_ref": "art-params.md §一/§二/§三(道具主体句)",
+   "note": "双态成对，除【状态】槽位外提示词逐字一致；亮态只改明度不画光晕"
+  },
+  {
+   "id": "G-02",
+   "slot": "portal",
+   "name": "门 / 楼梯 portal 两型",
+   "code": "g_02",
+   "dir": "props",
+   "files": [
+    "G-02-portal_door.png",
+    "G-02-portal_stairs.png"
+   ],
+   "status": "pending",
+   "required": true,
+   "code_only": false,
+   "default": "png",
+   "template": "G",
+   "spec": {
+    "size": [
+     256,
+     256
+    ],
+    "bg": "transparent",
+    "ratio": 1.0
+   },
+   "generated_by": "",
+   "params_ref": "",
+   "note": "双态成对，除【状态】槽位外提示词逐字一致；亮态只改明度不画光晕；门框不含门牌文字 / 发光"
+  },
+  {
+   "id": "G-04",
+   "slot": "props.rummage",
+   "name": "翻找容器（闭合 / 打开）",
+   "code": "g_04",
+   "dir": "props",
+   "files": [
+    "G-04-drawer-closed.png",
+    "G-04-drawer-open.png",
+    "G-04-safe-closed.png",
+    "G-04-safe-open.png",
+    "G-04-fridge-closed.png",
+    "G-04-fridge-open.png",
+    "G-04-crate-closed.png",
+    "G-04-crate-open.png",
+    "G-04-toolbox-closed.png",
+    "G-04-toolbox-open.png"
+   ],
+   "status": "pending",
+   "required": true,
+   "code_only": false,
+   "default": "png",
+   "template": "G",
+   "spec": {
+    "size": [
+     256,
+     256
+    ],
+    "bg": "transparent",
+    "ratio": 1.0
+   },
+   "generated_by": "",
+   "params_ref": "",
+   "note": "双态成对，除【状态】槽位外提示词逐字一致；亮态只改明度不画光晕"
+  },
+  {
+   "id": "F-16",
+   "slot": "ui.rummage_panel",
+   "name": "翻找面板贴纸",
+   "code": "rummage_panel",
+   "dir": "ui",
+   "files": [
+    "F-16-rummage_panel.png"
+   ],
+   "status": "pending",
+   "required": false,
+   "code_only": false,
+   "default": "css",
+   "template": "F",
+   "spec": {
+    "size": [
+     1024,
+     640
+    ],
+    "bg": "transparent",
+    "ratio": 1.6
+   },
+   "generated_by": "",
+   "params_ref": "",
+   "note": "默认已由 CSS 实现；交了才替换；面板内不写任何文字"
+  },
+  {
+   "id": "F-17",
+   "slot": "ui.spin_card",
+   "name": "旋转检视卡片正反面",
+   "code": "spin_card",
+   "dir": "ui",
+   "files": [
+    "F-17-spin_card.png"
+   ],
+   "status": "pending",
+   "required": false,
+   "code_only": false,
+   "default": "css",
+   "template": "F",
+   "spec": {
+    "size": [
+     1024,
+     640
+    ],
+    "bg": "transparent",
+    "ratio": 1.6
+   },
+   "generated_by": "",
+   "params_ref": "",
+   "note": "默认已由 CSS 实现；交了才替换；面板内不写任何文字"
+  },
+  {
+   "id": "F-18",
+   "slot": "ui.collection_book",
+   "name": "彩蛋藏品册面板",
+   "code": "collection_book",
+   "dir": "ui",
+   "files": [
+    "F-18-collection_book.png"
+   ],
+   "status": "pending",
+   "required": false,
+   "code_only": false,
+   "default": "css",
+   "template": "F",
+   "spec": {
+    "size": [
+     1024,
+     640
+    ],
+    "bg": "transparent",
+    "ratio": 1.6
+   },
+   "generated_by": "",
+   "params_ref": "",
+   "note": "默认已由 CSS 实现；交了才替换；面板内不写任何文字"
+  },
+  {
+   "id": "F-19",
+   "slot": "ui.room_nav",
+   "name": "房间 / 楼层导航贴纸",
+   "code": "room_nav",
+   "dir": "ui",
+   "files": [
+    "F-19-room_nav.png"
+   ],
+   "status": "pending",
+   "required": false,
+   "code_only": false,
+   "default": "css",
+   "template": "F",
+   "spec": {
+    "size": [
+     1024,
+     640
+    ],
+    "bg": "transparent",
+    "ratio": 1.6
+   },
+   "generated_by": "",
+   "params_ref": "",
+   "note": "默认已由 CSS 实现；交了才替换；面板内不写任何文字"
+  },
+  {
+   "id": "G-05",
+   "slot": "ui.egg_icons",
+   "name": "27 枚彩蛋藏品图标",
+   "code": "egg_icons",
+   "dir": "icons",
+   "files": [
+    "G-05-egg-01.png",
+    "G-05-egg-02.png",
+    "G-05-egg-03.png",
+    "G-05-egg-04.png",
+    "G-05-egg-05.png",
+    "G-05-egg-06.png",
+    "G-05-egg-07.png",
+    "G-05-egg-08.png",
+    "G-05-egg-09.png",
+    "G-05-egg-10.png",
+    "G-05-egg-11.png",
+    "G-05-egg-12.png",
+    "G-05-egg-13.png",
+    "G-05-egg-14.png",
+    "G-05-egg-15.png",
+    "G-05-egg-16.png",
+    "G-05-egg-17.png",
+    "G-05-egg-18.png",
+    "G-05-egg-19.png",
+    "G-05-egg-20.png",
+    "G-05-egg-21.png",
+    "G-05-egg-22.png",
+    "G-05-egg-23.png",
+    "G-05-egg-24.png",
+    "G-05-egg-25.png",
+    "G-05-egg-26.png",
+    "G-05-egg-27.png"
+   ],
+   "status": "pending",
+   "required": false,
+   "code_only": false,
+   "default": "css",
+   "template": "H",
+   "spec": {
+    "size": [
+     128,
+     128
+    ],
+    "bg": "transparent",
+    "ratio": 1.0
+   },
+   "generated_by": "",
+   "params_ref": "",
+   "note": "≤3 色、单一符号；默认 CSS 圆底 + 文字兜底，不交也能跑"
+  },
+  {
+   "id": "G-07",
+   "slot": "fx.jelly",
+   "name": "三型水母",
+   "code": "jelly",
+   "dir": "fx",
+   "files": [
+    "G-07-jelly-pink.png",
+    "G-07-jelly-blue.png",
+    "G-07-jelly-gold.png"
+   ],
+   "status": "pending",
+   "required": false,
+   "code_only": false,
+   "default": "css",
+   "template": "I",
+   "spec": {
+    "size": [
+     256,
+     256
+    ],
+    "bg": "transparent",
+    "ratio": 1.0
+   },
+   "generated_by": "",
+   "params_ref": "",
+   "note": "默认 CSS 绘制；只在捉水母玩法开局后显示；不画发光 / 电光"
+  },
+  {
+   "id": "G-09",
+   "slot": "npc.gary",
+   "name": "小蜗造型",
+   "code": "gary_snail",
+   "dir": "characters",
+   "files": [
+    "G-09-gary_snail-token.png",
+    "G-09-gary_snail-portrait.png"
+   ],
+   "status": "pending",
+   "required": false,
+   "code_only": false,
+   "default": "css",
+   "template": "I",
+   "spec": {
+    "size": [
+     128,
+     128
+    ],
+    "bg": "transparent",
+    "ratio": 1.0
+   },
+   "generated_by": "",
+   "params_ref": "",
+   "note": "默认中文色盘兜底；可并入 D-09"
+  },
+  {
+   "id": "G-10",
+   "slot": "world.playspots",
+   "name": "三处玩法场地地面",
+   "code": "field_ground",
+   "dir": "world",
+   "files": [
+    "G-10-field_jelly.png",
+    "G-10-field_bubble.png",
+    "G-10-field_karate.png"
+   ],
+   "status": "pending",
+   "required": false,
+   "code_only": false,
+   "default": "css",
+   "template": "J",
+   "spec": {
+    "size": [
+     256,
+     256
+    ],
+    "bg": "transparent",
+    "ratio": 1.0
+   },
+   "generated_by": "",
+   "params_ref": "",
+   "note": "默认 CSS 绘制；图内不含木牌文字 / UI / 发光 / 水母"
+  },
+  {
+   "id": "G-11",
+   "slot": "fx.bubble",
+   "name": "五段泡泡形态",
+   "code": "bubble_shape",
+   "dir": "fx",
+   "files": [
+    "G-11-bubble-round.png",
+    "G-11-bubble-big.png",
+    "G-11-bubble-krabby.png",
+    "G-11-bubble-boat.png",
+    "G-11-bubble-elephant.png"
+   ],
+   "status": "pending",
+   "required": false,
+   "code_only": false,
+   "default": "css",
+   "template": "J",
+   "spec": {
+    "size": [
+     256,
+     256
+    ],
+    "bg": "transparent",
+    "ratio": 1.0
+   },
+   "generated_by": "",
+   "params_ref": "",
+   "note": "默认 CSS 绘制"
+  },
+  {
+   "id": "G-12",
+   "slot": "fx.karate",
+   "name": "木桩 / 沙袋",
+   "code": "karate_post",
+   "dir": "fx",
+   "files": [
+    "G-12-karate_post.png",
+    "G-12-karate_bag.png"
+   ],
+   "status": "pending",
+   "required": false,
+   "code_only": false,
+   "default": "css",
+   "template": "J",
+   "spec": {
+    "size": [
+     256,
+     256
+    ],
+    "bg": "transparent",
+    "ratio": 1.0
+   },
+   "generated_by": "",
+   "params_ref": "",
+   "note": "默认 CSS 棕色圆角矩形"
+  },
+  {
+   "id": "E-01",
+   "slot": "food.krabby_patty",
+   "name": "蟹黄堡五层与 5 级咬痕（CSS + SVG clipPath evenodd）",
+   "code": "e_01",
+   "dir": "",
+   "files": [],
+   "status": "pending",
+   "required": false,
+   "code_only": true,
+   "default": "css",
+   "template": "",
+   "spec": {
+    "size": [
+     128,
+     128
+    ],
+    "bg": "transparent",
+    "ratio": 1.0
+   },
+   "generated_by": "",
+   "params_ref": "",
+   "note": "由代码绘制，严禁排产生图"
+  },
+  {
+   "id": "G-08",
+   "slot": "cursor.jelly_net",
+   "name": "鱼网光标与网挥动（SVG data-URI + CSS）",
+   "code": "g_08",
+   "dir": "",
+   "files": [],
+   "status": "pending",
+   "required": false,
+   "code_only": true,
+   "default": "css",
+   "template": "",
+   "spec": {
+    "size": [
+     128,
+     128
+    ],
+    "bg": "transparent",
+    "ratio": 1.0
+   },
+   "generated_by": "",
+   "params_ref": "",
+   "note": "由代码绘制，严禁排产生图"
+  },
+  {
+   "id": "G-13",
+   "slot": "ui.mg_session",
+   "name": "小游戏会话 UI：横幅 / HUD / 结算卡 / 蓄力条 / 招式卡",
+   "code": "g_13",
+   "dir": "",
+   "files": [],
+   "status": "pending",
+   "required": false,
+   "code_only": true,
+   "default": "css",
+   "template": "",
+   "spec": {
+    "size": [
+     128,
+     128
+    ],
+    "bg": "transparent",
+    "ratio": 1.0
+   },
+   "generated_by": "",
+   "params_ref": "",
+   "note": "由代码绘制，严禁排产生图"
+  },
+  {
+   "id": "F-01",
+   "slot": "ui.bubble",
+   "name": "NPC 头上气泡框（CSS）",
+   "code": "f_01",
+   "dir": "",
+   "files": [],
+   "status": "pending",
+   "required": false,
+   "code_only": true,
+   "default": "css",
+   "template": "",
+   "spec": {
+    "size": [
+     128,
+     128
+    ],
+    "bg": "transparent",
+    "ratio": 1.0
+   },
+   "generated_by": "",
+   "params_ref": "",
+   "note": "由代码绘制，严禁排产生图"
+  },
+  {
+   "id": "F-07",
+   "slot": "ui.highlight",
+   "name": "悬停高亮 / 呼吸发光引导（CSS）",
+   "code": "f_07",
+   "dir": "",
+   "files": [],
+   "status": "pending",
+   "required": false,
+   "code_only": true,
+   "default": "css",
+   "template": "",
+   "spec": {
+    "size": [
+     128,
+     128
+    ],
+    "bg": "transparent",
+    "ratio": 1.0
+   },
+   "generated_by": "",
+   "params_ref": "",
+   "note": "由代码绘制，严禁排产生图"
+  },
+  {
+   "id": "F-20",
+   "slot": "ui.jelly_counter",
+   "name": "捉水母计数板（CSS）",
+   "code": "f_20",
+   "dir": "",
+   "files": [],
+   "status": "pending",
+   "required": false,
+   "code_only": true,
+   "default": "css",
+   "template": "",
+   "spec": {
+    "size": [
+     128,
+     128
+    ],
+    "bg": "transparent",
+    "ratio": 1.0
+   },
+   "generated_by": "",
+   "params_ref": "",
+   "note": "由代码绘制，严禁排产生图"
+  },
+  {
+   "id": "G-14",
+   "dir": "characters",
+   "status": "delivered",
+   "name": "12 位比奇堡居民形象（世界 bot 居民随机换装）",
+   "files": [
+    "G-14-01-suit_sardine.png",
+    "G-14-02-puffer_stripes.png",
+    "G-14-03-angelfish_hat.png",
+    "G-14-04-old_flounder.png",
+    "G-14-05-tuna_lifeguard.png",
+    "G-14-06-shrimp_sweater.png",
+    "G-14-07-octopus_news.png",
+    "G-14-08-grouper_hawaii.png",
+    "G-14-09-seahorse_postal.png",
+    "G-14-10-skay_mustache.png",
+    "G-14-11-catfish_farmer.png",
+    "G-14-12-blowfish_grandma.png"
+   ],
+   "spec": {
+    "canvas": "tight-alpha",
+    "bg": "transparent",
+    "note": "12 位居民一次群像生成后切分，宽高比随各角色身形（不做统一画幅约束）"
+   },
+   "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v6 居民群像（hand_drawn_2D_cartoon_illustra_2026-11-11T06-47-38.png），cut_residents.py 程序化切分",
+   "params_ref": "assets/art-params.md"
+  },
+  {
+   "id": "E-09",
+   "slot": "props.residential.plus",
+   "name": "居住区小物补充与状态变体",
+   "code": "e_09",
+   "dir": "props",
+   "files": [
+    "E-09-cushion.png",
+    "E-09-vinyl.png",
+    "E-09-paintbox.png",
+    "E-09-stone_tv-on.png",
+    "E-09-jellynet.png",
+    "E-09-pine_ornament.png",
+    "E-09-toothbrush.png",
+    "E-09-conch.png",
+    "E-09-sandcastle.png",
+    "E-09-shovel.png",
+    "E-09-newspaper.png",
+    "E-09-cookie.png",
+    "E-09-starfig.png",
+    "E-09-mini_moai.png",
+    "E-09-lamp-on.png",
+    "E-09-drink-on.png",
+    "E-09-karen-on.png",
+    "E-09-nut_jar.png"
+   ],
+   "status": "delivered",
+   "required": true,
+   "code_only": false,
+   "default": "png",
+   "template": "E",
+   "spec": {
+    "size": [
+     256,
+     256
+    ],
+    "bg": "transparent",
+    "ratio": 1.0
+   },
+   "generated_by": "cut_props.py <- 6x 4x4 prop sheets 2026-11-11",
+   "params_ref": "art-params.md §一/§二/§三(道具主体句)",
+   "note": "亮态只改明度不画光晕；-on 变体与母图同提示词仅换状态槽"
+  },
+  {
+   "id": "E-10",
+   "slot": "props.world.chum.misc",
+   "name": "环境/海之霸/杂项小物",
+   "code": "e_10",
+   "dir": "props",
+   "files": [
+    "E-10-flower.png",
+    "E-10-treestump.png",
+    "E-10-acorn.png",
+    "E-10-flag.png",
+    "E-10-gauge.png",
+    "E-10-chum_bucket.png",
+    "E-10-scanner.png",
+    "E-10-plan_map.png",
+    "E-10-test_tube.png",
+    "E-10-flyer.png",
+    "E-10-stool.png",
+    "E-10-whiteboard.png",
+    "E-10-terminal.png",
+    "E-10-calendar.png",
+    "E-10-magazine.png",
+    "E-10-nightstand.png",
+    "E-10-selfportrait.png",
+    "E-10-photo_frame.png",
+    "E-10-cabinet.png",
+    "E-10-rock.png",
+    "E-10-sesame.png",
+    "E-10-jukebox.png",
+    "E-10-serving_window.png",
+    "E-10-pickup_counter.png",
+    "E-10-robot_arm.png",
+    "E-10-gramophone.png",
+    "E-10-curtain-closed.png",
+    "E-10-curtain-open.png",
+    "E-10-coin.png",
+    "E-10-stone_phone.png"
+   ],
+   "status": "delivered",
+   "required": true,
+   "code_only": false,
+   "default": "png",
+   "template": "E",
+   "spec": {
+    "size": [
+     256,
+     256
+    ],
+    "bg": "transparent",
+    "ratio": 1.0
+   },
+   "generated_by": "cut_props.py <- 6x 4x4 prop sheets 2026-11-11",
+   "params_ref": "art-params.md §一/§二/§三(道具主体句)",
+   "note": "含窗帘双态、凯伦亮屏、金币底座、石电话等"
+  },
+  {
+   "id": "E-11",
+   "slot": "props.krabby.patty",
+   "name": "蟹黄堡分级咬痕立绘 + 秘方酱料",
+   "code": "e_11",
+   "dir": "props",
+   "files": [
+    "E-11-burger-0.png",
+    "E-11-burger-1.png",
+    "E-11-burger-2.png",
+    "E-11-burger-3.png",
+    "E-11-sauce.png"
+   ],
+   "status": "delivered",
+   "required": true,
+   "code_only": false,
+   "default": "png",
+   "template": "E",
+   "spec": {
+    "size": [
+     320,
+     320
+    ],
+    "bg": "transparent",
+    "ratio": 1.0
+   },
+   "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / 3x2 图集 A_tidy_3x2_grid_of_exactly_6_s_2026-11-11T09-09-00.png，cut_burger.py 切分 + recolor_burger.py 面包换色",
+   "params_ref": "assets/art-params.md §十一",
+   "note": "burger-0..3 为逐口咬痕（完整→剩半个），第 4 口吃光露出 sauce"
+  }
+ ]
 }

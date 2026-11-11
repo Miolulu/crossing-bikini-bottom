@@ -321,29 +321,32 @@
   /* ===== 聚焦检视（放大 / 旋转 / 咬 / 隐藏彩蛋）===== */
   #focus{position:fixed;inset:0;z-index:330;display:none;background:rgba(6,35,56,.86);
     backdrop-filter:blur(8px);color:#fff;flex-direction:column;align-items:center;justify-content:center;}
-  #focus .stage{width:320px;height:280px;perspective:1000px;margin-bottom:6px;
+  #focus .stage{width:440px;height:380px;perspective:1000px;margin-bottom:6px;position:relative;
     display:flex;align-items:center;justify-content:center;}
-  #burgerClip{width:200px;height:160px;clip-path:url(#biteClip);-webkit-clip-path:url(#biteClip);}
-  #focusBurger{position:relative;width:200px;height:160px;margin:0 auto;transform-style:preserve-3d;
-    transform:rotateX(15deg) rotateY(-25deg);}
-  .layer{position:absolute;left:50%;transform:translateX(-50%);width:168px;height:26px;
-    border-radius:40% 40% 45% 45%/60% 60% 40% 40%;box-shadow:0 3px 6px rgba(0,0,0,.3);
-    display:flex;align-items:center;justify-content:center;}
-  .l-top{background:linear-gradient(#F7C65B,#E0A23F);top:14px;height:40px;width:176px;
-    border-radius:50% 50% 30% 30%/70% 70% 30% 30%;}
-  .l-lettuce{background:#5fbf5f;top:50px;height:18px;width:182px;}
-  .l-cheese{background:#FFC23F;top:66px;height:16px;}
-  .l-patty{background:linear-gradient(#8a5433,#6b3f26);top:80px;height:28px;width:174px;}
-  .l-bottom{background:linear-gradient(#E0A23F,#c98b2f);top:106px;height:30px;}
-  .layer span{font-size:11px;color:#062338;font-weight:700;opacity:.75;}
+  #focus .stage:before{content:"";position:absolute;left:50%;top:50%;width:470px;height:470px;
+    transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;
+    background:radial-gradient(circle,rgba(255,240,200,.20),rgba(255,240,200,0) 62%);}
+  #burgerClip{width:340px;height:340px;position:relative;}
+  #focusBurger{position:relative;width:340px;height:340px;margin:0 auto;transform-style:preserve-3d;
+    transform:rotateX(15deg) rotateY(-25deg);will-change:transform;
+    animation:focusFloat 3.4s ease-in-out infinite;}
+  @keyframes focusFloat{0%,100%{margin-top:0}50%{margin-top:-9px}}
+  #bbBurgerImg{display:block;width:100%;height:100%;object-fit:contain;
+    filter:drop-shadow(0 18px 20px rgba(0,0,0,.5)) drop-shadow(0 0 1px rgba(0,0,0,.35));
+    transition:opacity .16s;}
   #crumbLayer{position:fixed;inset:0;pointer-events:none;z-index:335;}
   .crumb{position:absolute;width:8px;height:8px;border-radius:2px;background:#F2B84B;}
   #secretSauce{display:none;text-align:center;}
-  #secretSauce .pool{font-size:56px;}
-  #secretSauce p{font-size:13px;line-height:1.7;margin-top:8px;}
+  #secretSauce .pool img{display:block;width:250px;height:auto;
+    filter:drop-shadow(0 8px 14px rgba(0,0,0,.45));
+    animation:sauceGlow 2.2s ease-in-out infinite;}
+  @keyframes sauceGlow{0%,100%{filter:drop-shadow(0 8px 14px rgba(0,0,0,.45)) brightness(1)}
+    50%{filter:drop-shadow(0 0 18px rgba(255,120,190,.85)) brightness(1.08)}}
+  #secretSauce p{font-size:13.5px;line-height:1.75;margin-top:10px;max-width:420px;}
   #focusInfo{max-width:440px;text-align:center;font-size:14px;line-height:1.7;margin:6px 16px;}
   #focusOps{font-size:11px;opacity:.75;margin-bottom:8px;text-align:center;}
   #focusBtns{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;justify-content:center;}
+  #focusBtns .btn:disabled{opacity:.45;filter:grayscale(.55);cursor:not-allowed;transform:none;}
   #photo{position:fixed;inset:0;z-index:340;display:none;background:rgba(6,35,56,.92);
     align-items:center;justify-content:center;flex-direction:column;gap:14px;color:#fff;}
   #photo .card{background:#fff;color:#062338;padding:20px 26px;border-radius:16px;text-align:center;
@@ -652,15 +655,6 @@
 </head>
 <body>
 
-<!-- 咬痕 clipPath：矩形减去若干圆（齿簇），evenodd 挖洞 -->
-<svg width="0" height="0" style="position:absolute;overflow:hidden" aria-hidden="true">
-  <defs>
-    <clipPath id="biteClip" clipPathUnits="userSpaceOnUse">
-      <path id="bitePath" clip-rule="evenodd" d="M0 0 H200 V160 H0 Z"/>
-    </clipPath>
-  </defs>
-</svg>
-
 <div id="viewport">
   <div id="world">
     <div id="ground"></div>
@@ -814,13 +808,9 @@
   <div id="focusOps">方向键 / WASD 旋转 · 鼠标拖拽旋转 · E / ESC 返回</div>
   <div class="stage">
     <div id="burgerClip"><div id="focusBurger">
-      <div class="layer l-top"><span>面包</span></div>
-      <div class="layer l-lettuce"><span>生菜</span></div>
-      <div class="layer l-cheese"><span>芝士</span></div>
-      <div class="layer l-patty"><span>肉饼</span></div>
-      <div class="layer l-bottom"><span>面包</span></div>
+      <img id="bbBurgerImg" alt="蟹黄堡" src="../assets/props/E-11-burger-0.png">
     </div></div>
-    <div id="secretSauce"><div class="pool">🫙✨</div><p></p></div>
+    <div id="secretSauce"><div class="pool"><img alt="秘方酱料" src="../assets/props/E-11-sauce.png"></div><p></p></div>
   </div>
   <div id="focusInfo">刚出锅的蟹黄堡。仔细看看，也许藏着什么。</div>
   <div id="focusBtns">
@@ -1567,6 +1557,108 @@
         bye:{t:'回头见！',o:[]}
       }}
   };
+  /* ===== 街头居民随机闲聊：按「居民类型 × 时段 × 话题」随机组合 =====
+     每个 bot 点开都是不同的开场 + 不同的话题，避免所有人同一句话。 */
+  var RES_TALK={
+    '泡泡鱼':{
+      greet:{day:['嗨！今天的海水清得能看见自己的影子。','你也出来晒太阳？我每天都在这条街转两圈。'],
+             evening:['傍晚的光最好看，整条街都是橘色的。','这个点儿还出来溜达，懂行。'],
+             night:['这么晚还在外面？比奇堡的夜里安静得有点吓人。','嘘——你听见没？章鱼哥又在吹竖笛了。']},
+      chat:{day:['我数过，从这儿到水母田一共有 47 只水母在飘。','刚才有人在泡泡摊吹出一头大象，我盯着看了半天。'],
+            evening:['下班的人都往蟹堡王挤，我偏不排队。','晚上凤梨屋的灯最好认，圆圆的，像个月亮。'],
+            night:['睡不着我就数气泡，数到两百多天就亮了。','夜里的水母会发光，你抬头看看。']},
+      tips:['蟹堡王要先在门口取号，别傻站着等。','水母田在街最里头，蓝色的那种千万别碰。','空手道场的连击榜最高分是珊迪挂的，我试过，差得远。','海之霸今天大概又只有零个客人。'],
+      who:'我叫泡泡鱼。这条街上的事我全知道——大部分是真的。',
+      bye:['回头见！','有空再来聊。','慢慢逛，别掉队。']},
+    '条纹鱼':{
+      greet:{day:['……你挡着我上班的路了。算了，说吧，什么事。','早高峰，别跟我提排队。'],
+             evening:['今天的班总算上完了。有话快说，我要去躺平。','这个点还在街上晃，你不用上班的吗？'],
+             night:['深夜不睡的人，一般都有心事。','别问我为什么还醒着，问就是加班。']},
+      chat:{day:['我一天要在这条路上走四个来回，鞋底都磨平了。','蟹堡王那个取号机坏过三次，每次都得排更久。'],
+            evening:['我攒了三个月的钱，就为了周末去看一场竖笛演出。','有时候我觉得，这条街吵得刚刚好。'],
+            night:['晚上的海之霸反而像个正经餐厅，安静、没人。','我常在夜里绕远路回家，就为了多看几眼路灯。']},
+      tips:['想省钱就点单层，双层那个芝士加钱。','后厨的出餐窗口比收银台快，看准了再去。','章鱼哥其实不凶，他只是懒得跟人客气。','别在蟹老板面前提「涨价」，他能讲半小时。'],
+      who:'条纹鱼。普通上班族，普通到没人记得我的名字。',
+      bye:['行，就这样。','走了。','别再挡路。']},
+    '小丑鱼':{
+      greet:{day:['哇！你的帽子好酷！可以给我看看吗？','你也是来玩的吗？我知道哪里最好玩！'],
+             evening:['天要黑了，妈妈说天黑前要回家……可是我还想玩。','你能陪我去水母田看一眼吗？就一眼。'],
+             night:['我偷偷溜出来的，别告诉我妈。','晚上出来探险才刺激，你不觉得吗？']},
+      chat:{day:['我刚才在空手道场外面偷看，珊迪一拳打飞了一个沙袋！','泡泡摊的叔叔说，吹得够久就能吹出小船。'],
+            evening:['傍晚的沙子上还留着白天的温度，踩上去暖暖的。','我在石头屋门口喊了三声，派大星才醒。'],
+            night:['夜里的水母是粉色的，比白天漂亮一百倍。','我数过，从这儿走回家要跳 213 下。']},
+      tips:['水母田的网要先按 E 拿起来，不然抓不到。','空手道要跟着箭头按方向键，按错就断连击了。','去凤梨屋找海绵宝宝，他会唱歌给你听。','章鱼哥家有楼梯，可以一层一层往上爬。'],
+      who:'我叫小丑鱼！我今年七岁半，比奇堡跑得最快的就是我。',
+      bye:['拜拜！','下次一起玩！','我要跑回家啦——']},
+    '比目鱼':{
+      greet:{day:['（慢慢转过来）……哦，是你啊。','嗯。今天还行。'],
+             evening:['（盯着远处）……你说，海到底有多深？','这个时间，光会从上面斜下来。'],
+             night:['夜里很平，像什么都没发生过。','（沉默了一会儿）……坐会儿吧。']},
+      chat:{day:['我以前也想过去远一点的海，后来觉得这儿挺好。','石头屋的电视只有雪花，派大星说那是最好的节目。'],
+            evening:['傍晚的颜色一天只有一次，错过了就没了。','我在这条街上住了十二年，认识每一块石头。'],
+            night:['夜里能听见沙子移动的声音，很轻。','有些事白天想不通，夜里就通了。']},
+      tips:['圆顶树屋要按门铃，珊迪才会来开。','石头底下还有一层，你翻翻看。','海之霸的凯伦会翻白眼，别被吓到。','想安静就去章鱼哥家三楼，天窗很好看。'],
+      who:'比目鱼。我不太会说话，但我会听。',
+      bye:['嗯，去吧。','路上小心。','……再见。']},
+    '石头鱼':{
+      greet:{day:['……哦。你好。','（缓慢地）今天的……水……不错。'],
+             evening:['（过了两秒）……晚上了啊。','风……变凉了。'],
+             night:['夜……很静。','（很久之后）……你还在这儿？']},
+      chat:{day:['我昨天……在这儿……站了一天。','（想了一会儿）……想不起来要说什么了。'],
+            evening:['沙子……白天晒过……现在还是暖的。','我认识一块石头……它比我还慢。'],
+            night:['夜里的海……像一块布。','（沉默）……这样挺好。']},
+      tips:['走到……发光的地方……就能进屋。','别急……慢慢走……也能到。','有些东西……要翻两次……才看得见。','（他指了指水母田的方向，没说话。）'],
+      who:'石头鱼。我说话慢，但我记得住每一个人。',
+      bye:['……再见。','（他缓缓地挥了挥手。）']},
+    '海胆先生':{
+      greet:{day:['请不要靠太近，我的刺是有原则的。','有什么事？我在思考一个很重要的问题。'],
+             evening:['傍晚适合思辨。你有什么观点？','我在统计这条街的人流量，样本还不够。'],
+             night:['深夜的比奇堡，才是真正的比奇堡。','你也是被噪音吵得睡不着吗？']},
+      chat:{day:['我算过，这条街平均每 9 秒会有一次无意义的对话。刚才那次算进去了。','海绵宝宝的笑声分贝数，是我研究里最难量化的变量。'],
+            evening:['章鱼哥的竖笛其实有技术含量，只是没人愿意承认。','我把海之霸的失败次数做成了一张图表，很规整。'],
+            night:['夜里的水母发光，本质上是一场低效率的求偶。','安静的时候，才能听见自己的刺在长。']},
+      tips:['蟹堡王的号码是 A 开头的，别拿错了。','想找彩蛋，就多翻翻角落——抽屉、柜子、糖罐。','珊瑚丛后面有条近路，知道的人不多。','别跟痞老板谈理想，他会给你讲三小时。'],
+      who:'海胆先生。海洋生物学爱好者，目前无业。',
+      bye:['谈话到此结束。','（他点了点头，继续思考。）']}
+  };
+  var RES_DEFAULT={
+    greet:{day:['嗨，今天海底挺舒服的。'],evening:['傍晚了，风里都是沙子的味道。'],night:['这么晚还没睡？']},
+    chat:{day:['我每天都沿这条小路走一圈。'],evening:['这会儿的光最好看。'],night:['夜里很安静。']},
+    tips:['去蟹堡王取个号呗，热乎的。','水母田那边挺好玩。','章鱼哥没那么凶，聊两句试试。'],
+    who:'我就是个路过的居民。',
+    bye:['回头见！','慢慢逛。']
+  };
+  function ensureResident(bot){
+    var T=RES_TALK[bot.name]||RES_DEFAULT;
+    var per=curPeriod==='evening'?'evening':(curPeriod==='night'?'night':'day');
+    function pick(a){return a[(Math.random()*a.length)|0];}
+    var pool=T.tips.slice();
+    var key='res:'+bot.name;
+    DIALOGS[key]={name:bot.name,emoji:bot.emoji||'🐠',color:bot.color||'#6fc4d8',
+      nodes:{
+        start:{t:pick(T.greet[per]),o:[
+          {t:'打听点事',to:'tip1'},
+          {t:'随便聊聊',to:'chat1'},
+          {t:'你是谁呀？',to:'who'},
+          {t:'（点点头走开）',to:'bye'}]},
+        tip1:{t:pick(pool),o:[
+          {t:'还有别的吗？',to:'tip2'},
+          {t:'谢谢，我记下了',to:'bye',fx:'clue'}]},
+        tip2:{t:pick(pool),o:[{t:'够了，谢谢',to:'bye'}]},
+        chat1:{t:pick(T.chat[per]),o:[
+          {t:'哈哈，真的？',to:'chat2'},
+          {t:'（笑）',to:'bye'}]},
+        chat2:{t:pick(T.chat[per]),o:[{t:'原来如此',to:'bye'}]},
+        who:{t:T.who,o:[{t:'记住了',to:'bye'}]},
+        bye:{t:pick(T.bye),o:[]}
+      }};
+    return key;
+  }
+  function openResidentTalk(bot){
+    if(!bot||inInterior)return;
+    openDialog(ensureResident(bot));
+  }
+
   var FX={
     gary_meow:function(){collectEgg('e13_gary');toast('小蜗开口了！彩蛋已记入藏品册');},
     like:function(){toast('💛 对方好像对你亲近了一点');},
@@ -1653,7 +1745,12 @@
     var x=360+Math.random()*1500,y=740+Math.random()*220;
     el.style.left=x+'px';el.style.top=y+'px';
     world.appendChild(el);
-    bots.push({el:el,x:x,y:y,name:d[0]});
+    var b={el:el,x:x,y:y,name:d[0],emoji:d[1],color:d[2]};
+    bots.push(b);
+    el.onclick=function(){
+      if(MG.active||MG.resultOpen||inInterior)return;
+      openResidentTalk(b);
+    };
   });
   setInterval(function(){
     if(curPeriod==='night')return;
@@ -1740,7 +1837,7 @@
     if(nearGary){openDialog('gary');return;}
     if(nearSpot){startMini(nearSpot.id);return;}
     if(nearNPC){openDialog(nearNPC);return;}
-    if(nearBot){openDialog('resident');return;}
+    if(nearBot){openResidentTalk(nearBot);return;}
   }
   function checkNearby(){
     if(MG.active||MG.resultOpen){promptEl.style.display='none';return;}
@@ -2516,33 +2613,24 @@
   document.getElementById('tipClose').onclick=closeObjTip;
   objTip.onclick=function(e){if(e.target===objTip)closeObjTip();};
 
-  /* ============ 聚焦检视：咬痕（非逐层消失） ============ */
-  var BITE_SPOTS=[
-    [{x:186,y:34,r:30},{x:166,y:20,r:15},{x:198,y:54,r:16}],
-    [{x:190,y:96,r:31},{x:170,y:82,r:16},{x:198,y:118,r:16}],
-    [{x:24,y:30,r:30},{x:44,y:16,r:15},{x:10,y:52,r:16}],
-    [{x:64,y:130,r:30},{x:92,y:142,r:16},{x:40,y:138,r:15}],
-    [{x:100,y:78,r:78}]
-  ];
-  var biteCount=0,bitePath=document.getElementById('bitePath');
-  function circlePath(cx,cy,r){
-    return 'M '+(cx-r)+' '+cy+' a '+r+' '+r+' 0 1 0 '+(2*r)+' 0 a '+r+' '+r+' 0 1 0 '+(-2*r)+' 0 Z';
-  }
-  function buildBiteD(n){
-    var d='M0 0 H200 V160 H0 Z';
-    for(var i=0;i<n&&i<BITE_SPOTS.length;i++){
-      BITE_SPOTS[i].forEach(function(c){d+=' '+circlePath(c.x,c.y,c.r);});
-    }
-    return d;
+  /* ============ 聚焦检视：逐口咬痕（手绘立绘分级切换） ============ */
+  var BURGER_STAGES=['E-11-burger-0','E-11-burger-1','E-11-burger-2','E-11-burger-3'];
+  var BITE_MAX=BURGER_STAGES.length,biteCount=0;
+  function setBurgerStage(n){
+    var img=document.getElementById('bbBurgerImg');if(!img)return;
+    var i=Math.max(0,Math.min(BITE_MAX-1,n));
+    img.src='../assets/props/'+BURGER_STAGES[i]+'.png';
   }
   var focus=document.getElementById('focus'),focusBurger=document.getElementById('focusBurger');
   var focusOpen=false,rx=15,ry=-25;
   function applyFocus(){focusBurger.style.transform='rotateX('+rx+'deg) rotateY('+ry+'deg)';}
   function resetBite(){
-    biteCount=0;bitePath.setAttribute('d',buildBiteD(0));
+    biteCount=0;setBurgerStage(0);
     document.getElementById('burgerClip').style.display='block';
     document.getElementById('secretSauce').style.display='none';
     document.getElementById('focusInfo').textContent='刚出锅的蟹黄堡。仔细看看，也许藏着什么。';
+    var bb=document.getElementById('biteBtn');
+    if(bb){bb.disabled=false;bb.textContent='😋 咬一口';}
     rx=15;ry=-25;applyFocus();
   }
   function openFocus(){
@@ -2570,18 +2658,21 @@
     }
   }
   function bite(){
-    if(biteCount>=BITE_SPOTS.length)return;
+    if(biteCount>=BITE_MAX)return;
     rx=15;ry=-25;applyFocus();
-    biteCount++;bitePath.setAttribute('d',buildBiteD(biteCount));crumbs();
-    if(biteCount>=BITE_SPOTS.length){
+    biteCount++;crumbs();
+    if(biteCount>=BITE_MAX){
       quest.step=6;renderQuest();
       document.getElementById('burgerClip').style.display='none';
       var ss=document.getElementById('secretSauce');ss.style.display='block';
-      ss.querySelector('p').innerHTML='🤫 <b>秘方酱料！</b> 你把整个蟹黄堡啃光了，盘子底下留着一滩闪着诡异光芒的酱料……<br>（莉娜式隐藏交互：吃掉才看得见）';
-      document.getElementById('focusInfo').textContent='吃光啦！好像发现了不该看到的东西。';
+      ss.querySelector('p').innerHTML='🤫 <b>秘方酱料！</b> 整个蟹黄堡都被你啃光了，盘底留下一滩粉红色酱料——还在微微冒泡，闻起来甜得有点不正常。';
+      document.getElementById('focusInfo').textContent='吃光啦！盘底好像还藏着点什么。';
+      var bb=document.getElementById('biteBtn');
+      if(bb){bb.disabled=true;bb.textContent='😋 已经吃完啦';}
     } else {
+      setBurgerStage(biteCount);
       document.getElementById('focusInfo').textContent=
-        '咔嚓！从边缘咬下一口，能看到面包、生菜、芝士、肉饼的夹层横截面。已咬 '+biteCount+' 口。';
+        '咔嚓！从边缘咬下一口，面包、生菜、芝士、肉饼的夹层看得清清楚楚。已咬 '+biteCount+' / '+BITE_MAX+' 口。';
     }
   }
   document.getElementById('biteBtn').onclick=bite;
