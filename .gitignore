@@ -9,3 +9,7 @@ __pycache__/
 # 本地自检报告（每次运行会变，不进仓库）
 assets/_review/validation-report.md
 # 注意：不要忽略 assets/**/*.png —— 美术资源必须进仓库
+
+# QA 临时档案
+src/.qa-prof-*/
+qa-*.html

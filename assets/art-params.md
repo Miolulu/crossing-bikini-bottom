@@ -1,54 +1,144 @@
-# 生成参数存档（锁风格后填写 · **未填不得批量**）
+# 比奇堡 · 美术生成参数存档（当前有效批次 v5 · 手绘 2D + 轻等角）
 
-> 本文件是**复现与补图的唯一依据**。跨账号 / 跨批次补图时若没有它，只能重猜参数，风格必然漂移。
-> 美术 AI 维护；集成 AI 只读。每开一个新批次追加一节，不要覆盖历史记录。
+> 美术 AI 维护 · 2026-11-11 · **复现与补图的唯一依据，未填不得批量**。
+> 原文件为全「待填」空模板，无历史记录可保留，现由 v4 完整存档替代。
+> **v5 相对 v4 的四处变更**（用户 2026-11-11 决议）：
+> 1. **建筑 sprite 由 512 方画布改为按主体紧裁画布**（高统一 526px、主体占约 89%），修复 contain 缩放导致的「建筑偏小」；契约同步修订见 `docs/资产契约修订-v5.md`。
+> 2. **角色立绘/头像 token 落地**：1 张六角色群像 → 程序化切分为 6×(512×768 立绘 + 256×256 圆形 token)，见 §八。
+> 3. **表现层皮肤系统**：`skin.css` / `icons.js` / `skin.js` / `room-skins.js` 四文件承接 UI 重设计、emoji 清零、房间差异化与动效（见 §九）。
+> 4. 资产校验脚本新增按文件名种类后缀的画幅覆盖（portrait 2:3 / token 1:1）。
+> **v4 相对 v3 的三处变更**（同日早前决议）：
+> 1. **A-01 改为「不含任何建筑」的纯背景大图**；六栋建筑由代码按 `buildings[]` 坐标贴图叠加。整景生成的形体永远对不齐独立 sprite，整景方案已废弃。
+> 2. **房间 14 张用 v3 锁定锚点重出 1 张基础图 + 程序化换色派生**，替换旧 2.5D 画风。
+> 3. 生图工具传空 `footnote` **仍会加水印**；水印一律后处理清除（不得改写锚点）。
+> 历史：v1 绿底（废弃）→ v2 2.5D 微缩 → v3 手绘 2D 首批 → **v4 当前有效**。
 
-## 全局基线（不要改）
+---
 
-| 字段 | 值 |
+## 一、风格锚点（逐字复用，一个字都不改）
+
+```
+hand-drawn 2D cartoon illustration shown in a loose light isometric 3/4 view, thick wobbly black ink outlines with visibly uneven line weight, flat opaque cel-vinyl paint with subtle watercolor grain and a slightly weathered hand-painted look, deliberately irregular lopsided bulbous shapes with no ruler-straight edges, quirky found-object architecture with hand-painted wood grain, rope and rivet details, mid-century tiki pattern accents, tropical undersea palette of turquoise, banana yellow, coral orange and earthy brown, plain solid background, subject facing right, aligned baseline, no text, no logo, no watermark, no shadow.
+```
+
+> **与 v2 的本质差异**：v2 锚点是 `light isometric 2.5D miniature diorama illustration, thick soft navy outlines...`，产出「精致 3D 微缩手办」；v4 是手绘语言。二者不是参数微调，**禁止混用**。
+> **锚点保持不变**：`plain solid background` 逐字保留。工具 `background:transparent` 不生效，**不要为迁就工具改写锚点**；透明底一律后处理。
+> **合规边界**：非官方同人、非商用、神似非形似、不 1:1 复刻；提示词不出现作品名 / 角色名 / 商标 / 招牌文字。
+
+---
+
+## 二、负面词（逐字复用，封死「3D 手办感」）
+
+```
+3D render, 3D lighting, glossy highlight, glass specular, gradient shading, bevel, ambient occlusion, plastic sheen, polished game icon, miniature diorama, smooth vector lines, perfectly symmetrical proportions, metallic reflection, photorealistic material, depth of field blur, shadow, cast shadow, contact shadow, glow effect, golden highlight, breathing halo, sparkle particles, text, letters, numbers, signage lettering, logo, trademark, watermark, signature, date, overlapping subjects, foreground occlusion, perspective distortion, noise, dirty edges, gray fringe, exact character replica, known cartoon character, ground plane, background clutter
+```
+
+---
+
+## 三、主体句（每批只替换这一段；锚点与负面词不动）
+
+**建筑统一尾部**
+```
+, deliberately asymmetrical and slightly wonky, no ruler-straight edges; only the building itself, no ground, no furniture, no characters, centered with 10% margin, clean uniform backdrop for cutout.
+```
+
+| 编号 | 主体句（v3/v4 共用，逐字） |
 |---|---|
-| 风格锚点版本 | v1.0 · `docs/美术资产规格与提示词包.md` §3（逐字） |
-| 负面词版本 | v1.0 · 同文件 §6（逐字） |
-| 拼装公式 | 锚点（原样） + 类别模板（只换【】槽位） + 负面词（原样） |
-| 色板 | 海水青 `#1AA3C4` / 深海底蓝 `#062338`（描边） / 菠萝黄 `#F2C14E` / 珊瑚红 `#E74C3C` / 暖沙金 `#CAA86A` / 泡沫白 `#F7FBFE` |
-| 硬约束 | 透明底 PNG · sRGB · 8–12% 边距 · 基线齐平 · 朝右 · ≤6 色 · 图内零文字 / 零发光 / 零投影 |
+| B-01 | `A single squat yellow pineapple-shaped house with a rough diamond cross-hatch rind, a small green leaf crown, two round porthole windows with thick rings and a low arched door; banana yellow with earthy brown shading` + 统一尾部 |
+| B-02 | `A single carved stone head house shaped like a weathered monolithic statue with a long nose, heavy brow ridge, two dark window eyes and a small door at the base; cool dusty blue-gray stone with chipped rough texture` + 统一尾部 |
+| B-03 | `A single low half-dome brown rock house with a lumpy uneven surface, a small bent antenna on top, one round hatch opening and a few pebbles; warm reddish sand brown` + 统一尾部 |
+| B-04 | `A single large clear glass hemispherical dome over one big leafy oak tree and a patch of grass, with a round metal airlock hatch and a few visible seam lines; pale green-blue glass and earthy green tree` + 统一尾部 |
+| B-05（基准） | `A single short squat wooden crab-trap shaped seaside diner built from rough uneven planks, with a lopsided slanted roof, rope and fishing net details, two round porthole windows with thick rings, a crooked tall flag pole and a blank anchor-shaped sign frame with no lettering on it; weathered coral red and warm wood brown, deliberately asymmetrical and slightly wonky, no ruler-straight edges; only the building itself, no ground, no furniture, no characters, centered with 10% margin, clean uniform backdrop for cutout.` |
+| B-06 | `A single tall dented metal bucket-shaped diner, wider at the top, with horizontal rivet bands, a bent chimney, one round porthole and a fist-like handle on top; cold gray and metallic blue` + 统一尾部 |
 
-## 批次登记表
-
-| 批次 | 日期 | 覆盖编号 | 平台 / 模型版本 | 种子 | 步数 / 尺寸 / 采样器 | 提示词语言 | 抽检记录 | 状态 |
-|---|---|---|---|---|---|---|---|---|
-| 0 · 锁风格 | 待填 | `B-05` | 待填 | 待填 | 待填 | 待填 | 待填 | 待开工 |
-| 1 · L1 | 待填 | `B-01..B-06` `A-01` `G-01` 模板 | 待填 | 待填 | 待填 | 待填 | 待填 | 待开工 |
-| 2 · L2 | 待填 | 全 14 房间 + `D-*` + `E-*` + `G-02` | 待填 | 待填 | 待填 | 待填 | 待填 | 待开工 |
-| 3 · L3 | 待填 | `E-08` `D-10` `G-05` `F-16..19` | 待填 | 待填 | 待填 | 待填 | 待填 | 待开工 |
-
-## 完整提示词全文存档
-
-> 每个批次把「实际使用的完整提示词」逐字粘在下面，不要写「同上」或「见文档」——补图时要能直接复制。
-
-### 批次 0 · `B-05` 锁风格（起手样板）
-
+**v4 新增 · A-01 纯背景主体句（逐字）**
 ```
-（粘贴实际使用的完整提示词：锚点 + B 类模板 + 负面词）
+A complete wide EMPTY underwater town BACKDROP containing absolutely NO buildings and NO houses and NO characters and NO signs: upper area is open turquoise sea-water with a few soft abstract flower-shaped clouds and faint clusters of small bubbles, a few distant pale gray cylinder towers low on the horizon; lower two thirds is a gently rolling pale sand seabed with ONE wavy S-shaped sand path curving from the lower right across to the left, scattered simple bulbous kelp, small coral clumps and tiny pebbles along the edges; keep broad clear open sand areas across the middle band from left to right for separately placed building cutouts, no objects blocking the center; hand-painted weathered watercolor grain, flat even lighting, wide panoramic composition, clean uniform backdrop, no architecture, no furniture, no lettering.
 ```
 
-### 批次 1
-
+**v4 新增 · 房间基础图主体句（逐字）**
 ```
-（逐条粘贴：锚点 + 对应类别模板（已替换【】槽位）+ 负面词）
+A single hand-drawn isometric interior room of a seaside wooden diner: one uneven plank back wall with a carved anchor-shaped wood motif at its center and a partial lopsided archway on the right, a floor of loose wobbly 45-degree diamond tiles, a large completely empty floor area in the foreground for code-placed interactive props; cool sea blue and foam white with warm wood brown accents, deliberately asymmetrical and slightly wonky, no ruler-straight edges; no furniture, no characters, no lettering, no props; flat even lighting, plain solid muted sea-blue backdrop, wide 3/2 composition, clean uniform backdrop for cropping.
 ```
 
-## 首批验证图
+> **形体口径按原作纠正**（与主规范 §4.2 不一致，见 `_review/规范异议.md` 异议 5）：B-05 矮胖捕蟹笼木屋、B-06 冷灰金属桶、B-02 深蓝摩艾、B-04 玻璃罩 + 大橡树 + 草地。
+
+---
+
+## 四、生成参数与已验证的工具行为
 
 | 项 | 值 |
 |---|---|
-| 编号 / 文件 | 待填（推荐 `B-05-krusty_krab-right.png`） |
-| 透明底 / 纯色底双版本 | 待填 |
-| 描边粗细 / 饱和度 / 等角角度是否达标 | 待填 |
-| 抠图边缘是否无灰黑脏边 | 待填 |
+| 平台 / 模型 | WorkBuddy ImageGen（高画质） |
+| 尺寸 | 建筑 `1024x1024`；全景 / 房间 `1536x1024` |
+| 画质 | `high` |
+| 背景参数 | `background:opaque`；`background:transparent` **不生效**，实际出纯色底 |
+| `footnote` | 传 `""` **仍会加右下角白色「AI生成 / WORKBUDDY」水印**，颜色随底色变化（白底→浅青灰 `(168,201,209)`，米白底→近白）。**不要靠改参数消水印，一律后处理** |
+| 底色（实测） | 各张不统一：纯白 / 淡青 / 米白 / 青绿。抠底必须按四角自适应 |
+| seed / 步数 | 工具未回传 / 托管不可见；补图须逐张人工验收 |
+| 源图 | `generated-images/hand_drawn_2D_cartoon_illustra_2026-11-11T04-{21-19,27-38,28-03,28-26,28-53,29-18}.png`；v4 新增 `04-46-00`（房间）、`04-54-06`（纯背景） |
 
-## 抽检记录（每 3 张抽检 1 张）
+---
 
-| 日期 | 抽检文件 | 结论 | 处置 |
-|---|---|---|---|
-| 待填 | 待填 | 待填 | 待填 |
+## 五、后处理流程（v4 · `l2_process.py` + `l3_process.py`）
+
+1. **去水印**：右下角区域。白底 sprite 用局部中值（随后抠底整体变透明）；纯色底用「按水印色值的掩膜 `MaxFilter(9)` 膨胀 → 取上方 80px 真实背景像素覆盖」。**纯背景图的水印落在底部白毛边区，裁到 1.898:1 时会被自然切掉**。
+2. **自适应底色连通域 flood fill**（关键）：从 `(0,0)` 起 `ImageDraw.floodfill(..., (255,0,255), thresh=30)`，只把**与边缘连通**的底色变透明。主体内部被黑色描边包住的浅色高光不与边缘连通 → 完整保留。**禁止按颜色直接抠底**。
+3. **主连通块保留**：膨胀版主块保住叶冠 / 弯天线 / 旗杆；仅剔除通过膨胀桥接进来的 <200px 碎点。6 张建筑最终均为单连通块。
+4. `GaussianBlur(0.5)` 轻微羽化。
+5. 裁紧 → 按最长边 **80% 占比等比居中**（不拉伸）→ 导出三件套：`<ID>-<name>-right.png`（1×512 透明）/ `@2x`（2×1024）/ `-solid`（泡沫白底，仅供边缘复核）。
+6. **A-01 纯背景不抠透明**：内缩 2% 去掉水彩纸毛边 → 裁到 `1.898:1`（上 25% 偏移）→ `2600×1370` 与 `5200×2740`。
+7. **房间 14 张**：去水印 → 裁 `1200×760` → 按 6 主题换色 + 同栋局部明度小改 → 14 张。
+   - **换色铁律**：背景用「四角连通域」定位后替换成主题底色（**不能按颜色距离**，否则蓝白地砖会被误判成背景，产生黄斑）；主体只在 `±0.06`（±22°）内微调 hue；`v<0.36` 的粗黑描边与 `v>0.80` 的白地砖保持原样。早期版本对全图做 ±0.5 hue 旋转，出现紫色墙 / 橙色地砖，已废弃。
+8. **仓库校验**：`world/`/`rooms/` 的 PNG 需存成 **RGBA**（契约 `formats: PNG with alpha`），否则 `tools/validate-assets.py` 的 alpha 检查会报错；`spec.bg` 含 `solid` 的条目会跳过四角透明检查。
+
+---
+
+## 六、本批验收
+
+| 项 | 结果 |
+|---|---|
+| `tools/validate-assets.py` | **61 条 / 实检 21 文件 / 0 错误 / 0 提醒 / PASS** |
+| 本地六维自检 | 28/28 PASS：四角全透明、边距最小 10.0%、羽化 0.60–1.01%、角落水印 0 px、每张单连通块 |
+| A-01 纯背景 | 2600×1370，无建筑、无文字水印、无白毛边；S 形沙路 / 花形云 / 海草珊瑚 / 远景塔 / 中部留白齐全 |
+| 6 栋建筑 | 1×512 / 2×1024 / solid 三件套，叠中青底无白框 / 脏边 / 挖洞 |
+| 房间 14 张 | 1200×760，6 主题底色区分明确，粗黑描边与白地砖保住，无水印 |
+
+---
+
+## 七、批量一致性约束
+
+- 锚点（§一）与负面词（§二）**逐字复用**，每批只替换 §三 主体句；**不得改写锚点迁就工具**。
+- **每张只抽 1 次、零重抽**；任何瑕疵只靠后处理修。
+- **A-01 永远不含建筑**：背景只提供地形与装饰，六栋建筑是独立 sprite，由 `buildings[]` 坐标贴上去。
+- 每张源图统一走 §五 流水线；旧稿一律归档不删除。
+- `default=css` 的 58 张与 `code_only` 的 6 条**不排产生图**，见 `docs/交付产物清单.md`「不进图清单」。
+
+---
+
+## 八、v5 角色（1 次生图 → 程序化切分，零追加积分）
+
+**源图**：`generated-images/hand_drawn_2D_cartoon_illustra_2026-11-11T05-24-17.png`（1536×1024，六角色横排群像，v4 锚点 + 负面词 + 主体句「six underwater cartoon town residents standing in a row…」，一次调用）。
+
+**切分脚本**：工作区 `recut_chars.py`（numpy + Pillow），要点：
+
+1. 列连通域切分：`SEGS=[(46,314),(339,589),(599,808),(830,1044),(1049,1309),(1335,1470)]`，
+   `NAMES=[D-02-sponge, D-04-star, D-03-squid, D-05-krabs, D-06-sandy, D-07-plankton]`。
+2. 白底转 alpha：不做整体阈值——`min(RGB)>232 且 max-min<22` 判白（alpha=0）；`min>205` 的过渡带给 alpha=130 软化锯齿；再清 alpha<26 碎边。
+3. **立绘**：裁紧后等比缩到主体高 600，落位 `(512-nw)/2, 700-nh` → 512×768（2:3），透明边距 8.7%。
+4. **token**：取全身顶部 52% 作头肩，等比缩到圆内可视直径 `0.74×画布`，**圆内垂直居中**；奶油底圆 `pad=21`（内缩 8.2%，满足边距告警线）+ 墨线描边 `width=10` → 256×256（规范 128 的 2×，供 92px 头像与高分屏）。
+
+**接线**：`icons.js` 的 `CH` 表把 🧽⭐🐙🦀🐿️🦠 六 emoji 映射到 `D-0x-*-portrait.png`；HUD 徽章用 `D-02-sponge-token.png`。其余海洋邻居走 `BB_CHAR_SVG` 手绘 SVG 兜底。
+
+---
+
+## 九、v5 表现层皮肤系统（省积分的代码侧美术）
+
+| 文件 | 职责 | 关键实现 |
+|---|---|---|
+| `src/skin.css` | 设计 token / UI 重设计 / 动效 | 调研 §7.1 色板落成 CSS 变量（`--ink #162C36`、`--water-mid #1FA5B8`、`--sand-base #EAC684`、`--banana #FBE34B`、`--ui-gold #F2C34E`…）；HUD 头像徽章+折叠说明、portal 手绘门牌、物件标签胶囊、10 组 keyframes（bbBob/bbSway/bbJellyFloat/bbCloudPulse/bbBubbleUp/bbRoomIn 等）+ `prefers-reduced-motion` 降级 |
+| `src/icons.js` | 141 种 emoji → 手绘 SVG | 30 个 shape 函数 × 14 色槽 + 字符串哈希兜底；`BB_ICON/BB_CHAR/BB_CHAR_SVG` 三个导出；`skin.js` 用 TreeWalker 扫文本节点运行时替换 |
+| `src/skin.js` | 运行时注入器 | `fixRoad()` 横向缓 S 弯、`buildWorldDeco()` 花云/水母/海草/石头/气泡 63 件程序化装饰、`applyRoom()` 房间变体（哈希缩放偏移 + multiply 色调）、`syncDepth()` 140ms 统一景深（替代旧 `1000-y`）、点击金色✦粒子、同人免责声明 |
+| `src/room-skins.js` | 六套房间家具叠加层 | 每 theme 一张 `viewBox 0 0 1200 760` 内联 SVG；构图签名：蟹堡王木梁渔网旗串 / 凤梨屋舷窗锚饰菠萝床 / 摩艾画框蛤壳吊灯电梯门 / 石头屋半球岩石+CRT / 树屋气闸门+穹顶肋+橡树头盔 / 海之霸铆钉桶壁+齿轮电脑屏；中间交互区 `x∈[300,900]&y∈[260,560]` 强制留空 |
+
+**契约红线**：四文件只做表现层，不改玩法数据结构与坐标契约（`asset-slots.json`、`window.__BB` 不动）；可整体回滚。

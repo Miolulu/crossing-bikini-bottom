@@ -311,10 +311,10 @@
         2600,
         1370
       ],
-      "mount": "background-image: url(../assets/world/A-01-world_panorama.png); background-size: 2600px 1370px",
+      "mount": "background-image: url(../assets/world/A-01-world_panorama.png); background-size: 2600px 1370px; 原 #ground 不透明沙块需停用",
       "anchor": "top-left",
       "placeholder": "CSS 渐变 + 沙路 SVG",
-      "note": "建筑层叠在其上，图内建筑须与 buildings[] 坐标大致对应"
+      "note": "v4：背景图不含任何建筑；六栋建筑由 .building 层按 buildings[] 坐标叠加贴图，图内只提供沙路/海草/花形云/远景塔与大块留白。"
     },
     {
       "slot": "npc.*",

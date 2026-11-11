@@ -11,18 +11,34 @@
     -webkit-user-select:none;user-select:none;touch-action:none;}
   #viewport{position:fixed;inset:0;overflow:hidden;background:
     radial-gradient(120% 120% at 50% 0%, #1aa3c4 0%, #0B5E86 45%, #062338 100%);}
-  #world{position:absolute;left:0;top:0;transform:translate(0,0);will-change:transform;}
-  #ground{position:absolute;left:0;top:470px;width:2600px;height:900px;
-    background:linear-gradient(#caa86a,#9c7b4f);border-top:6px solid #d8c089;}
-  #paths{position:absolute;left:0;top:0;pointer-events:none;}
-  .deco{position:absolute;color:rgba(255,255,255,.55);font-size:30px;pointer-events:none;}
+  /* v4 美术挂载：A-01 为「不含建筑」的纯背景，六栋由 .building 层按坐标叠加。
+     原 #ground 不透明沙块会盖住背景下半部；#paths / .deco 与背景自带沙路、
+     手绘海草重复，故一律停用（保留 DOM 以免破坏既有引用）。 */
+  #world{position:absolute;left:0;top:0;transform:translate(0,0);will-change:transform;
+    background-image:url(../assets/world/A-01-world_panorama.png);
+    background-size:2600px 1370px;background-position:top left;background-repeat:no-repeat;}
+  /* v5：把沙地地平线上移到 y=320，让放大后的六栋建筑站在沙地上而不是漂在海水里。
+     下半段渐变到全透明，完整露出 A-01 自带的水彩沙地与 S 形小路。 */
+  #ground{position:absolute;left:0;top:280px;width:2600px;height:1090px;
+    background:linear-gradient(180deg,
+      #f4e3bd 0%,#f1dfb6 30%,rgba(241,223,182,.94) 43%,
+      rgba(241,223,182,.42) 49%,rgba(241,223,182,0) 52.5%,transparent 100%);
+    border-top:none;pointer-events:none;}
+  #ground::before{content:"";position:absolute;left:0;top:0;width:2600px;height:610px;
+    background-image:
+      radial-gradient(circle at 18% 26%,rgba(150,116,74,.20) 0 2px,transparent 3px),
+      radial-gradient(circle at 67% 72%,rgba(150,116,74,.15) 0 3px,transparent 4px),
+      radial-gradient(circle at 41% 48%,rgba(255,255,255,.42) 0 2px,transparent 3px);
+    background-size:78px 78px,132px 132px,96px 96px;opacity:.75;}
+  #paths{display:none;}
+  .deco{display:none;}
 
-  .building{position:absolute;border-radius:12px;box-shadow:0 14px 28px rgba(0,0,0,.28);
+  .building{position:absolute;background-color:transparent;
+    background-repeat:no-repeat;background-size:contain;background-position:center bottom;
     display:flex;align-items:flex-end;justify-content:center;}
   .building .label{position:absolute;top:-26px;left:50%;transform:translateX(-50%);
-    background:rgba(6,35,56,.82);color:#fff;font-size:13px;padding:2px 8px;border-radius:8px;white-space:nowrap;}
-  .door{position:absolute;width:54px;height:64px;background:#3a2a16;border-radius:8px 8px 0 0;
-    border:3px solid rgba(0,0,0,.35);}
+    background:rgba(6,35,56,.72);color:#fff;font-size:13px;padding:2px 8px;border-radius:8px;white-space:nowrap;}
+  .door{position:absolute;width:54px;height:64px;background:transparent;border:none;}
 
   .actor{position:absolute;width:46px;height:46px;transform:translate(-50%,-100%);
     transition:left 1.4s linear,top 1.4s linear;}
@@ -123,18 +139,16 @@
   #interior .topbar{position:absolute;top:0;left:0;right:0;padding:12px 18px;display:flex;
     justify-content:space-between;align-items:center;background:rgba(6,35,56,.55);z-index:80;}
   #interior h2{font-size:19px;color:#fff;}
+  /* v4 美术挂载：14 张房间 PNG 铺在 #room 背景层；THEME 色作为底色兜底。
+     原 .floor / .wall 的不透明 CSS 菱格砖与木条会盖住新房间图，故停用。 */
   #room{position:absolute;left:50%;top:52%;width:1200px;height:760px;
     transform:translate(-50%,-50%) scale(1);transform-origin:center center;
+    background-size:1200px 760px;background-position:center;background-repeat:no-repeat;
     --w1:#3f7fb5;--w2:#356fa3;--f1:#d8b878;--f2:#b8965a;}
   #room .floor{position:absolute;inset:0;border-radius:18px;
-    background:
-      repeating-linear-gradient(45deg, rgba(255,255,255,.06) 0 2px, transparent 2px 46px),
-      repeating-linear-gradient(-45deg, rgba(0,0,0,.06) 0 2px, transparent 2px 46px),
-      linear-gradient(var(--f1),var(--f2));
-    box-shadow:inset 0 0 60px rgba(0,0,0,.25);}
+    background:transparent;box-shadow:none;}
   #room .wall{position:absolute;left:0;right:0;top:0;height:118px;border-radius:18px 18px 0 0;
-    background:repeating-linear-gradient(90deg,var(--w1) 0 46px,var(--w2) 46px 50px);
-    box-shadow:inset 0 -8px 18px rgba(0,0,0,.2);border-bottom:6px solid #8a6a3a;}
+    background:transparent;box-shadow:none;border-bottom:none;}
   .zoneTag{position:absolute;font-size:12px;font-weight:700;color:#fff;
     background:rgba(6,35,56,.5);padding:3px 10px;border-radius:8px;z-index:2;pointer-events:none;}
   .counterBar{position:absolute;height:56px;border-radius:8px;
@@ -633,6 +647,8 @@
   #mgResult .rBtns .btn:last-child{background:#e8e8e8;}
   body.mg-goal #mgHud{box-shadow:0 0 0 4px rgba(255,210,63,.9),0 6px 18px rgba(0,0,0,.35);}
 </style>
+<!-- v5 表现层：设计 token / UI / 动效，玩法样式保留在上一个 style 中 -->
+<link rel="stylesheet" href="skin.css">
 </head>
 <body>
 
@@ -875,21 +891,33 @@
   }
 
   /* ============ 世界：错落建筑 + 弯曲小路 ============ */
+  /* v5 布局：sprite 已裁紧（主体占画布 89%），容器按各自宽高比设置，
+     目标高度放大到 190~330px，六栋错落排布、底边统一对齐 y=720，
+     与参考图的「大比例建筑 + 门前可走动的沙地」一致。 */
   var buildings=[
-    {id:'moai',name:'摩艾屋',x:140,y:560,w:96,h:170,color:'#9c7b4f',doorX:188,doorY:730},
-    {id:'pineapple',name:'凤梨屋',x:300,y:620,w:104,h:150,color:'#FFD23F',doorX:352,doorY:770},
-    {id:'treedome',name:'圆顶树屋',x:600,y:540,w:130,h:130,color:'#bfeaf2',doorX:665,doorY:670,round:true},
-    {id:'rock',name:'石头屋',x:470,y:790,w:84,h:84,color:'#8a8f96',doorX:512,doorY:874},
-    {id:'krusty',name:'蟹堡王',x:1560,y:520,w:190,h:160,color:'#c0392b',doorX:1655,doorY:680},
-    {id:'chum',name:'海之霸',x:1860,y:600,w:130,h:130,color:'#5b6e57',doorX:1925,doorY:730}
+    {id:'treedome', name:'圆顶树屋',x:200, y:280, w:420, h:500, color:'#bfeaf2',doorX:410, doorY:780,round:true},
+    {id:'pineapple',name:'凤梨屋',  x:680, y:320, w:300, h:460, color:'#FFD23F',doorX:830, doorY:780},
+    {id:'moai',     name:'摩艾屋',  x:1020,y:420, w:280, h:360, color:'#9c7b4f',doorX:1160,doorY:780},
+    {id:'rock',     name:'石头屋',  x:1340,y:555, w:250, h:225, color:'#8a8f96',doorX:1465,doorY:780},
+    {id:'krusty',   name:'蟹堡王',  x:1720,y:280, w:490, h:500, color:'#c0392b',doorX:1965,doorY:780},
+    {id:'chum',     name:'海之霸',  x:2280,y:415, w:250, h:400, color:'#5b6e57',doorX:2405,doorY:815}
   ];
   var bById={};
+  /* v4 美术挂载：编号 → 建筑 sprite。锚点/负面词见 assets/art-params.md v4。
+     z-index 保持 1000-b.y（asset-slots.json 契约，勿单方面改）。 */
+  var BUILDING_ART={
+    pineapple:'B-01-pineapple_house-right', moai:'B-02-moai_house-right',
+    rock:'B-03-rock_house-right', treedome:'B-04-treedome-right',
+    krusty:'B-05-krusty_krab-right', chum:'B-06-chum_bucket-right'
+  };
   buildings.forEach(function(b){
     var el=document.createElement('div');el.className='building';
+    el.dataset.bid=b.id;                 // asset-slots.json 的 .building[data-bid] 定位契约
     el.style.left=b.x+'px';el.style.top=b.y+'px';
     el.style.width=b.w+'px';el.style.height=b.h+'px';
-    el.style.background=b.color;el.style.zIndex=String(1000-b.y);
-    if(b.round) el.style.borderRadius='50% 50% 14px 14px';
+    el.style.backgroundColor='transparent';
+    el.style.backgroundImage='url(../assets/buildings/'+BUILDING_ART[b.id]+'.png)';
+    el.style.zIndex=String(1000-b.y);
     el.innerHTML='<div class="label">'+b.name+'</div>';
     var d=document.createElement('div');d.className='door';
     d.style.left=(b.doorX-b.x-27)+'px';d.style.top=(b.doorY-b.y-64)+'px';
@@ -1653,7 +1681,7 @@
     if(MG.resultOpen){if(k==='escape')exitMini();return;}
     if(MG.active){
       if(k==='escape'){exitMini();return;}
-      if(MG.id==='bubble'&&k===' '){blowStart();return;}
+      if(MG.id==='bubble'&&k===' '){e.preventDefault();blowStart();return;}
       if(MG.id==='karate'&&KDIR[k]){karateHit(KDIR[k]);return;}
       return;                                  // 玩法中不响应移动 / 进屋 / 对话
     }
@@ -1737,6 +1765,10 @@
         if(on&&!nearSpot)nearSpot=sp;
       });
       if(!nearGary&&!nearNPC&&!nearSpot)nearBot=botNear();
+    }else{
+      /* v4 修复：靠近建筑门时上面的 PLAYSPOTS.forEach 不执行，
+         玩法场地的 .near 金圈会残留不消失；此处统一清掉。 */
+      PLAYSPOTS.forEach(function(sp){sp.el.classList.remove('near');});
     }
     if(nearBuilding){promptEl.style.display='block';promptEl.innerHTML='按 <b>E</b> 进入 '+nearBuilding.name;}
     else if(nearGary){promptEl.style.display='block';promptEl.innerHTML='按 <b>E</b> 和 小蜗 打个招呼（或直接点它）';}
@@ -1910,6 +1942,8 @@
     var th=THEME[R.bid]||THEME.krusty;
     roomEl.style.setProperty('--w1',th.w1);roomEl.style.setProperty('--w2',th.w2);
     roomEl.style.setProperty('--f1',th.f1);roomEl.style.setProperty('--f2',th.f2);
+    roomEl.style.backgroundColor=th.w1;                       // THEME 渐变兜底
+    roomEl.style.backgroundImage='url(../assets/rooms/G-01-'+key+'.png)';  // 14 张房间 PNG
     document.getElementById('roomTitle').textContent=R.title;
     renderDecor(R.decor);renderFx(R);renderObjects(R.objects);renderSeats(R.seats);
     renderPortals(R);renderNPCs(key);renderRoomNav();
@@ -2695,7 +2729,10 @@
   function endMini(){
     if(!MG.active)return;
     MG.active=false;MG.resultOpen=true;
-    clearInterval(MG.timer);
+    /* 集中清理：不依赖各 end* 回调是否记得收尾 */
+    clearInterval(MG.timer);cancelAnimationFrame(MG.blowRaf);
+    clearTimeout(KAR._t);clearTimeout(MG.bannerT);
+    jellySpawnStop();blowHold=false;
     var cfg=MINIS[MG.id];if(cfg&&cfg.end)cfg.end();
     clearJellies();clearBubbleFloats();
     document.getElementById('toast').classList.remove('on');
@@ -2711,6 +2748,7 @@
     MG.active=false;MG.resultOpen=false;MG.id=null;MG.goalDone=false;
     clearInterval(MG.timer);cancelAnimationFrame(MG.blowRaf);
     clearTimeout(KAR._t);clearTimeout(MG.bannerT);
+    jellySpawnStop();blowHold=false;
     clearJellies();clearBubbleFloats();setJellyOn(false,true);
     PLAYSPOTS.forEach(function(sp){sp.el.classList.remove('playing');});
     document.body.classList.remove('mg-active','mg-result','mg-jelly','mg-bubble','mg-karate','mg-goal');
@@ -2787,8 +2825,15 @@
       jellyScore.blue++;
       document.body.classList.add('stung');
       setTimeout(function(){document.body.classList.remove('stung');},380);
-      scorePop(x,y,'哎哟 -1','#5BC8FF');
-      toast('哎哟！蓝色电水母不能抓，会被蜇到！');
+      /* 处罚与提示一致：电水母真的 -1（原本只弹「-1」字样、不扣分） */
+      if(jellyCaught>0){
+        jellyCaught--;MG.score=jellyCaught;
+        scorePop(x,y,'哎哟 -1','#5BC8FF');
+        toast('被蓝色电水母蜇到了 -1！等它自己飘走，别抓');
+      }else{
+        scorePop(x,y,'哎哟 被蜇了一下','#5BC8FF');
+        toast('被蓝色电水母蜇到了！别抓它，等它自己飘走');
+      }
     }else{
       jellyCaught++;jellyScore[t]++;MG.score=jellyCaught;
       scorePop(x,y,'+'+JELLY[t].score,t==='gold'?'#FFD23F':'#FF8FC7');
@@ -2808,15 +2853,25 @@
   function initJelly(){
     jellyCaught=0;jellyScore={pink:0,blue:0,gold:0};
     clearJellies();updateJellyHud();setJellyOn(true,true);
+    jellySpawnStart();
   }
-  function endJelly(){setJellyOn(false,true);}
+  function endJelly(){jellySpawnStop();setJellyOn(false,true);}
   function jellyRank(){
     var n=jellyCaught,q=jellyScore;
     var r=n>=15?['金牌 · 水母大师','gold']:n>=8?['银牌 · 我准备好了','silver']:['铜牌 · 再练练网','bronze'];
     return {rank:r[0],cls:r[1],line:'本轮捉到 '+n+' 只水母',
       sub:'粉 '+q.pink+' · 金 '+q.gold+' · 触电 '+q.blue+' 次 ｜ 原作《Jellyfishing》用网捉、碰到电水母被蜇'};
   }
-  setInterval(function(){spawnJelly();},820);
+  /* 生成器随小玩法启停：不再常驻空转（原 setInterval 全局常驻，靠 spawnJelly 内部守卫自弃） */
+  var jellySpawnT=null;
+  function jellySpawnStart(){
+    if(jellySpawnT)return;
+    jellySpawnT=setInterval(function(){spawnJelly();},820);
+    setTimeout(function(){spawnJelly();},450);   // 开局半秒内出第一只，避免干等
+  }
+  function jellySpawnStop(){
+    if(jellySpawnT){clearInterval(jellySpawnT);jellySpawnT=null;}
+  }
 
   /* ---------- 玩法 B：吹泡泡（Bubblestand 蓄力） ---------- */
   var BLOW_SHAPES=[
@@ -3020,5 +3075,9 @@
   loop();
 })();
 </script>
+<!-- v5 表现层脚本：图标库 → 房间主题层 → 注入器（顺序不可换） -->
+<script src="icons.js"></script>
+<script src="room-skins.js"></script>
+<script src="skin.js"></script>
 </body>
 </html>

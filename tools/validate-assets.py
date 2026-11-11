@@ -16,6 +16,16 @@ DIRS = {"world", "buildings", "rooms", "characters", "props", "ui", "icons", "fx
 STATUS = {"pending", "delivered", "accepted", "rejected"}
 NAME_RE = re.compile(r"^[A-G]-\d{2}(?:-[a-z0-9_]+)*(?:@2x)?\.png$")
 
+# 同一资产条目下可能混装多种画幅（立绘 2:3、token 1:1、行走帧 2:3）。
+# spec.ratio 是条目主画幅，这里按文件名种类后缀覆盖，口径见
+# docs/美术资源需求与交付规范.md §交付规格：D 立绘 512×768 = 2:3，D token = 1:1。
+KIND_RATIO = {"portrait": 0.667, "token": 1.0, "walk": 0.667, "sit": 0.667}
+
+
+def kind_of(fn):
+    stem = fn.rsplit(".", 1)[0].replace("@2x", "")
+    return stem.rsplit("-", 1)[-1] if "-" in stem else ""
+
 try:
     from PIL import Image
 except ImportError:
@@ -63,6 +73,8 @@ def main():
         d = os.path.join(ASSETS, a.get("dir", ""))
         spec = a.get("spec") or {}
         ratio = spec.get("ratio")
+        kind_ratio = dict(KIND_RATIO)
+        kind_ratio.update(spec.get("ratio_by_kind") or {})
         for fn in files:
             p = os.path.join(d, fn)
             if not os.path.isfile(p):
@@ -79,10 +91,11 @@ def main():
             w, h = im.size
             if "A" not in im.getbands() and "transparency" not in im.info:
                 errors.append("[%s] 缺少 alpha 通道（非透明底）: %s" % (aid, fn))
-            if ratio:
+            ratio_use = kind_ratio.get(kind_of(fn), ratio)
+            if ratio_use:
                 r = w / h
-                if abs(r - ratio) / ratio > 0.12:
-                    errors.append("[%s] 宽高比偏差 >12%%: %s 实际 %.3f 期望 %.3f" % (aid, fn, r, ratio))
+                if abs(r - ratio_use) / ratio_use > 0.12:
+                    errors.append("[%s] 宽高比偏差 >12%%: %s 实际 %.3f 期望 %.3f" % (aid, fn, r, ratio_use))
             # 透明底检查（纯色底的世界/房间图跳过）
             if a.get("dir") in ("world", "rooms") and "solid" in str(spec.get("bg", "")):
                 continue

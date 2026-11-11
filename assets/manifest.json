@@ -68,7 +68,7 @@
       "files": [
         "A-01-world_panorama.png"
       ],
-      "status": "pending",
+      "status": "accepted",
       "required": true,
       "code_only": false,
       "default": "png",
@@ -81,8 +81,8 @@
         "bg": "solid #1AA3C4",
         "ratio": 1.898
       },
-      "generated_by": "",
-      "params_ref": "",
+      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
+      "params_ref": "assets/art-params.md",
       "note": "六栋错落散布 + S 形弯曲小路；禁止一字排开；建议另出 @2x"
     },
     {
@@ -146,7 +146,7 @@
       "files": [
         "B-01-pineapple_house-right.png"
       ],
-      "status": "pending",
+      "status": "accepted",
       "required": true,
       "code_only": false,
       "default": "png",
@@ -157,10 +157,12 @@
           512
         ],
         "bg": "transparent",
-        "ratio": 1.0
+        "ratio": 0.65,
+        "canvas": "tight-alpha",
+        "note": "v5 改为按主体紧裁的透明画布（原 1:1 画布导致 contain 缩放后建筑偏小，见 docs/资产契约修订-v5.md）"
       },
-      "generated_by": "",
-      "params_ref": "",
+      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
+      "params_ref": "assets/art-params.md",
       "note": "可另出 -solid 纯色底版本验证抠图"
     },
     {
@@ -172,7 +174,7 @@
       "files": [
         "B-02-moai_house-right.png"
       ],
-      "status": "pending",
+      "status": "accepted",
       "required": true,
       "code_only": false,
       "default": "png",
@@ -183,10 +185,12 @@
           512
         ],
         "bg": "transparent",
-        "ratio": 1.0
+        "ratio": 0.78,
+        "canvas": "tight-alpha",
+        "note": "v5 改为按主体紧裁的透明画布（原 1:1 画布导致 contain 缩放后建筑偏小，见 docs/资产契约修订-v5.md）"
       },
-      "generated_by": "",
-      "params_ref": "",
+      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
+      "params_ref": "assets/art-params.md",
       "note": "可另出 -solid 纯色底版本验证抠图"
     },
     {
@@ -198,7 +202,7 @@
       "files": [
         "B-03-rock_house-right.png"
       ],
-      "status": "pending",
+      "status": "accepted",
       "required": true,
       "code_only": false,
       "default": "png",
@@ -209,10 +213,12 @@
           512
         ],
         "bg": "transparent",
-        "ratio": 1.0
+        "ratio": 1.11,
+        "canvas": "tight-alpha",
+        "note": "v5 改为按主体紧裁的透明画布（原 1:1 画布导致 contain 缩放后建筑偏小，见 docs/资产契约修订-v5.md）"
       },
-      "generated_by": "",
-      "params_ref": "",
+      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
+      "params_ref": "assets/art-params.md",
       "note": "可另出 -solid 纯色底版本验证抠图"
     },
     {
@@ -224,7 +230,7 @@
       "files": [
         "B-04-treedome-right.png"
       ],
-      "status": "pending",
+      "status": "accepted",
       "required": true,
       "code_only": false,
       "default": "png",
@@ -235,10 +241,12 @@
           512
         ],
         "bg": "transparent",
-        "ratio": 1.0
+        "ratio": 0.83,
+        "canvas": "tight-alpha",
+        "note": "v5 改为按主体紧裁的透明画布（原 1:1 画布导致 contain 缩放后建筑偏小，见 docs/资产契约修订-v5.md）"
       },
-      "generated_by": "",
-      "params_ref": "",
+      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
+      "params_ref": "assets/art-params.md",
       "note": "可另出 -solid 纯色底版本验证抠图"
     },
     {
@@ -250,7 +258,7 @@
       "files": [
         "B-05-krusty_krab-right.png"
       ],
-      "status": "pending",
+      "status": "accepted",
       "required": true,
       "code_only": false,
       "default": "png",
@@ -261,10 +269,12 @@
           512
         ],
         "bg": "transparent",
-        "ratio": 1.0
+        "ratio": 0.99,
+        "canvas": "tight-alpha",
+        "note": "v5 改为按主体紧裁的透明画布（原 1:1 画布导致 contain 缩放后建筑偏小，见 docs/资产契约修订-v5.md）"
       },
-      "generated_by": "",
-      "params_ref": "",
+      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
+      "params_ref": "assets/art-params.md",
       "note": "锁风格首张，先跑这张"
     },
     {
@@ -276,7 +286,7 @@
       "files": [
         "B-06-chum_bucket-right.png"
       ],
-      "status": "pending",
+      "status": "accepted",
       "required": true,
       "code_only": false,
       "default": "png",
@@ -287,10 +297,12 @@
           512
         ],
         "bg": "transparent",
-        "ratio": 1.0
+        "ratio": 0.62,
+        "canvas": "tight-alpha",
+        "note": "v5 改为按主体紧裁的透明画布（原 1:1 画布导致 contain 缩放后建筑偏小，见 docs/资产契约修订-v5.md）"
       },
-      "generated_by": "",
-      "params_ref": "",
+      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
+      "params_ref": "assets/art-params.md",
       "note": "可另出 -solid 纯色底版本验证抠图"
     },
     {
@@ -328,7 +340,7 @@
       "files": [
         "G-01-krusty_hall.png"
       ],
-      "status": "pending",
+      "status": "accepted",
       "required": true,
       "code_only": false,
       "default": "png",
@@ -341,8 +353,8 @@
         "bg": "solid theme color",
         "ratio": 1.579
       },
-      "generated_by": "",
-      "params_ref": "",
+      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
+      "params_ref": "assets/art-params.md",
       "note": "主题色板 蓝木；同栋子房间只改【主题】与【主题纹样】两个槽位；预留大面积空白地面"
     },
     {
@@ -354,7 +366,7 @@
       "files": [
         "G-01-krusty_kitchen.png"
       ],
-      "status": "pending",
+      "status": "accepted",
       "required": true,
       "code_only": false,
       "default": "png",
@@ -367,8 +379,8 @@
         "bg": "solid theme color",
         "ratio": 1.579
       },
-      "generated_by": "",
-      "params_ref": "",
+      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
+      "params_ref": "assets/art-params.md",
       "note": "主题色板 蓝木；同栋子房间只改【主题】与【主题纹样】两个槽位；预留大面积空白地面"
     },
     {
@@ -380,7 +392,7 @@
       "files": [
         "G-01-krusty_office.png"
       ],
-      "status": "pending",
+      "status": "accepted",
       "required": true,
       "code_only": false,
       "default": "png",
@@ -393,8 +405,8 @@
         "bg": "solid theme color",
         "ratio": 1.579
       },
-      "generated_by": "",
-      "params_ref": "",
+      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
+      "params_ref": "assets/art-params.md",
       "note": "主题色板 蓝木；同栋子房间只改【主题】与【主题纹样】两个槽位；预留大面积空白地面"
     },
     {
@@ -406,7 +418,7 @@
       "files": [
         "G-01-moai_f1.png"
       ],
-      "status": "pending",
+      "status": "accepted",
       "required": true,
       "code_only": false,
       "default": "png",
@@ -419,8 +431,8 @@
         "bg": "solid theme color",
         "ratio": 1.579
       },
-      "generated_by": "",
-      "params_ref": "",
+      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
+      "params_ref": "assets/art-params.md",
       "note": "主题色板 冷灰；同栋子房间只改【主题】与【主题纹样】两个槽位；预留大面积空白地面"
     },
     {
@@ -432,7 +444,7 @@
       "files": [
         "G-01-moai_f2.png"
       ],
-      "status": "pending",
+      "status": "accepted",
       "required": true,
       "code_only": false,
       "default": "png",
@@ -445,8 +457,8 @@
         "bg": "solid theme color",
         "ratio": 1.579
       },
-      "generated_by": "",
-      "params_ref": "",
+      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
+      "params_ref": "assets/art-params.md",
       "note": "主题色板 冷灰；同栋子房间只改【主题】与【主题纹样】两个槽位；预留大面积空白地面"
     },
     {
@@ -458,7 +470,7 @@
       "files": [
         "G-01-moai_f3.png"
       ],
-      "status": "pending",
+      "status": "accepted",
       "required": true,
       "code_only": false,
       "default": "png",
@@ -471,8 +483,8 @@
         "bg": "solid theme color",
         "ratio": 1.579
       },
-      "generated_by": "",
-      "params_ref": "",
+      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
+      "params_ref": "assets/art-params.md",
       "note": "主题色板 冷灰；同栋子房间只改【主题】与【主题纹样】两个槽位；预留大面积空白地面"
     },
     {
@@ -484,7 +496,7 @@
       "files": [
         "G-01-pineapple_main.png"
       ],
-      "status": "pending",
+      "status": "accepted",
       "required": true,
       "code_only": false,
       "default": "png",
@@ -497,8 +509,8 @@
         "bg": "solid theme color",
         "ratio": 1.579
       },
-      "generated_by": "",
-      "params_ref": "",
+      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
+      "params_ref": "assets/art-params.md",
       "note": "主题色板 菠萝黄；同栋子房间只改【主题】与【主题纹样】两个槽位；预留大面积空白地面"
     },
     {
@@ -510,7 +522,7 @@
       "files": [
         "G-01-pineapple_kitchen.png"
       ],
-      "status": "pending",
+      "status": "accepted",
       "required": true,
       "code_only": false,
       "default": "png",
@@ -523,8 +535,8 @@
         "bg": "solid theme color",
         "ratio": 1.579
       },
-      "generated_by": "",
-      "params_ref": "",
+      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
+      "params_ref": "assets/art-params.md",
       "note": "主题色板 菠萝黄；同栋子房间只改【主题】与【主题纹样】两个槽位；预留大面积空白地面"
     },
     {
@@ -536,7 +548,7 @@
       "files": [
         "G-01-rock_main.png"
       ],
-      "status": "pending",
+      "status": "accepted",
       "required": true,
       "code_only": false,
       "default": "png",
@@ -549,8 +561,8 @@
         "bg": "solid theme color",
         "ratio": 1.579
       },
-      "generated_by": "",
-      "params_ref": "",
+      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
+      "params_ref": "assets/art-params.md",
       "note": "主题色板 沙褐；同栋子房间只改【主题】与【主题纹样】两个槽位；预留大面积空白地面"
     },
     {
@@ -562,7 +574,7 @@
       "files": [
         "G-01-rock_under.png"
       ],
-      "status": "pending",
+      "status": "accepted",
       "required": true,
       "code_only": false,
       "default": "png",
@@ -575,8 +587,8 @@
         "bg": "solid theme color",
         "ratio": 1.579
       },
-      "generated_by": "",
-      "params_ref": "",
+      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
+      "params_ref": "assets/art-params.md",
       "note": "主题色板 沙褐；同栋子房间只改【主题】与【主题纹样】两个槽位；预留大面积空白地面"
     },
     {
@@ -588,7 +600,7 @@
       "files": [
         "G-01-treedome_main.png"
       ],
-      "status": "pending",
+      "status": "accepted",
       "required": true,
       "code_only": false,
       "default": "png",
@@ -601,8 +613,8 @@
         "bg": "solid theme color",
         "ratio": 1.579
       },
-      "generated_by": "",
-      "params_ref": "",
+      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
+      "params_ref": "assets/art-params.md",
       "note": "主题色板 树绿；同栋子房间只改【主题】与【主题纹样】两个槽位；预留大面积空白地面"
     },
     {
@@ -614,7 +626,7 @@
       "files": [
         "G-01-treedome_airlock.png"
       ],
-      "status": "pending",
+      "status": "accepted",
       "required": true,
       "code_only": false,
       "default": "png",
@@ -627,8 +639,8 @@
         "bg": "solid theme color",
         "ratio": 1.579
       },
-      "generated_by": "",
-      "params_ref": "",
+      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
+      "params_ref": "assets/art-params.md",
       "note": "主题色板 树绿；同栋子房间只改【主题】与【主题纹样】两个槽位；预留大面积空白地面"
     },
     {
@@ -640,7 +652,7 @@
       "files": [
         "G-01-chum_counter.png"
       ],
-      "status": "pending",
+      "status": "accepted",
       "required": true,
       "code_only": false,
       "default": "png",
@@ -653,8 +665,8 @@
         "bg": "solid theme color",
         "ratio": 1.579
       },
-      "generated_by": "",
-      "params_ref": "",
+      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
+      "params_ref": "assets/art-params.md",
       "note": "主题色板 暗橄榄绿；同栋子房间只改【主题】与【主题纹样】两个槽位；预留大面积空白地面"
     },
     {
@@ -666,7 +678,7 @@
       "files": [
         "G-01-chum_lab.png"
       ],
-      "status": "pending",
+      "status": "accepted",
       "required": true,
       "code_only": false,
       "default": "png",
@@ -679,8 +691,8 @@
         "bg": "solid theme color",
         "ratio": 1.579
       },
-      "generated_by": "",
-      "params_ref": "",
+      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v4-handdrawn-2d",
+      "params_ref": "assets/art-params.md",
       "note": "主题色板 暗橄榄绿；同栋子房间只改【主题】与【主题纹样】两个槽位；预留大面积空白地面"
     },
     {
@@ -753,7 +765,7 @@
         "D-02-sponge-portrait.png",
         "D-02-sponge-token.png"
       ],
-      "status": "pending",
+      "status": "accepted",
       "required": true,
       "code_only": false,
       "default": "png",
@@ -766,8 +778,8 @@
         "bg": "transparent",
         "ratio": 0.667
       },
-      "generated_by": "",
-      "params_ref": "",
+      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v5-characters (1 sprite sheet,程序化切分)",
+      "params_ref": "assets/art-params.md",
       "note": "立绘与 token 须像同一角色；统一朝右"
     },
     {
@@ -780,7 +792,7 @@
         "D-03-squid-portrait.png",
         "D-03-squid-token.png"
       ],
-      "status": "pending",
+      "status": "accepted",
       "required": true,
       "code_only": false,
       "default": "png",
@@ -793,8 +805,8 @@
         "bg": "transparent",
         "ratio": 0.667
       },
-      "generated_by": "",
-      "params_ref": "",
+      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v5-characters (1 sprite sheet,程序化切分)",
+      "params_ref": "assets/art-params.md",
       "note": "立绘与 token 须像同一角色；统一朝右"
     },
     {
@@ -807,7 +819,7 @@
         "D-04-star-portrait.png",
         "D-04-star-token.png"
       ],
-      "status": "pending",
+      "status": "accepted",
       "required": true,
       "code_only": false,
       "default": "png",
@@ -820,8 +832,8 @@
         "bg": "transparent",
         "ratio": 0.667
       },
-      "generated_by": "",
-      "params_ref": "",
+      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v5-characters (1 sprite sheet,程序化切分)",
+      "params_ref": "assets/art-params.md",
       "note": "立绘与 token 须像同一角色；统一朝右"
     },
     {
@@ -834,7 +846,7 @@
         "D-05-krabs-portrait.png",
         "D-05-krabs-token.png"
       ],
-      "status": "pending",
+      "status": "accepted",
       "required": true,
       "code_only": false,
       "default": "png",
@@ -847,8 +859,8 @@
         "bg": "transparent",
         "ratio": 0.667
       },
-      "generated_by": "",
-      "params_ref": "",
+      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v5-characters (1 sprite sheet,程序化切分)",
+      "params_ref": "assets/art-params.md",
       "note": "立绘与 token 须像同一角色；统一朝右"
     },
     {
@@ -861,7 +873,7 @@
         "D-06-sandy-portrait.png",
         "D-06-sandy-token.png"
       ],
-      "status": "pending",
+      "status": "accepted",
       "required": true,
       "code_only": false,
       "default": "png",
@@ -874,8 +886,8 @@
         "bg": "transparent",
         "ratio": 0.667
       },
-      "generated_by": "",
-      "params_ref": "",
+      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v5-characters (1 sprite sheet,程序化切分)",
+      "params_ref": "assets/art-params.md",
       "note": "立绘与 token 须像同一角色；统一朝右"
     },
     {
@@ -888,7 +900,7 @@
         "D-07-plankton-portrait.png",
         "D-07-plankton-token.png"
       ],
-      "status": "pending",
+      "status": "accepted",
       "required": true,
       "code_only": false,
       "default": "png",
@@ -901,8 +913,8 @@
         "bg": "transparent",
         "ratio": 0.667
       },
-      "generated_by": "",
-      "params_ref": "",
+      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v5-characters (1 sprite sheet,程序化切分)",
+      "params_ref": "assets/art-params.md",
       "note": "立绘与 token 须像同一角色；统一朝右"
     },
     {
