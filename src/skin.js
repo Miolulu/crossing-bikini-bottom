@@ -44,8 +44,19 @@
     'G-14-03-angelfish_hat.png','G-14-04-old_flounder.png',
     'G-14-05-tuna_lifeguard.png','G-14-06-shrimp_sweater.png',
     'G-14-07-octopus_news.png','G-14-08-grouper_hawaii.png',
-    'G-14-09-seahorse_postal.png','G-14-10-skay_mustache.png',
-    'G-14-11-catfish_farmer.png','G-14-12-blowfish_grandma.png'];
+    'G-14-09-seahorse_postal.png','G-14-10-catfish_farmer.png',
+    'G-14-11-blowfish_grandma.png','G-14-12-skay_mustache.png'];
+  /* 居民名字必须和外形对得上：一次出图 12 格，切分后文件名与画面并非一一对应，
+     已按实际画面把 09/10/11/12 四张的文件名校正（见 assets/art-params.md §十三） */
+  var RES_BY_NAME={
+    '泡泡鱼':'G-14-11-blowfish_grandma.png',   // 圆鼓鼓的斑点河豚
+    '条纹鱼':'G-14-02-puffer_stripes.png',     // 红白条纹的河豚
+    '神仙鱼':'G-14-03-angelfish_hat.png',      // 戴帽子的神仙鱼
+    '比目鱼':'G-14-04-old_flounder.png',       // 扁扁的、拄拐的老比目鱼
+    '石头鱼':'G-14-12-skay_mustache.png',      // 贴着地面像块石头、还留着胡子
+    '海鲶先生':'G-14-10-catfish_farmer.png'    // 有胡子的鲶鱼、穿背带裤
+  };
+  window.BB_RES_SPRITE=RES_BY_NAME;   // 供对话面板取同一位居民的立绘
   function dressActors(root){
     if(!root)return;
     var sel='.actor .disc,#iplayer .disc,#player .disc';
@@ -58,7 +69,11 @@
       var isBot=!!(host&&host.classList&&host.classList.contains('bot'));
       var f;
       if(isPlayer)f='D-01-player-portrait.png';
-      else if(isBot)f=RESIDENTS[(Math.random()*RESIDENTS.length)|0];
+      else if(isBot){
+        var nmEl=host.querySelector('.nm');
+        var nm=nmEl?(nmEl.textContent||'').trim():'';
+        f=RES_BY_NAME[nm]||RESIDENTS[(Math.random()*RESIDENTS.length)|0];
+      }
       else f=CHAR?CHAR((d.textContent||'').trim().replace(/\uFE0F/g,'')):null;
       var html=f?'<img class="bbCharImg" alt="" src="../assets/characters/'+f+'">'
                 :(CHAR_SVG?CHAR_SVG((d.textContent||'').trim(),88):'');
@@ -121,6 +136,7 @@
     'pineapple_main|garyl':{s:'E-07-snail'},
     'pineapple_main|jellynet':{s:'E-09-jellynet'},
     'pineapple_main|tv':{s:'E-08-stone_tv',on:'E-09-stone_tv-on'},
+    'pineapple_main|hat':{s:'E-08-soda_cap'},
     'pineapple_main|pine':{s:'E-09-pine_ornament'},
     'pineapple_kitchen|fridge':{s:'E-08-fridge'},
     'pineapple_kitchen|record':{s:'E-08-record_player'},
@@ -327,24 +343,17 @@
     var stamp=key+'|'+src.length+'|'+theme;
     if(!force && room.dataset.bbKey===stamp && (!skin||skin.innerHTML))return;
     room.dataset.bbKey=stamp;
+    /* v9：14 个房间已各自重绘，不再做「随机缩放/偏移/镜像」伪造差异化，
+       也不叠加 room-skins 的 SVG 家具层（会和新手绘图里的柜台桌椅打架）。 */
     var h=hash(key);
-    var scale=1+(h%26)/100, dx=-((h>>3)%90), dy=-((h>>6)%55);
     busy=true;
-    room.style.backgroundSize=(1200*scale)+'px '+(760*scale)+'px';
-    room.style.backgroundPosition=dx+'px '+dy+'px';
+    room.style.backgroundSize='1200px 760px';
+    room.style.backgroundPosition='0px 0px';
     busy=false;
     var tint=document.getElementById('bbRoomTint');
-    if(!tint){tint=document.createElement('div');tint.id='bbRoomTint';room.appendChild(tint);}
-    tint.style.cssText='position:absolute;inset:0;z-index:3;pointer-events:none;background:'+
-      (TINT[theme]||'rgba(255,255,255,.05)')+';mix-blend-mode:multiply;';
+    if(tint)tint.remove();
     if(!skin){skin=document.createElement('div');skin.id='bbRoomSkin';room.appendChild(skin);}
-    skin.innerHTML=src;
-    var svg=skin.querySelector('svg');
-    if(svg){
-      svg.style.transform=(h%2)?'scaleX(-1)':'none';
-      svg.style.transformOrigin='center center';
-      svg.style.opacity='.9';
-    }
+    skin.innerHTML='';
   }
 
   /* --- 5. 点击反馈：金色小星星 --- */

@@ -261,6 +261,10 @@
     transform:translateX(-50%) rotate(-3deg);width:54px;height:16px;
     background:rgba(255,210,63,.55);border:1px solid rgba(180,150,90,.5);}
   #questHud h3{font-size:14px;margin-bottom:8px;color:#8a6530;border-bottom:1px dashed #c9ae78;padding-bottom:6px;}
+  #saveReset{pointer-events:auto;display:block;width:100%;margin-top:9px;padding:5px 0;
+    font:inherit;font-size:10.5px;font-weight:700;color:#8a6530;cursor:pointer;
+    background:rgba(255,255,255,.5);border:1px dashed #c9ae78;border-radius:6px;}
+  #saveReset:hover{background:#ffe9b8;color:#6d4c1c;}
   #questHud .qi{font-size:12px;line-height:1.9;display:flex;align-items:center;gap:7px;}
   #questHud .dot{width:15px;height:15px;border-radius:50%;border:2px solid #b89a68;
     display:inline-flex;align-items:center;justify-content:center;font-size:10px;flex:none;}
@@ -778,6 +782,7 @@
   <h3>🧾 你的点单条</h3>
   <div id="questList"></div>
   <div class="hint">跟着地上的<b>金色光圈</b>走到物件前，按 E 或点它。<br>这张纸条只记进度，不用点它。</div>
+  <button id="saveReset" type="button">🗑 重置本机进度</button>
 </div>
 <div id="nearTip" class="nearTip" style="display:none">按 E 交互</div>
 
@@ -1453,6 +1458,10 @@
           {t:'教我哼你那首歌吧',to:'song'},
           {t:'小蜗呢？',to:'gary'},
           {t:'（先忙）',to:'bye'}]},
+        start2:{t:'你又来啦——！！我刚才还在想「要是他现在出现就好了」，然后你就出现了！🎵',o:[
+          {t:'还在煎蟹黄堡？',to:'work'},
+          {t:'那首歌唱到第几句了？',to:'song'},
+          {t:'（先忙）',to:'bye'}]},
         work:{t:'我在煎蟹黄堡！每一片肉饼都要翻得刚刚好，哼哼哼~ 🎵',o:[
           {t:'秘方到底是什么？',to:'secret'},
           {t:'加油！',to:'bye',fx:'like'}]},
@@ -1479,6 +1488,10 @@
           {t:'蟹黄堡怎么卖这么贵？',to:'price'},
           {t:'海之霸最近怎么样？',to:'chum'},
           {t:'（点点头）',to:'bye'}]},
+        start2:{t:'哟，又是你。（他瞟了一眼你的口袋）刚才那份钱……付了吧？付了吧。',o:[
+          {t:'生意还是这么好？',to:'money'},
+          {t:'我又来花钱了',to:'price'},
+          {t:'（点点头）',to:'bye'}]},
         money:{t:'「怎么样」？！每一分钱都是我辛辛苦苦、一个一个铜板攒出来的！',o:[
           {t:'那账本给我看一眼？',to:'ledger',fx:'clue'},
           {t:'佩服佩服',to:'bye',fx:'like'}]},
@@ -1501,6 +1514,10 @@
           {t:'你在干嘛呢？',to:'nothing'},
           {t:'要不要一起发呆？',to:'stare'},
           {t:'石头底下有什么？',to:'under'}]},
+        start2:{t:'咦，你回来了。我刚刚想到一件特别重要的事……然后又忘了。要不要一起想？',o:[
+          {t:'你刚才什么都没干吧',to:'nothing'},
+          {t:'那我们继续发呆',to:'stare'},
+          {t:'石头底下那件事呢？',to:'under'}]},
         nothing:{t:'什么都没干。而且我干得可好了，已经干了一上午了。',o:[
           {t:'厉害',to:'bye',fx:'like'}]},
         stare:{t:'好呀！（两个人并排坐着，什么也没说，过了很久）……这真是最好的一天。',o:[
@@ -1517,6 +1534,10 @@
           {t:'你在研究什么？',to:'sci'},
           {t:'这里为什么有空气？',to:'air'},
           {t:'来比试一下？',to:'sport'}]},
+        start2:{t:'伙计，你回来得正好！我刚把那组数据算完——结论还是那句：科学解释不了海绵宝宝。',o:[
+          {t:'又发现什么了？',to:'sci'},
+          {t:'头盔还在吗？',to:'air'},
+          {t:'这次来比试？',to:'sport'}]},
         sci:{t:'我在分析比奇堡的沙子！成分完全不合理——里面居然有大量「欢乐」的残留。',o:[
           {t:'结论呢？',to:'sci2',fx:'clue'}]},
         sci2:{t:'结论是：科学解释不了海绵宝宝。这大概是本世纪最伟大的发现。',o:[
@@ -1535,6 +1556,10 @@
           {t:'先来一份海霸糊',to:'order'},
           {t:'你又在打蟹黄堡的主意？',to:'plan'},
           {t:'凯伦，你怎么看？',to:'karen'}]},
+        start2:{t:'你又来了？（他飞快地擦了两下台面）……难道海霸糊真的没那么难吃？凯伦，快记下来！',o:[
+          {t:'再来一份海霸糊',to:'order'},
+          {t:'第 1206 次学术交流？',to:'plan'},
+          {t:'凯伦今天心情如何？',to:'karen'}]},
         order:{t:'（他愣了三秒）……凯伦，记下来！我们今天有——有客人了！！',o:[
           {t:'（坐下等待）',to:'bye',fx:'egg'}]},
         plan:{t:'「打主意」？不不不，是「学术交流」！第 1205 次学术交流！',o:[
@@ -1580,7 +1605,7 @@
       tips:['想省钱就点单层，双层那个芝士加钱。','后厨的出餐窗口比收银台快，看准了再去。','章鱼哥其实不凶，他只是懒得跟人客气。','别在蟹老板面前提「涨价」，他能讲半小时。'],
       who:'条纹鱼。普通上班族，普通到没人记得我的名字。',
       bye:['行，就这样。','走了。','别再挡路。']},
-    '小丑鱼':{
+    '神仙鱼':{
       greet:{day:['哇！你的帽子好酷！可以给我看看吗？','你也是来玩的吗？我知道哪里最好玩！'],
              evening:['天要黑了，妈妈说天黑前要回家……可是我还想玩。','你能陪我去水母田看一眼吗？就一眼。'],
              night:['我偷偷溜出来的，别告诉我妈。','晚上出来探险才刺激，你不觉得吗？']},
@@ -1588,7 +1613,7 @@
             evening:['傍晚的沙子上还留着白天的温度，踩上去暖暖的。','我在石头屋门口喊了三声，派大星才醒。'],
             night:['夜里的水母是粉色的，比白天漂亮一百倍。','我数过，从这儿走回家要跳 213 下。']},
       tips:['水母田的网要先按 E 拿起来，不然抓不到。','空手道要跟着箭头按方向键，按错就断连击了。','去凤梨屋找海绵宝宝，他会唱歌给你听。','章鱼哥家有楼梯，可以一层一层往上爬。'],
-      who:'我叫小丑鱼！我今年七岁半，比奇堡跑得最快的就是我。',
+      who:'我叫神仙鱼！我今年七岁半，比奇堡跑得最快的就是我。',
       bye:['拜拜！','下次一起玩！','我要跑回家啦——']},
     '比目鱼':{
       greet:{day:['（慢慢转过来）……哦，是你啊。','嗯。今天还行。'],
@@ -1610,15 +1635,15 @@
       tips:['走到……发光的地方……就能进屋。','别急……慢慢走……也能到。','有些东西……要翻两次……才看得见。','（他指了指水母田的方向，没说话。）'],
       who:'石头鱼。我说话慢，但我记得住每一个人。',
       bye:['……再见。','（他缓缓地挥了挥手。）']},
-    '海胆先生':{
-      greet:{day:['请不要靠太近，我的刺是有原则的。','有什么事？我在思考一个很重要的问题。'],
+    '海鲶先生':{
+      greet:{day:['请不要靠太近，我的胡子是有原则的。','有什么事？我在思考一个很重要的问题。'],
              evening:['傍晚适合思辨。你有什么观点？','我在统计这条街的人流量，样本还不够。'],
              night:['深夜的比奇堡，才是真正的比奇堡。','你也是被噪音吵得睡不着吗？']},
       chat:{day:['我算过，这条街平均每 9 秒会有一次无意义的对话。刚才那次算进去了。','海绵宝宝的笑声分贝数，是我研究里最难量化的变量。'],
             evening:['章鱼哥的竖笛其实有技术含量，只是没人愿意承认。','我把海之霸的失败次数做成了一张图表，很规整。'],
-            night:['夜里的水母发光，本质上是一场低效率的求偶。','安静的时候，才能听见自己的刺在长。']},
+            night:['夜里的水母发光，本质上是一场低效率的求偶。','安静的时候，才能听见自己的胡子在长。']},
       tips:['蟹堡王的号码是 A 开头的，别拿错了。','想找彩蛋，就多翻翻角落——抽屉、柜子、糖罐。','珊瑚丛后面有条近路，知道的人不多。','别跟痞老板谈理想，他会给你讲三小时。'],
-      who:'海胆先生。海洋生物学爱好者，目前无业。',
+      who:'海鲶先生。海洋生物学爱好者，目前无业。',
       bye:['谈话到此结束。','（他点了点头，继续思考。）']}
   };
   var RES_DEFAULT={
@@ -1734,8 +1759,8 @@
 
   /* ============ bot 居民：填充街道人气 ============ */
   var BOT_DEF=[
-    ['泡泡鱼','🐠','#7fd1d8'],['条纹鱼','🐟','#f0a45c'],['小丑鱼','🐡','#ff8f6b'],
-    ['比目鱼','🐟','#a8c46a'],['石头鱼','🐠','#b39ad8'],['海胆先生','🦔','#8fb0c4']
+    ['泡泡鱼','🐠','#7fd1d8'],['条纹鱼','🐟','#f0a45c'],['神仙鱼','🐡','#ff8f6b'],
+    ['比目鱼','🐟','#a8c46a'],['石头鱼','🐠','#b39ad8'],['海鲶先生','🐟','#8fb0c4']
   ];
   var bots=[];
   BOT_DEF.forEach(function(d,i){
@@ -1910,10 +1935,92 @@
   var EXIT_HOT={x:1086,y:651};
   var exitHintShown=false;
   var IP={x:600,y:690};
+  /* ===== v9 房间重绘（14 张独立手绘图 1200×760）后的坐标重排 =====
+     旧坐标是按「代码家具」排的，与新手绘图完全不对位；这里按新图里的
+     柜台面 / 桌面 / 货架 / 地面重新落位。obj/seat/npc/portal 均为覆盖值。 */
+  var ROOM_POS={
+    krusty_hall:{
+      obj:{register:[370,199],pickup:[40,212],tip:[215,245],menu:[250,80],
+        window:[480,45],jukebox:[60,657],salt:[376,408],fries:[756,431],ticket:[960,652]},
+      seat:[[360,470],[740,480],[560,350]],npc:{squid:[520,520]},
+      portal:[[930,100],[930,250]]},
+    krusty_kitchen:{
+      obj:{grill:[40,404],fridge:[32,540],cabinet:[700,282],spatula:[300,210],
+        sauce:[280,450],sesame:[420,497],drink:[520,446],bin:[860,671]},
+      seat:[[760,540]],npc:{sponge:[780,500]},portal:[[980,120],[980,300]]},
+    krusty_office:{
+      obj:{safe:[60,233],ledger:[330,319],desklamp:[600,329],portrait:[620,40],
+        coin1:[600,520],anchor:[870,626]},
+      seat:[[740,350]],npc:{krabs:[520,330]},portal:[[890,150]]},
+    moai_f1:{
+      obj:{cushion:[110,333],clarinet:[260,319],gramophone:[380,316],lamp:[520,343],
+        selfportrait:[350,100],coffee:[330,590]},
+      seat:[[280,420],[860,620]],npc:{squid:[620,600]},portal:[[800,250]]},
+    moai_f2:{
+      obj:{easel:[360,384],paintbox:[560,414],curtain:[760,200],record:[760,560],
+        calendar:[620,150],paint:[480,540]},
+      seat:[[660,420]],portal:[[930,300],[30,280]]},
+    moai_f3:{
+      obj:{nightstand:[560,414],vinyl:[200,396],magazine:[300,355],coffee:[620,405],
+        statue:[690,170],window:[300,20]},
+      seat:[[420,450]],portal:[[760,300]]},
+    pineapple_main:{
+      obj:{clock:[170,390],pine:[250,415],hat:[420,300],jellynet:[720,297],
+        tv:[480,515],garyl:[700,556]},
+      seat:[[350,400],[600,540]],npc:{sponge:[760,560]},portal:[[830,260]]},
+    pineapple_kitchen:{
+      obj:{fridge:[110,240],jar:[300,192],photo:[660,90],record:[420,240],
+        toothbrush:[560,295],bed:[90,615]},
+      seat:[[200,600]],portal:[[830,260]]},
+    rock_main:{
+      obj:{chips:[190,263],phone:[320,227],tv:[470,318],conch:[280,684],
+        sandcastle:[760,520],shovel:[620,620]},
+      seat:[[250,470],[700,600]],npc:{patrick:[640,560]},portal:[[830,220]]},
+    rock_under:{
+      obj:{rocktop:[380,216],paper:[520,221],fridge:[40,430],cookie:[700,606],
+        lamp:[860,526],star:[420,700]},
+      seat:[[900,560]],portal:[[860,380]]},
+    treedome_main:{
+      obj:{scope:[100,352],nutjar:[240,393],board:[520,190],gauge:[420,345],
+        robotarm:[600,385],helmet:[700,381]},
+      seat:[[250,420]],npc:{sandy:[660,560]},portal:[[930,300]]},
+    treedome_airlock:{
+      obj:{computer:[60,401],acorn:[250,426],flag:[180,180],barbell:[200,598],
+        flower:[30,605],treestump:[700,577]},
+      seat:[[700,560]],portal:[[870,300]]},
+    chum_counter:{
+      obj:{chum:[190,396],register:[470,372],karen:[600,330],menu:[400,58],
+        flyer:[330,350],stool:[170,560]},
+      seat:[[260,600],[700,600]],npc:{plankton:[680,470]},portal:[[850,300]]},
+    chum_lab:{
+      obj:{jar:[330,261],scanner:[400,420],bucket:[300,691],plan:[620,100],
+        portrait:[880,120],mop:[930,608]},
+      seat:[[900,480]],portal:[[890,520]]}
+  };
+  (function(){
+    Object.keys(ROOM_POS).forEach(function(k){
+      var R=ROOMS[k],F=ROOM_POS[k];if(!R||!F)return;
+      (R.objects||[]).forEach(function(o){
+        var p=F.obj&&F.obj[o.id];
+        if(p){o.x=p[0];o.y=p[1];}
+      });
+      if(F.seat&&R.seats){for(var i=0;i<R.seats.length&&i<F.seat.length;i++){
+        R.seats[i].x=F.seat[i][0];R.seats[i].y=F.seat[i][1];}}
+      if(F.npc&&R.npcs){R.npcs.forEach(function(n){
+        var p=F.npc[n.id];if(p){n.x=p[0];n.y=p[1];}});}
+      if(F.portal&&R.portals){for(var j=0;j<R.portals.length&&j<F.portal.length;j++){
+        var pp=R.portals[j];pp.x=F.portal[j][0];pp.y=F.portal[j][1];
+        pp.cx=pp.x+48;pp.cy=pp.y+38;}}
+    });
+  })();
+
   var OBJECTS=[],objEls={},seatEls={},curNpcs=[];
 
   function renderDecor(list){
     roomDecor.innerHTML='';
+    /* v9：14 个房间已换成各自的手绘室内图，柜台/餐桌/区域标签这些「代码家具」
+       会和画面重复，一律不再绘制；引导交给目标光圈与物件本体。 */
+    return;
     list.forEach(function(d){
       var el=document.createElement('div');
       if(d.t==='tag'){el.className='zoneTag';el.textContent=d.label;}
@@ -2305,16 +2412,25 @@
   }
 
   /* ============ 橙光式分支对话面板 ============ */
+  var NPC_PORTRAIT={sponge:'D-02-sponge-portrait.png',squid:'D-03-squid-portrait.png',
+    patrick:'D-04-star-portrait.png',krabs:'D-05-krabs-portrait.png',
+    sandy:'D-06-sandy-portrait.png',plankton:'D-07-plankton-portrait.png'};
   var dlg=document.getElementById('dlg'),dlgOpen=false,dlgState={npc:null,node:null};
   function openDialog(npcId){
     var D=DIALOGS[npcId];if(!D)return;
     dlgState.npc=npcId;
-    // 选项后果：特定 flag 改变开场白
+    // 选项后果：二手搭话换开场白（见过一次就走 start2）
     var start='start';
     if(npcId==='squid'&&flags.squid_clarinet)start='start2';
+    else if(D.nodes.start2&&flags['met_'+npcId])start='start2';
+    flags['met_'+npcId]=true;
     dlgState.node=start;
-    document.getElementById('dlgPortrait').textContent=D.emoji;
-    document.getElementById('dlgPortrait').style.background=D.color;
+    var pEl=document.getElementById('dlgPortrait');
+    pEl.style.background=D.color;
+    /* 头像：主角团直接用手绘立绘；街头居民用它自己的那一张（名字↔外形已绑定） */
+    var pf=NPC_PORTRAIT[npcId]||(window.BB_RES_SPRITE&&window.BB_RES_SPRITE[D.name]);
+    if(pf)pEl.innerHTML='<img alt="" src="../assets/characters/'+pf+'">';
+    else pEl.textContent=D.emoji;
     document.getElementById('dlgName').innerHTML=D.name+'<small>按 1-4 选择 · ESC 结束</small>';
     dlg.style.display='flex';dlgOpen=true;
     renderNode();
@@ -3114,6 +3230,69 @@
     if(MG.active||MG.resultOpen||inInterior)return;openDialog('gary');};
   setJellyOn(false,true);                         // 默认街上不冒水母
 
+  /* ============ 轻量存档：进度写 localStorage，关掉网页也不丢 ============ */
+  var SAVE_KEY='bb_save_v1',saveSig='',saveOn=true;
+  function saveNow(){
+    if(!saveOn)return;
+    try{
+      localStorage.setItem(SAVE_KEY,JSON.stringify({
+        v:1,ts:Date.now(),step:quest.step,eaten:quest.eaten,myNr:quest.myNr,
+        found:found,toggle:toggleState,rummage:rummageState,flags:flags,
+        period:curPeriod,pos:{x:Math.round(P.x),y:Math.round(P.y)}
+      }));
+    }catch(e){}
+  }
+  function loadSave(){
+    var d;
+    try{
+      var raw=localStorage.getItem(SAVE_KEY);
+      if(!raw)return false;
+      d=JSON.parse(raw);
+    }catch(e){return false;}
+    if(!d||d.v!==1)return false;
+    if(typeof d.step==='number')quest.step=Math.max(0,Math.min(6,d.step));
+    quest.eaten=!!d.eaten;
+    if(d.myNr)quest.myNr=d.myNr;
+    if(d.found)Object.keys(d.found).forEach(function(k){found[k]=true;});
+    if(d.toggle)Object.keys(d.toggle).forEach(function(k){toggleState[k]=d.toggle[k];});
+    if(d.rummage)Object.keys(d.rummage).forEach(function(k){rummageState[k]=d.rummage[k];});
+    if(d.flags)Object.keys(d.flags).forEach(function(k){flags[k]=d.flags[k];});
+    if(d.period&&periodLabels[d.period]){
+      curPeriod=d.period;
+      if(clockEl)clockEl.textContent=periodLabels[curPeriod];
+      Object.keys(schedule).forEach(function(id){placeNPC(id,curPeriod,true);});
+    }
+    if(d.pos&&typeof d.pos.x==='number'){
+      P.x=d.pos.x;P.y=d.pos.y;
+      ipEl.style.left=P.x+'px';ipEl.style.top=P.y+'px';
+    }
+    return true;
+  }
+  function resetSave(){
+    saveOn=false;
+    try{localStorage.removeItem(SAVE_KEY);}catch(e){}
+    resetQuest();
+    saveSig='';
+    saveOn=true;
+  }
+  /* 状态指纹：变了才写盘，避免每帧 IO */
+  function saveTick(){
+    var sig=[quest.step,quest.eaten,
+      Object.keys(found).length,Object.keys(toggleState).length,
+      Object.keys(rummageState).length,flags.talked?1:0,curPeriod,
+      Math.round(P.x/40),Math.round(P.y/40)].join('|');
+    if(sig!==saveSig){saveSig=sig;saveNow();}
+  }
+  var saveRestored=loadSave();
+  renderQuest();
+  setInterval(saveTick,1800);
+  window.addEventListener('beforeunload',saveNow);
+  document.getElementById('saveReset').onclick=function(){
+    if(!window.confirm('清空本机存档，点单进度、藏品、房间开关全部回到初始，确定吗？'))return;
+    resetSave();
+    toast('🗑 存档已清空，从头再来一遍吧');
+  };
+
   function loop(){
     if(inInterior)updateInterior();else updateWorld();
     requestAnimationFrame(loop);
@@ -3158,6 +3337,8 @@
       get:function(){return blow;},set:function(v){blow=v;},holding:function(){return blowHold;},
       found:function(){return blowFoundN;},shapes:function(){return Object.keys(blowFound);},
       count:function(){return blowCount;},shapeAt:blowShape},
+    playSave:function(){saveNow();},resetSave:resetSave,
+    saveRestored:function(){return saveRestored;},
     moveLocked:function(){return !!(MG.active||MG.resultOpen);},
     karate:{next:karateNext,hit:karateHit,timeout:karateTimeout,
       combo:function(){return kCombo;},best:function(){return kBest;},

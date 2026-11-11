@@ -206,3 +206,64 @@ drips, no plate, no dish.
 **接线**：`#focus` 里原来的 5 个 CSS `div.layer` 已删除，换成 `<img id="bbBurgerImg">`；
 `BURGER_STAGES` 数组 + `setBurgerStage(n)` 按 `biteCount` 换图，第 4 口吃光隐藏汉堡、显示 `E-11-sauce`
 （`#secretSauce .pool img` 带呼吸光晕）。原来的 SVG `#biteClip` 圆形减法遮罩与 `BITE_SPOTS` 一并移除。
+
+---
+
+## 十二、v9 房间底图逐间重绘（G-01，14 张）
+
+**为什么重出**：v8 的 14 间房是「一张底图换色 + 随机缩放/偏移/镜像 + room-skins.js 叠 SVG 家具」伪造出来的差异化，
+实际像素平均差最小只有 5.7（chum_lab vs chum_counter），且前厅画成「普通木屋 + 铁锚」——没有柜台、没有船形桌椅、没有菜单牌。
+用户拍板：**14 间全部重出**，每间一张独立手绘室内图。
+
+**出图口径**：沿用 v5 美术锚点句（hand-drawn 2D cartoon illustration、厚描边、纸纹、暖色海盐质感），
+每间主体句只换「房间功能 + 必须出现的家具」两槽，负面词封死 3D 手办感。
+三间与标题不符的返工重出：`moai_f2`（首版画成卧室 → 改画架+画布堆）、`moai_f3`（首版画成储物阁楼 → 改斜顶床+天窗）、
+`treedome_main`（首版没有实验台 → 改白色工作台+空白白板+橡树）。
+
+**14 张时间戳（都是 1200×760 RGBA）**：
+krusty_hall `09-31-49`／krusty_kitchen `09-32-26`／krusty_office `09-33-00`／moai_f1 `09-33-55`／
+moai_f2 `09-48-32`／moai_f3 `09-49-07`／pineapple_main `09-35-25`／pineapple_kitchen `09-35-56`／
+rock_main `09-36-30`／rock_under `09-36-55`／treedome_main `09-49-40`／treedome_airlock `09-38-03`／
+chum_counter `09-38-28`／chum_lab `09-38-51`。
+
+**后处理**（工作区 `process_rooms.py`）：
+- `paper_mask = (min(RGB)>215) & (max-min<26)` 找出插画自带的纸白底/花边；
+- `fill_paper()` 用 `np.roll` 四方向**最近邻扩散**逐圈填真实像素（早前用「邻域平均」会留斜向条纹）；
+- `CROP` 内收比例（krusty_kitchen 0.11、pineapple_* 0.05）先切掉插图自带的边框；
+- `TRIM` 在覆盖后二次裁切（krusty_kitchen `(0.015,0,0.012,0.12)`）——**镜像补边已弃用**，会留下对称复制的桌腿/地砖接缝。
+
+**表现层同步改口径**（`skin.js` / `skin.css`）：
+- `applyRoom()` 不再做随机 `backgroundSize`（1.00–1.25）/ `backgroundPosition` / 奇偶镜像，
+  固定 `1200px 760px` + `0px 0px`，并移掉 `bbRoomTint` 主题色蒙版与 `bbRoomSkin` 的 SVG 家具层；
+- `renderDecor()` 首行 `return`，代码家具（`counterBar`/`table`/`zoneTag`）全部停用——新底图里已经有柜台桌椅，再画就是双层家具。
+
+**坐标系约定（重要）**：`#room` 固定 `1200×760`，`fitInterior()` 在 1440×900 下 `scale=1`，
+所以**物件 CSS 坐标 = 底图像素坐标**。所有摆放集中在 `index.html` 的 `ROOM_POS` 覆盖表
+（89 件物件 / 30 个座位 / 8 个 NPC / 17 个门梯），在 `ROOMS` 之后、`OBJECTS` 之前用 IIFE 覆写，避免手改长列表。
+读坐标的方法：`qa_drive.py` 的 `#grid:<room>` 模式在 `#room` 内注入 100px 红网格 + 黄色坐标标签层（`z-index:999`），
+1440×900 截图后按 `(120,88,1320,848)` 裁剪，得到的就是精确 1200×760。
+
+**落地对齐**：物件用 `object-fit:contain` + `object-position:50% 100%`、`transform:scale(1.7)`、`transform-origin:50% 100%`，
+底边不动往上长；`ground_props.py` 在每件物件底座下方 95px 内找最强的水平亮度阶跃（台面线），
+给出 `dy`，加 22px 经验偏置写回 `ROOM_POS`（89 件里 53 件被修正），再对 13 处个别悬空/裁切/压住 UI 的做人工微调。
+
+---
+
+## 十三、G-14 居民立绘：文件名与画面校正
+
+12 格居民群像一次出图后由 `cut_residents.py` 按位置切分，文件名是按「行带顺序」起的，
+但实际画面与名字并非一一对应，导致出现「叫神仙鱼的其实是鲶鱼」。按实际画面对照后做了两件事：
+
+1. **09↔10 内容互换**（两张图本身没画错，只是顺序错位）：交换后
+   `G-14-09-seahorse_postal` 是戴水手帽、背邮包的海马；`G-14-10-catfish_farmer` 是留胡子、穿背带裤、戴草帽的鲶鱼。
+2. **11/12 改名**（内容不动，只把文件名换成画面对应的名字）：
+   `G-14-11-blowfish_grandma` 是圆鼓鼓的斑点河豚（卷发、粉裙、木勺）；
+   `G-14-12-skay_mustache` 是贴地而卧、留着两撇胡子的魟鱼。
+
+**代码侧**：`skin.js` 新增 `RES_BY_NAME`（名字 → 立绘）并按 `.nm` 文本查表，不再是 `Math.random()` 随机分配；
+对话面板 `#dlgPortrait` 也走同一张表（`window.BB_RES_SPRITE`），并给六位主角接上 `D-0x-*-portrait`，
+所以「画面上这只」和「对话框里这只」永远是同一个角色。居民名字同步改了两个：
+`小丑鱼 → 神仙鱼`（对应 angelfish）、`海胆先生 → 海鲶先生`（对应 catfish，台词里的「刺」改成「胡子」）。
+
+**顺带修的头像**：`D-05-krabs-token.png` 原来只露出眼柄和一截头，重做方式是从全身立绘条里
+重裁蟹老板上半身（眼柄+头+蓝衬衫+钳子）再合成回原圆环内（`fix_krabs_token.py`），圆环与外描边保持不动。

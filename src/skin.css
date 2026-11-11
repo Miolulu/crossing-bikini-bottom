@@ -277,24 +277,40 @@ body #viewport{background:linear-gradient(180deg,var(--water-deep) 0%,var(--wate
   box-shadow:none!important;border-radius:0!important;overflow:visible!important;
   transition:transform .16s ease;
 }
-#room .obj .ic{display:block;width:100%;height:100%;
-  filter:drop-shadow(0 7px 5px rgba(22,44,54,.30));}
+#room .obj .ic{display:block;width:100%;height:100%;}
 #room .obj .ic .bbSvg{width:100%!important;height:100%!important;}
-#room .obj .ic .bbObjImg{display:block;width:100%;height:100%;object-fit:contain;}
+/* v9.1：手绘房间底图细节太密，40~60px 的小图标会被背景"吃掉"。
+   统一放大 1.7 倍（transform-origin 取底边中点 = 底座不动、往上长，保持贴地），
+   再补一圈暖白描边把它从背景里剥出来，加一层接触阴影压住底部。 */
+#room .obj .ic .bbObjImg{
+  display:block;width:100%;height:100%;object-fit:contain;
+  object-position:50% 100%;
+  transform:scale(1.7);transform-origin:50% 100%;
+  filter:
+    drop-shadow(1.5px 0 0 rgba(255,250,236,.85))
+    drop-shadow(-1.5px 0 0 rgba(255,250,236,.85))
+    drop-shadow(0 1.5px 0 rgba(255,250,236,.85))
+    drop-shadow(0 -1.5px 0 rgba(255,250,236,.85))
+    drop-shadow(0 8px 6px rgba(22,44,54,.42));
+}
 /* 物件状态徽标：无独立亮态立绘的开关类，打开时头顶浮动符号 */
 #room .obj .bbFx{position:absolute;top:-20px;right:-8px;font-size:16px;line-height:1;
   color:#FBE34B;text-shadow:0 2px 0 #162C36;pointer-events:none;
   animation:bbFxFloat 1.6s ease-in-out infinite;}
 @keyframes bbFxFloat{0%,100%{transform:translateY(0) rotate(-6deg);opacity:.85}
   50%{transform:translateY(-7px) rotate(6deg);opacity:1}}
-#room .obj .bbPropShadow{position:absolute;left:8%;right:8%;bottom:-7px;height:14px;
+#room .obj .bbPropShadow{position:absolute;left:-26%;right:-26%;bottom:-6px;height:18px;
   border-radius:50%;pointer-events:none;
-  background:radial-gradient(ellipse,rgba(22,44,54,.26),transparent 72%);}
+  background:radial-gradient(ellipse,rgba(22,44,54,.30),transparent 72%);}
 #room .obj .tx{background:var(--paper)!important;color:var(--ink)!important;
   border:2px solid var(--ink);border-radius:999px;font-weight:900;padding:1px 8px;
   font-size:10px;box-shadow:0 2px 0 rgba(22,44,54,.25);white-space:nowrap;
   opacity:0!important;transition:opacity .16s ease;pointer-events:none;}
 #room .obj:hover .tx,#room .obj.active .tx{opacity:1!important;transform:translateY(-2px);}
+/* 放大后的图标比原 .obj 盒子大一圈，顺手把点击热区也放宽，避免"看得到点不到" */
+#room .obj:after{content:"";position:absolute;left:-9px;right:-9px;top:-16px;bottom:-5px;}
+/* 引导期非目标物件原先是 .6 透明 + 去饱和，在细节密集的手绘图里会直接消失，改为轻微压暗 */
+#room .obj.dim{opacity:.84!important;filter:saturate(.94);}
 #room .obj:hover{transform:translateY(-4px) scale(1.06)!important;}
 #room .obj.ready{animation:bbReady 1.3s ease-in-out infinite;}
 #room .obj.taken{opacity:.4;}
@@ -335,7 +351,12 @@ body #viewport{background:linear-gradient(180deg,var(--water-deep) 0%,var(--wate
 #dlg .opt .k{background:var(--ink)!important;color:var(--banana)!important;font-weight:900!important;}
 #dlg .opt.end{background:var(--banana)!important;color:var(--ink)!important;text-align:center;}
 #dlg .fx{color:#8a5f2c!important;font-weight:700;}
-#dlg .portrait{border-color:var(--ink)!important;box-shadow:0 5px 0 var(--ink)!important;}
+#dlg .portrait{border-color:var(--ink)!important;box-shadow:0 5px 0 var(--ink)!important;
+  overflow:hidden;}
+/* 对话头像直接用手绘立绘/居民立绘，替掉 emoji 图标；底色仍用角色主题色，
+   否则浅色立绘落在米白圆底上会看不见 */
+#dlg .portrait img{display:block;width:100%;height:100%;object-fit:contain;
+  object-position:50% 100%;border-radius:50%;transform:scale(1.14);}
 
 /* 小玩法 UI */
 #mgHud,#mgBanner,.mgHScore,.kCombo,.blowHint,.blowFound{
