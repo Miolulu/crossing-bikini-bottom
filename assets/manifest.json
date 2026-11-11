@@ -53,11 +53,12 @@
   "counts": {
     "total": 61,
     "code_only": 6,
-    "deliverable": 59,
+    "deliverable": 182,
     "required": 38,
     "optional": 17,
     "expected_png": 161,
-    "remaining": 0
+    "remaining": 0,
+    "entries": 68
   },
   "assets": [
     {
@@ -114,29 +115,44 @@
     },
     {
       "id": "A-03",
-      "slot": "world.foreground",
-      "name": "近景海草视差层",
-      "code": "foreground_seaweed",
+      "slot": "world.deco.props",
+      "name": "世界装饰小物",
+      "code": "world_deco_props",
       "dir": "world",
       "files": [
-        "A-03-foreground_seaweed.png"
+        "A-03-bubbles.png",
+        "A-03-coral1.png",
+        "A-03-coral2.png",
+        "A-03-flower_cloud1.png",
+        "A-03-flower_cloud2.png",
+        "A-03-flower_cloud3.png",
+        "A-03-jellyfish1.png",
+        "A-03-jellyfish2.png",
+        "A-03-jellyfish3.png",
+        "A-03-kelp1.png",
+        "A-03-kelp2.png",
+        "A-03-pebble1.png",
+        "A-03-pebble2.png",
+        "A-03-shell.png",
+        "A-03-starfish.png",
+        "A-03-tubeworm.png"
       ],
-      "status": "pending",
+      "status": "delivered",
       "required": false,
       "code_only": false,
       "default": "png",
       "template": "A",
       "spec": {
         "size": [
-          1024,
+          256,
           256
         ],
         "bg": "transparent",
-        "ratio": 4.0
+        "ratio": 1.0
       },
-      "generated_by": "",
-      "params_ref": "",
-      "note": "左右无缝平铺"
+      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v5-handdrawn-2d",
+      "params_ref": "assets/art-params.md",
+      "note": "花云/水母/海星/贝壳/鹅卵石/海草/珊瑚/气泡；替代原 skin.js 内联 SVG 装饰；4x4 图集切分"
     },
     {
       "id": "B-01",
@@ -1898,6 +1914,109 @@
       "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / 3x2 图集 A_tidy_3x2_grid_of_exactly_6_s_2026-11-11T09-09-00.png，cut_burger.py 切分 + recolor_burger.py 面包换色",
       "params_ref": "assets/art-params.md §十一",
       "note": "#focus 检视弹窗用 <img id=\"bbBurgerImg\"> 逐口换图（0→3），第 4 口吃光切 E-11-sauce"
+    },
+    {
+      "id": "E-12",
+      "slot": "props.playfield",
+      "name": "玩法场地与座位",
+      "code": "playfield",
+      "dir": "props",
+      "files": [
+        "E-12-cushion.png",
+        "E-12-playfield_chalk.png",
+        "E-12-playfield_plank.png",
+        "E-12-playfield_rope.png",
+        "E-12-shell_chair.png",
+        "E-12-stool.png"
+      ],
+      "status": "delivered",
+      "required": false,
+      "code_only": false,
+      "default": "png",
+      "template": "A",
+      "spec": {
+        "size": [
+          384,
+          384
+        ],
+        "bg": "transparent",
+        "ratio": 1.0
+      },
+      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v5-handdrawn-2d",
+      "params_ref": "assets/art-params.md",
+      "note": "三处玩法场地贴片（绳圈/粉笔圈/木板框）+ 木桶凳/贝壳椅/坐垫；替代原 CSS 渐变场地与座位圆点"
+    },
+    {
+      "id": "E-13",
+      "slot": "props.door",
+      "name": "场景门与楼梯",
+      "code": "door_art",
+      "dir": "props",
+      "files": [
+        "E-13-arch_coral.png",
+        "E-13-door_front.png",
+        "E-13-door_office.png",
+        "E-13-door_plank.png",
+        "E-13-hatch.png",
+        "E-13-stairs.png"
+      ],
+      "status": "delivered",
+      "required": false,
+      "code_only": false,
+      "default": "png",
+      "template": "A",
+      "spec": {
+        "size": [
+          384,
+          384
+        ],
+        "bg": "transparent",
+        "ratio": 1.0
+      },
+      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v5-handdrawn-2d",
+      "params_ref": "assets/art-params.md",
+      "note": "木门/办公室门/楼梯口/正门/金属舱门/珊瑚拱门；替代原 CSS 纸卡门牌与 SVG 门图标"
+    },
+    {
+      "id": "G-15",
+      "slot": "ui.icon",
+      "name": "界面手绘图标",
+      "code": "ui_icons",
+      "dir": "ui",
+      "files": [
+        "G-15-icon_bite.png",
+        "G-15-icon_camera.png",
+        "G-15-icon_clock.png",
+        "G-15-icon_close.png",
+        "G-15-icon_crate.png",
+        "G-15-icon_door.png",
+        "G-15-icon_egg.png",
+        "G-15-icon_ff.png",
+        "G-15-icon_flip.png",
+        "G-15-icon_lens.png",
+        "G-15-icon_map.png",
+        "G-15-icon_note.png",
+        "G-15-icon_receipt.png",
+        "G-15-icon_stool.png",
+        "G-15-icon_target.png",
+        "G-15-icon_trash.png"
+      ],
+      "status": "delivered",
+      "required": false,
+      "code_only": false,
+      "default": "png",
+      "template": "A",
+      "spec": {
+        "size": [
+          192,
+          192
+        ],
+        "bg": "transparent",
+        "ratio": 1.0
+      },
+      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v5-handdrawn-2d",
+      "params_ref": "assets/art-params.md",
+      "note": "16 枚界面图标（时钟/快进/地图/靶心/清单/垃圾桶/蛋/放大镜/咬一口/翻面/相机/木箱/音符/叉/凳/门）；替代 icons.js 内联 SVG"
     }
   ]
 }

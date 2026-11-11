@@ -260,71 +260,48 @@
     });
   }
 
-  /* --- 3. 世界手绘装饰层 --- */
-  function cloud(x,y,s,c){
-    var pet='';
-    for(var i=0;i<6;i++){
-      var a=i*Math.PI/3;
-      pet+='<ellipse cx="'+(50+28*Math.cos(a)).toFixed(1)+'" cy="'+(50+28*Math.sin(a)).toFixed(1)+
-           '" rx="24" ry="20" fill="'+c+'" stroke="#162C36" stroke-width="4"/>';
-    }
-    return '<div class="bbCloud" style="left:'+x+'px;top:'+y+'px;width:'+s+'px;height:'+s+'px;'+
-      'animation-delay:'+(Math.random()*6).toFixed(1)+'s">'+
-      '<svg viewBox="0 0 100 100" width="100%" height="100%">'+pet+
-      '<circle cx="50" cy="50" r="13" fill="#FBE34B" stroke="#162C36" stroke-width="4"/></svg></div>';
+  /* --- 3. 世界装饰层（v10：全部换手绘 PNG 立绘，不再用内联 SVG 拼形状） ---
+     A-01 底图本身已经画了海草/卵石/气泡/沙路，所以这里只补「底图没有」的东西：
+     花云、水母，以及零星散在沙地上的海星 / 贝壳 / 鹅卵石点缀。
+     kelp / rock / bubble 三组 SVG 已删除（会和底图重复、且比角色还高）。 */
+  var DECO_DIR = '../assets/world/';
+  function decoTag(dir, file) {
+    return '<img class="bbDecoImg" alt="" src="' + dir + file + '.png" draggable="false">';
   }
-  function jelly(x,y,s,c){
-    return '<div class="bbJelly" style="left:'+x+'px;top:'+y+'px;width:'+s+'px;height:'+(s*1.3)+'px;'+
-      'animation-delay:'+(Math.random()*4).toFixed(1)+'s">'+
-      '<svg viewBox="0 0 80 104" width="100%" height="100%">'+
-      '<path d="M6 46Q6 8 40 8t34 38q-6 10-12 4-7 9-14 2-8 9-16 1-9 8-14-2-6 6-12-5z" fill="'+c+'" stroke="#162C36" stroke-width="4" stroke-linejoin="round"/>'+
-      '<path d="M20 54q-6 22 2 42M40 56q-4 24 2 44M60 54q6 22-2 42" fill="none" stroke="#162C36" stroke-width="4" stroke-linecap="round"/>'+
-      '<circle cx="29" cy="33" r="4" fill="#162C36"/><circle cx="51" cy="33" r="4" fill="#162C36"/></svg></div>';
+  function cloud(x, y, s, variant) {
+    return '<div class="bbCloud" style="left:' + x + 'px;top:' + y + 'px;width:' + s +
+      'px;height:' + s + 'px;animation-delay:' + (Math.random() * 6).toFixed(1) + 's">' +
+      decoTag(DECO_DIR, 'A-03-flower_cloud' + variant) + '</div>';
   }
-  function weed(x,y,s,c){
-    return '<div class="bbWeed" style="left:'+x+'px;top:'+y+'px;width:'+s+'px;height:'+(s*1.6)+'px;'+
-      'animation-delay:'+(Math.random()*3).toFixed(1)+'s">'+
-      '<svg viewBox="0 0 60 96" width="100%" height="100%">'+
-      '<path d="M30 94Q4 68 12 30q16 6 18 34Q36 22 50 6q8 40-12 76z" fill="'+c+'" stroke="#162C36" stroke-width="4" stroke-linejoin="round"/>'+
-      '<path d="M30 92V34" fill="none" stroke="#162C36" stroke-width="3" opacity=".55"/></svg></div>';
+  function jelly(x, y, s, variant) {
+    return '<div class="bbJelly" style="left:' + x + 'px;top:' + y + 'px;width:' + s +
+      'px;height:' + (s * 1.25) + 'px;animation-delay:' + (Math.random() * 4).toFixed(1) + 's">' +
+      decoTag(DECO_DIR, 'A-03-jellyfish' + variant) + '</div>';
   }
-  function rock(x,y,s){
-    return '<div class="bbRock" style="left:'+x+'px;top:'+y+'px;width:'+s+'px;height:'+(s*.6)+'px">'+
-      '<svg viewBox="0 0 100 60" width="100%" height="100%">'+
-      '<path d="M6 54Q2 24 30 14q22-14 44 2 24 8 20 38z" fill="#3C5A68" stroke="#162C36" stroke-width="4"/>'+
-      '<path d="M24 26q14-10 28-4" fill="none" stroke="#7FA8B8" stroke-width="4" stroke-linecap="round"/></svg></div>';
+  function ground(x, y, s, file) {
+    return '<div class="bbGround" style="left:' + x + 'px;top:' + y + 'px;width:' + s +
+      'px;height:' + s + 'px">' + decoTag(DECO_DIR, file) + '</div>';
   }
-  function bub(x,y,s){
-    return '<div class="bbBub" style="left:'+x+'px;top:'+y+'px;width:'+s+'px;height:'+s+'px;'+
-      'animation-delay:'+(Math.random()*7).toFixed(1)+'s">'+
-      '<svg viewBox="0 0 40 40" width="100%" height="100%"><circle cx="20" cy="20" r="16" fill="#FFFFFF" fill-opacity=".34" stroke="#FFFFFF" stroke-width="3"/>'+
-      '<path d="M11 14q4-6 10-5" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg></div>';
-  }
-  /* 原 #paths 是一条竖向 S 弯，放粗后像蓝色河流；改成横向平缓的深灰蓝街道 */
-  function fixRoad(){
-    var d='M -60 980 C 320 930 520 1060 900 990 S 1480 900 1880 970 S 2320 1060 2660 960';
-    [].slice.call(document.querySelectorAll('#paths path')).forEach(function(p){p.setAttribute('d',d);});
-  }
+  /* 原 #paths 是一条竖向 S 弯，放粗后像河流；v10 起 #paths 已在 skin.css 里关掉，
+     底图自带的手绘沙路才是唯一的路，这里不再改写路径。 */
   function buildWorldDeco(){
     var world=document.getElementById('world');if(!world||document.getElementById('bbWorldDeco'))return;
     var d=document.createElement('div');d.id='bbWorldDeco';
     var h='';
-    var clouds=[[90,70,190,'#F49CC0'],[430,150,140,'#B49ADB'],[760,60,220,'#9AD35C'],
-      [1120,180,160,'#7FA8D6'],[1480,90,200,'#F49CC0'],[1860,160,150,'#B49ADB'],
-      [2220,70,230,'#7FA8D6'],[2500,220,140,'#9AD35C'],
-      /* 中景组：首屏相机显示世界 y≥470，这组在建筑后方、部分被遮挡，保证第一屏有花云 */
-      [300,430,150,'#B49ADB'],[620,470,120,'#F49CC0'],[950,440,140,'#9AD35C'],
-      [1300,480,120,'#7FA8D6'],[1660,430,150,'#F49CC0'],[2100,470,130,'#B49ADB']];
-    clouds.forEach(function(c){h+=cloud(c[0],c[1],c[2],c[3]);});
-    [[160,330,54],[620,260,44],[980,360,62],[1360,250,48],[1720,330,58],[2120,280,50],[2460,400,44],
-     [420,560,40],[1080,600,36],[1780,580,42],[2380,560,38]]
-      .forEach(function(j){h+=jelly(j[0],j[1],j[2],'#F49CC0');});
-    [[60,980,80],[300,1120,64],[560,930,92],[900,1180,70],[1240,980,84],[1580,1120,66],
-      [1980,960,90],[2320,1150,76],[2520,990,62]]
-      .forEach(function(w,i){h+=weed(w[0],w[1],w[2],i%2?'#4E9A40':'#8FC96A');});
-    [[240,1080,54],[700,1240,42],[1080,1060,60],[1460,1260,48],[1820,1080,56],[2200,1240,44],[2500,1120,52]]
-      .forEach(function(r){h+=rock(r[0],r[1],r[2]);});
-    for(var i=0;i<22;i++)h+=bub(80+Math.random()*2400,420+Math.random()*700,10+Math.random()*20);
+    [[90,70,190,1],[430,150,140,2],[760,60,220,3],[1120,180,160,1],[1480,90,200,2],
+     [1860,160,150,3],[2220,70,230,1],[2500,220,140,2],
+     /* 中景组：首屏相机显示世界 y≥470，这组在建筑后方、部分被遮挡，保证第一屏有花云 */
+     [300,430,150,3],[620,470,120,1],[950,440,140,2],
+     [1300,480,120,3],[1660,430,150,1],[2100,470,130,2]]
+      .forEach(function(c){h+=cloud(c[0],c[1],c[2],c[3]);});
+    [[160,330,54,1],[620,260,44,2],[980,360,62,3],[1360,250,48,1],[1720,330,58,2],
+     [2120,280,50,3],[2460,400,44,1],[420,560,40,2],[1080,600,36,3],[1780,580,42,1],[2380,560,38,2]]
+      .forEach(function(j){h+=jelly(j[0],j[1],j[2],j[3]);});
+    /* 沙地点缀：海星 / 贝壳 / 鹅卵石（底图这些位置是空沙） */
+    [[240,1080,46,'A-03-starfish'],[700,1240,38,'A-03-shell'],[1080,1060,40,'A-03-pebble1'],
+     [1460,1260,34,'A-03-pebble2'],[1820,1080,42,'A-03-shell'],[2200,1240,36,'A-03-starfish'],
+     [2500,1120,44,'A-03-pebble1'],[520,980,34,'A-03-pebble2'],[1620,1010,30,'A-03-shell']]
+      .forEach(function(g){h+=ground(g[0],g[1],g[2],g[3]);});
     d.innerHTML=h;
     world.insertBefore(d,world.firstChild);
   }
@@ -407,7 +384,7 @@
     iconize(root);
   }
   function boot(){
-    fixRoad();buildWorldDeco();disclaimer();applyRoom();pass(document.body);
+    buildWorldDeco();disclaimer();applyRoom();pass(document.body);
     var mo=new MutationObserver(function(recs){
       var touched=false;
       recs.forEach(function(r){

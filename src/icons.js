@@ -100,13 +100,42 @@
   };
   var KEYS=Object.keys(shapes), COLS=Object.keys(C);
   function hash(s){var h=0;for(var i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))>>>0;return h;}
+  /* --- v10：界面图标改用生图手绘位图（assets/ui，G-15 系列） ---
+     这些槽位渲染尺寸都在 20px 以上，位图比 SVG 更贴手绘风；未列出的占位
+     仍走上面的 SVG 库兜底（小号内联字形用位图会糊）。 */
+  var PNG_DIR='../assets/ui/';
+  var PNG_MAP={
+    '⏩':'G-15-icon_ff','⏭':'G-15-icon_ff',
+    '🗺':'G-15-icon_map','🗺️':'G-15-icon_map','🌈':'G-15-icon_map',
+    '🧾':'G-15-icon_receipt','📋':'G-15-icon_receipt','📄':'G-15-icon_receipt',
+    '📜':'G-15-icon_receipt','📝':'G-15-icon_receipt','🎫':'G-15-icon_receipt',
+    '🎟️':'G-15-icon_receipt','🎟':'G-15-icon_receipt','📰':'G-15-icon_receipt',
+    '🗑':'G-15-icon_trash','🗑️':'G-15-icon_trash',
+    '📦':'G-15-icon_crate','🗄':'G-15-icon_crate','🗄️':'G-15-icon_crate',
+    '🗃':'G-15-icon_crate','🛢️':'G-15-icon_crate',
+    '🔎':'G-15-icon_lens','🔍':'G-15-icon_lens',
+    '🍔':'G-15-icon_bite','😋':'G-15-icon_bite','🍽':'G-15-icon_bite','🍽️':'G-15-icon_bite',
+    '🔄':'G-15-icon_flip','↻':'G-15-icon_flip','↺':'G-15-icon_flip',
+    '📸':'G-15-icon_camera',
+    '🥚':'G-15-icon_egg','🧊':'G-15-icon_egg',
+    '⏰':'G-15-icon_clock','🕐':'G-15-icon_clock','📅':'G-15-icon_clock',
+    '🎯':'G-15-icon_target','💿':'G-15-icon_target',
+    '🎵':'G-15-icon_note','🎷':'G-15-icon_note','♪':'G-15-icon_note','🎐':'G-15-icon_note',
+    '✕':'G-15-icon_close','✖':'G-15-icon_close','✗':'G-15-icon_close',
+    '🪑':'G-15-icon_stool','🛋':'G-15-icon_stool','🛋️':'G-15-icon_stool','🛏':'G-15-icon_stool',
+    '🚪':'G-15-icon_door','🪜':'G-15-icon_door','🏰':'G-15-icon_door'
+  };
+  window.BB_ICON_PNG=PNG_DIR;
   window.BB_ICON=function(key,size){
     key=String(key||'').replace(/\uFE0F/g,'');
     if(!key)return '';
+    var n=size||24;
+    var png=PNG_MAP[key]||PNG_MAP[key+'\uFE0F'];
+    if(png)return '<img class="bbIcoImg" alt="" draggable="false" src="'+PNG_DIR+png+'.png"'+
+      ' width="'+n+'" height="'+n+'" style="width:'+n+'px;height:'+n+'px">';
     var spec=MAP[key];
     if(!spec){var h=hash(key);spec=KEYS[h%KEYS.length]+':'+COLS[(h>>4)%COLS.length];}
     var p=spec.split(':'),fn=shapes[p[0]]||shapes.misc,c1=C[p[1]]||C.sand;
-    var n=size||24;
     return '<svg class="bbSvg" viewBox="0 0 64 64" width="'+n+'" height="'+n+'" aria-hidden="true">'+
       fn(c1,P.cream)+'</svg>';
   };

@@ -33,18 +33,29 @@ body #viewport{background:linear-gradient(180deg,var(--water-deep) 0%,var(--wate
 .bbSvg,.bbCharSvg{display:block;flex:none;overflow:visible;}
 .bb-ico .bbSvg{width:1.15em;height:1.15em;}
 .bb-ico-in-btn .bbSvg{width:1.35em;height:1.35em;}
+/* v10：界面图标位图版，尺寸跟随字号，避免生图位图在按钮里过大/过小 */
+.bbIcoImg{display:block;flex:none;object-fit:contain;pointer-events:none;user-select:none;}
+.bb-ico .bbIcoImg{width:1.18em!important;height:1.18em!important;}
+.btn .bbIcoImg,.bb-ico-in-btn .bbIcoImg{width:1.3em!important;height:1.3em!important;}
+#tipIcon .bbIcoImg{width:56px!important;height:56px!important;margin:0 auto;}
+#spinFront .bbIcoImg{width:92px!important;height:92px!important;margin:0 auto;}
+/* v10：底部工具条的按钮图标改成手绘位图（22px，比 emoji 更贴画风） */
+.btnIco{display:inline-block;width:22px;height:22px;object-fit:contain;
+  vertical-align:-5px;margin-right:6px;pointer-events:none;}
+#timeBtn .btnIco,#mapBtn .btnIco,#mgGuideBtn .btnIco{filter:drop-shadow(0 1px 0 rgba(22,44,54,.28));}
+#colBtn .bbIcoImg{width:22px!important;height:22px!important;display:inline-block;
+  vertical-align:-4px;margin-right:2px;}
 
 /* ---- 世界层：建筑 ---- */
-/* 原 #paths 就是一条 S 形弯曲小路；改成参考图里那条深蓝灰柏油路，
-   保留第二条虚线作为路面点彩，避免「浅沙路 + 深色路」双重重影。 */
-#paths{display:block!important;pointer-events:none;}
-#paths path{stroke:#405C68!important;stroke-width:56px!important;opacity:.78;}
-#paths path:nth-child(2){stroke:#A6C4CC!important;stroke-width:56px!important;
-  opacity:.32!important;stroke-dasharray:3 110!important;}
-/* 玩法场地：手绘草皮（SVG 草丛+卵石平铺）+ 墨线圈，替代绿色椭圆贴片 */
-.playspot .psArea{background:
-  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='90' viewBox='0 0 120 90'%3E%3Cg fill='none' stroke='%233F7A3F' stroke-width='3' stroke-linecap='round'%3E%3Cpath d='M22 74 C20 62 16 55 11 51 M22 74 C23 60 26 53 30 47 M22 74 C26 64 32 60 36 58'/%3E%3Cpath d='M86 36 C84 26 81 20 78 15 M86 36 C87 24 90 18 94 13 M86 36 C90 28 95 25 99 22'/%3E%3Cpath d='M60 62 C58 54 56 49 53 46 M60 62 C61 52 63 47 66 42'/%3E%3C/g%3E%3Cellipse cx='44' cy='80' rx='9' ry='5' fill='%23A8B3B8'/%3E%3Ccircle cx='106' cy='70' r='4' fill='%23A8B3B8'/%3E%3C/svg%3E") repeat,
-  radial-gradient(ellipse at 42% 38%,rgba(158,214,102,.55),rgba(110,182,122,.34) 60%,rgba(79,195,199,.12))!important;}
+/* v10：A-01 底图自带一条手绘沙路，之前 skin.css 又用 #paths 盖了一条深灰柏油路，
+   两条路叠在一起（沙路在下、灰路在上）很脏。这里直接把 #paths 关掉，只留底图那条。 */
+#paths{display:none!important;}
+/* 玩法场地：改成手绘场地贴片（E-12-playfield_*），CSS 只负责定位与放大，
+   不再用「SVG 草皮平铺 + 渐变 + 虚线框」拼假地面。 */
+.playspot .psArea{background:none!important;border:0!important;box-shadow:none!important;}
+.playspot .psArea .psArt{position:absolute;inset:0;width:100%;height:100%;
+  object-fit:fill;pointer-events:none;
+  filter:drop-shadow(0 10px 10px rgba(22,44,54,.20));}
 #world .building{
   transition:transform .28s cubic-bezier(.2,1.5,.5,1),filter .28s ease;
   filter:drop-shadow(0 10px 10px rgba(22,44,54,.22));
@@ -111,21 +122,19 @@ body #viewport{background:linear-gradient(180deg,var(--water-deep) 0%,var(--wate
 #player,#iplayer{z-index:70;}
 #player .disc{animation:bbBob 1.6s ease-in-out infinite;}
 
-/* 世界装饰层（由 skin.js 注入） */
+/* 世界装饰层（由 skin.js 注入；v10 起全部是手绘 PNG 立绘） */
 #bbWorldDeco{position:absolute;left:0;top:0;width:2600px;height:1370px;
   pointer-events:none;z-index:2;overflow:hidden;}
+#bbWorldDeco .bbDecoImg{display:block;width:100%;height:100%;object-fit:contain;
+  pointer-events:none;user-select:none;-webkit-user-drag:none;}
 #bbWorldDeco .bbCloud{position:absolute;animation:bbCloudPulse 8s ease-in-out infinite;}
 #bbWorldDeco .bbJelly{position:absolute;animation:bbJellyFloat 5.5s ease-in-out infinite;}
-#bbWorldDeco .bbWeed{position:absolute;transform-origin:bottom center;
-  animation:bbSway 4.6s ease-in-out infinite;}
-#bbWorldDeco .bbRock{position:absolute;}
-#bbWorldDeco .bbBub{position:absolute;animation:bbBubbleUp 7s linear infinite;}
+#bbWorldDeco .bbGround{position:absolute;filter:drop-shadow(0 4px 4px rgba(22,44,54,.20));}
 #bbWorldDeco .bbRoad{position:absolute;left:0;top:0;}
-/* 场景内换房门 / 楼梯：统一成米白手绘门牌，与出口门同一语言 */
-.portal{background:var(--paper)!important;border:4px solid var(--ink)!important;
-  border-radius:16px!important;animation:none!important;
-  box-shadow:0 5px 0 var(--ink),0 12px 22px rgba(6,35,56,.32)!important;}
-.portal.stair{background:linear-gradient(180deg,#FFF3D2,#F6DEA8)!important;}
+/* 场景内换房门 / 楼梯：v10 起换成手绘门立绘（E-13-*），
+   这里清掉旧的米白纸卡底与墨线框，只保留标签药丸的配色。 */
+.portal{background:none!important;border:0!important;border-radius:0!important;
+  box-shadow:none!important;animation:none!important;}
 .portal .pTx{background:var(--banana)!important;color:var(--ink)!important;
   border:2px solid var(--ink)!important;border-radius:999px!important;font-weight:900!important;}
 
@@ -222,14 +231,15 @@ body #viewport{background:linear-gradient(180deg,var(--water-deep) 0%,var(--wate
 
 /* ---- 玩法场地 ---- */
 .playspot{z-index:80;}
+/* v10：场地面已经是手绘贴片，不再描墨线框/内金边，只保留靠近时的高亮环 */
 .playspot .psArea{
-  border:4px solid var(--ink)!important;
-  box-shadow:0 6px 0 rgba(22,44,54,.3),inset 0 0 0 4px rgba(251,227,75,.35)!important;
-  transition:transform .25s ease,box-shadow .25s ease;
+  border:0!important;
+  box-shadow:none!important;
+  transition:transform .25s ease,filter .25s ease;
 }
 .playspot .psRing{border:3px dashed var(--ui-gold)!important;animation:bbRingPulse 2.4s ease-in-out infinite;}
 .playspot.near .psArea{transform:translate(-50%,-50%) scale(1.05);
-  box-shadow:0 0 0 6px var(--banana),0 10px 24px rgba(22,44,54,.4)!important;}
+  filter:brightness(1.12) drop-shadow(0 0 16px rgba(251,227,75,.85));}
 .playspot .psSign{
   background:var(--paper)!important;color:var(--ink)!important;
   border:3px solid var(--ink)!important;border-radius:14px!important;
@@ -314,8 +324,8 @@ body #viewport{background:linear-gradient(180deg,var(--water-deep) 0%,var(--wate
 #room .obj:hover{transform:translateY(-4px) scale(1.06)!important;}
 #room .obj.ready{animation:bbReady 1.3s ease-in-out infinite;}
 #room .obj.taken{opacity:.4;}
-#room .seat{background:var(--paper)!important;border:3px solid var(--ink)!important;
-  box-shadow:0 4px 0 var(--ink)!important;}
+/* v10：座位已换手绘木凳立绘，这里不再叠米白底 + 墨线框 */
+#room .seat{background:none!important;border:0!important;box-shadow:none!important;}
 #exitDoor{background:var(--paper)!important;border:4px solid var(--ink)!important;
   box-shadow:0 6px 0 var(--ink)!important;color:var(--ink)!important;}
 #exitDoor .dTx,#exitDoor .dSub{color:var(--ink)!important;font-weight:900;}
