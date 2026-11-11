@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>比奇堡 · 沉浸式连通世界</title>
+<meta http-equiv="refresh" content="0;url=src/index.html">
+<style>
+  html,body{height:100%;margin:0;background:#0b2b3c;
+    font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;}
+  .wrap{height:100%;display:flex;flex-direction:column;align-items:center;
+    justify-content:center;gap:18px;color:#FFF3D2;text-align:center;padding:24px;}
+  .bub{width:86px;height:86px;border-radius:50%;border:4px solid #F2C34E;
+    background:radial-gradient(circle at 34% 30%,#ffe98a,#F2C34E 62%,#c99a22);
+    box-shadow:0 8px 0 rgba(0,0,0,.28),inset 0 -6px 12px rgba(140,96,16,.35);
+    animation:bob 1.8s ease-in-out infinite;}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+  h1{font-size:19px;margin:0;letter-spacing:.06em}
+  p{margin:0;font-size:13px;opacity:.72}
+  a{color:#FBE34B;text-decoration:none;border-bottom:2px solid rgba(251,227,75,.45);
+    font-weight:700}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="bub"></div>
+    <h1>比奇堡 · 沉浸式连通世界</h1>
+    <p>正在潜入比奇堡…</p>
+    <p><a href="src/index.html">如果没有自动跳转，点这里进入</a></p>
+  </div>
+  <script>location.replace('src/index.html');</script>
+</body>
+</html>
