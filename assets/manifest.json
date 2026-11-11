@@ -1030,7 +1030,7 @@
     {
       "id": "E-02",
       "slot": "room.krusty_hall.props",
-      "name": "前厅道具组",
+      "name": "前厅道具组（收银机双态/菜单/小费罐）",
       "code": "e_02",
       "dir": "props",
       "files": [
@@ -1039,7 +1039,7 @@
         "E-02-menu.png",
         "E-02-tip_jar.png"
       ],
-      "status": "pending",
+      "status": "delivered",
       "required": true,
       "code_only": false,
       "default": "png",
@@ -1052,14 +1052,14 @@
         "bg": "transparent",
         "ratio": 1.0
       },
-      "generated_by": "",
-      "params_ref": "",
+      "generated_by": "cut_props.py <- 6x 4x4 prop sheets 2026-11-11",
+      "params_ref": "art-params.md §一/§二/§三(道具主体句)",
       "note": "双态成对，除【状态】槽位外提示词逐字一致；亮态只改明度不画光晕"
     },
     {
       "id": "E-03",
       "slot": "room.krusty_kitchen.props",
-      "name": "后厨道具组",
+      "name": "后厨道具组（煎炉/垃圾桶双态、锅铲正反面）",
       "code": "e_03",
       "dir": "props",
       "files": [
@@ -1072,7 +1072,7 @@
         "E-03-bin-closed.png",
         "E-03-bin-open.png"
       ],
-      "status": "pending",
+      "status": "delivered",
       "required": true,
       "code_only": false,
       "default": "png",
@@ -1085,14 +1085,14 @@
         "bg": "transparent",
         "ratio": 1.0
       },
-      "generated_by": "",
-      "params_ref": "",
+      "generated_by": "cut_props.py <- 6x 4x4 prop sheets 2026-11-11",
+      "params_ref": "art-params.md §一/§二/§三(道具主体句)",
       "note": "双态成对，除【状态】槽位外提示词逐字一致；亮态只改明度不画光晕"
     },
     {
       "id": "E-04",
       "slot": "room.krusty_office.props",
-      "name": "办公室道具组",
+      "name": "办公室道具组（保险柜双态、账本正反面、画像）",
       "code": "e_04",
       "dir": "props",
       "files": [
@@ -1100,9 +1100,9 @@
         "E-04-safe-open.png",
         "E-04-ledger-front.png",
         "E-04-ledger-back.png",
-        "E-04-portrait.png"
+        "E-04-captain_frame.png"
       ],
-      "status": "pending",
+      "status": "delivered",
       "required": true,
       "code_only": false,
       "default": "png",
@@ -1115,14 +1115,14 @@
         "bg": "transparent",
         "ratio": 1.0
       },
-      "generated_by": "",
-      "params_ref": "",
+      "generated_by": "cut_props.py <- 6x 4x4 prop sheets 2026-11-11",
+      "params_ref": "art-params.md §一/§二/§三(道具主体句)",
       "note": "双态成对，除【状态】槽位外提示词逐字一致；亮态只改明度不画光晕"
     },
     {
       "id": "E-05",
       "slot": "world.props",
-      "name": "环境物件组",
+      "name": "环境物件组（锚/救生圈/盐/杯/薯条/桶/拖把）",
       "code": "e_05",
       "dir": "props",
       "files": [
@@ -1134,7 +1134,7 @@
         "E-05-bucket.png",
         "E-05-mop.png"
       ],
-      "status": "pending",
+      "status": "delivered",
       "required": true,
       "code_only": false,
       "default": "png",
@@ -1147,21 +1147,21 @@
         "bg": "transparent",
         "ratio": 1.0
       },
-      "generated_by": "",
-      "params_ref": "",
+      "generated_by": "cut_props.py <- 6x 4x4 prop sheets 2026-11-11",
+      "params_ref": "art-params.md §一/§二/§三(道具主体句)",
       "note": "双态成对，除【状态】槽位外提示词逐字一致；亮态只改明度不画光晕"
     },
     {
       "id": "E-06",
       "slot": "room.krusty_hall.props",
-      "name": "点餐道具组",
+      "name": "点餐道具组（取号机/叫号屏）",
       "code": "e_06",
       "dir": "props",
       "files": [
         "E-06-ticket_machine.png",
         "E-06-number_board.png"
       ],
-      "status": "pending",
+      "status": "delivered",
       "required": true,
       "code_only": false,
       "default": "png",
@@ -1174,23 +1174,22 @@
         "bg": "transparent",
         "ratio": 1.0
       },
-      "generated_by": "",
-      "params_ref": "",
+      "generated_by": "cut_props.py <- 6x 4x4 prop sheets 2026-11-11",
+      "params_ref": "art-params.md §一/§二/§三(道具主体句)",
       "note": "双态成对，除【状态】槽位外提示词逐字一致；亮态只改明度不画光晕；号码屏内不写数字"
     },
     {
       "id": "E-07",
       "slot": "props.misc",
-      "name": "私人物品组",
+      "name": "私人物品组（竖笛正反面/小蜗）",
       "code": "e_07",
       "dir": "props",
       "files": [
         "E-07-clarinet-front.png",
         "E-07-clarinet-back.png",
-        "E-07-gadget.png",
-        "E-07-snail_bowl.png"
+        "E-07-snail.png"
       ],
-      "status": "pending",
+      "status": "delivered",
       "required": true,
       "code_only": false,
       "default": "png",
@@ -1203,14 +1202,14 @@
         "bg": "transparent",
         "ratio": 1.0
       },
-      "generated_by": "",
-      "params_ref": "",
+      "generated_by": "cut_props.py <- 6x 4x4 prop sheets 2026-11-11",
+      "params_ref": "art-params.md §一/§二/§三(道具主体句)",
       "note": "双态成对，除【状态】槽位外提示词逐字一致；亮态只改明度不画光晕"
     },
     {
       "id": "E-08",
       "slot": "props.residential",
-      "name": "居住区小物（第二批）",
+      "name": "居住区小物（闹钟/唱片机/冰箱/菠萝床/舷窗/罐/画架/画笔/沙发/台灯/石头电视/糖罐/头盔/显微镜/杠铃/凯伦）",
       "code": "e_08",
       "dir": "props",
       "files": [
@@ -1231,7 +1230,7 @@
         "E-08-barbell.png",
         "E-08-karen_screen.png"
       ],
-      "status": "pending",
+      "status": "delivered",
       "required": false,
       "code_only": false,
       "default": "png",
@@ -1244,8 +1243,8 @@
         "bg": "transparent",
         "ratio": 1.0
       },
-      "generated_by": "",
-      "params_ref": "",
+      "generated_by": "cut_props.py <- 6x 4x4 prop sheets 2026-11-11",
+      "params_ref": "art-params.md §一/§二/§三(道具主体句)",
       "note": "双态成对，除【状态】槽位外提示词逐字一致；亮态只改明度不画光晕"
     },
     {
@@ -1776,6 +1775,104 @@
       },
       "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v6 居民群像（hand_drawn_2D_cartoon_illustra_2026-11-11T06-47-38.png），cut_residents.py 程序化切分",
       "params_ref": "assets/art-params.md"
+    },
+    {
+      "id": "E-09",
+      "slot": "props.residential.plus",
+      "name": "居住区小物补充与状态变体",
+      "code": "e_09",
+      "dir": "props",
+      "files": [
+        "E-09-cushion.png",
+        "E-09-vinyl.png",
+        "E-09-paintbox.png",
+        "E-09-stone_tv-on.png",
+        "E-09-jellynet.png",
+        "E-09-pine_ornament.png",
+        "E-09-toothbrush.png",
+        "E-09-conch.png",
+        "E-09-sandcastle.png",
+        "E-09-shovel.png",
+        "E-09-newspaper.png",
+        "E-09-cookie.png",
+        "E-09-starfig.png",
+        "E-09-mini_moai.png",
+        "E-09-lamp-on.png",
+        "E-09-drink-on.png",
+        "E-09-karen-on.png",
+        "E-09-nut_jar.png"
+      ],
+      "status": "delivered",
+      "required": true,
+      "code_only": false,
+      "default": "png",
+      "template": "E",
+      "spec": {
+        "size": [
+          256,
+          256
+        ],
+        "bg": "transparent",
+        "ratio": 1.0
+      },
+      "generated_by": "cut_props.py <- 6x 4x4 prop sheets 2026-11-11",
+      "params_ref": "art-params.md §一/§二/§三(道具主体句)",
+      "note": "亮态只改明度不画光晕；-on 变体与母图同提示词仅换状态槽"
+    },
+    {
+      "id": "E-10",
+      "slot": "props.world.chum.misc",
+      "name": "环境/海之霸/杂项小物",
+      "code": "e_10",
+      "dir": "props",
+      "files": [
+        "E-10-flower.png",
+        "E-10-treestump.png",
+        "E-10-acorn.png",
+        "E-10-flag.png",
+        "E-10-gauge.png",
+        "E-10-chum_bucket.png",
+        "E-10-scanner.png",
+        "E-10-plan_map.png",
+        "E-10-test_tube.png",
+        "E-10-flyer.png",
+        "E-10-stool.png",
+        "E-10-whiteboard.png",
+        "E-10-terminal.png",
+        "E-10-calendar.png",
+        "E-10-magazine.png",
+        "E-10-nightstand.png",
+        "E-10-selfportrait.png",
+        "E-10-photo_frame.png",
+        "E-10-cabinet.png",
+        "E-10-rock.png",
+        "E-10-sesame.png",
+        "E-10-jukebox.png",
+        "E-10-serving_window.png",
+        "E-10-pickup_counter.png",
+        "E-10-robot_arm.png",
+        "E-10-gramophone.png",
+        "E-10-curtain-closed.png",
+        "E-10-curtain-open.png",
+        "E-10-coin.png",
+        "E-10-stone_phone.png"
+      ],
+      "status": "delivered",
+      "required": true,
+      "code_only": false,
+      "default": "png",
+      "template": "E",
+      "spec": {
+        "size": [
+          256,
+          256
+        ],
+        "bg": "transparent",
+        "ratio": 1.0
+      },
+      "generated_by": "cut_props.py <- 6x 4x4 prop sheets 2026-11-11",
+      "params_ref": "art-params.md §一/§二/§三(道具主体句)",
+      "note": "含窗帘双态、凯伦亮屏、金币底座、石电话等"
     }
   ]
 }

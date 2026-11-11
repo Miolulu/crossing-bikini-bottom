@@ -144,3 +144,36 @@ A single hand-drawn isometric interior room of a seaside wooden diner: one uneve
 | `src/room-skins.js` | 六套房间家具叠加层 | 每 theme 一张 `viewBox 0 0 1200 760` 内联 SVG；构图签名：蟹堡王木梁渔网旗串 / 凤梨屋舷窗锚饰菠萝床 / 摩艾画框蛤壳吊灯电梯门 / 石头屋半球岩石+CRT / 树屋气闸门+穹顶肋+橡树头盔 / 海之霸铆钉桶壁+齿轮电脑屏；中间交互区 `x∈[300,900]&y∈[260,560]` 强制留空 |
 
 **契约红线**：四文件只做表现层，不改玩法数据结构与坐标契约（`asset-slots.json`、`window.__BB` 不动）；可整体回滚。
+
+---
+
+## 十、v7 房间物件精灵表（6 次生图 → 程序化切分，2026-11-11）
+
+**源图**（`generated-images/`，均为 1536×1024、4×4 网格、quality high、背景 opaque）：
+
+| 组 | 源图时间戳 | 内容 |
+|---|---|---|
+| P1 | 07-46-56 | 蟹堡王：取号机/叫号屏/收银机双态/菜单牌/小费罐/煎炉双态/锅铲正反/酱料瓶/饮料机/垃圾桶双态/冰箱/唱片机 |
+| P2 | 07-47-21 | 办公室+章鱼哥家：保险柜双态/账本正反/船长画像/竖笛正反/小蜗/闹钟/台灯/沙发/坐垫/画架/画笔/黑胶/画具盘 |
+| P3 | 07-47-47 | 菠萝屋+石头屋：菠萝床/舷窗/玻璃罐/糖罐/石头电视双态/水母网/菠萝摆件/牙刷/海螺/沙堡/铲子/报纸/曲奇/海星 |
+| P4 | 07-48-15 | 树屋+环境：头盔/显微镜/杠铃/凯伦暗屏/船锚/救生圈/盐/咖啡杯/薯条/木桶/拖把/盆花/树桩/橡果/德州旗/气压表 |
+| P5 | 07-48-46 | 海之霸+杂项：海霸糊桶/扫描仪/计划图/试管/传单/吧台凳/白板/终端/日历/杂志/床头柜/摩艾自画像/相框/木柜/圆石/芝麻 |
+| P6 | 07-49-14 | 状态变体：点唱机/传菜窗/取餐台/迷你摩艾/机械臂/留声机/窗帘双态/台灯亮态/饮料机亮态/凯伦亮屏/金币/石电话/橡果罐 |
+
+**主体句模板**（锚点 §一 / 负面词 §二 逐字复用，只替换主体句）：
+```
+A tidy 4x4 grid of exactly 16 separate hand-drawn cartoon props on one sheet, 4 rows by 4 columns,
+every item centered inside its own roomy square cell with wide empty white gaps, items never touch
+and never overlap, listed in reading order from left to right and top to bottom: 1) …; 2) …; … 16) ….
+```
+双态对（-off/-on、-closed/-open、-front/-back）在主体句中写成「the same X …（状态）」，除状态槽外描述逐字一致。
+
+**切分脚本**：工作区 `cut_props.py`（run-labeling 连通域 + 行带 `cy//256` 排序 + 紧裁 + 256 方形画布 8.5% 边距）；
+右下角 190×54 水印先涂白再转 alpha；连通域面积阈值 >3000px。
+**落盘**：`deploy_props.py` 按映射表复制为 `assets/props/E-xx-*.png`（93 张，弃用 3 格：P3#7 纸帽误画、P6#13 鱼罐冗余、P6#15 橡果罐重复）。
+**命名注意**：文件名不得含 `-portrait` 后缀（触发 2:3 立绘检查），画像命名用 `-captain_frame`。
+
+**接线**：`skin.js` 的 `OBJ_SPR` 表按 `roomId|objId` 映射常态/`on`（开关亮态）/`open`（容器翻找后）三形态，
+`syncObjState()` 挂在 140ms 心跳上，读取 `.on` class、`getRummageState()`、`quest.step`（收银机结账后开抽屉）自动换图；
+无独立亮态的开关（点唱机/留声机/唱片机/机械臂/旗帜）用 `.bbFx` 浮动徽标（♪/⚙/≈）。
+未命中映射的物件（蟹堡王帽）保持 icons.js SVG 兜底。`E-04-portrait` 已改名 `E-04-captain_frame`。

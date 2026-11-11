@@ -72,7 +72,159 @@
     });
   }
 
-  /* --- 2.5 房间道具化：图标按物件高度放大、微旋转、贴地阴影（莉娜式散布观感） --- */
+  /* --- 2.5 房间物件手绘精灵表（E 系列，6 张 4x4 图集切分） ---
+     key = 'roomId|objId'；s=常态，on=开关打开态，open=容器翻找后形态。
+     未命中的物件走 icons.js 的 SVG 兜底。 */
+  var OBJ_SPR={
+    'krusty_hall|ticket':{s:'E-06-ticket_machine'},
+    'krusty_hall|register':{s:'E-02-register-closed',open:'E-02-register-open'},
+    'krusty_hall|window':{s:'E-10-serving_window'},
+    'krusty_hall|pickup':{s:'E-10-pickup_counter'},
+    'krusty_hall|tip':{s:'E-02-tip_jar'},
+    'krusty_hall|jukebox':{s:'E-10-jukebox'},
+    'krusty_hall|menu':{s:'E-02-menu'},
+    'krusty_hall|salt':{s:'E-05-salt'},
+    'krusty_hall|fries':{s:'E-05-fries'},
+    'krusty_kitchen|grill':{s:'E-03-grill-off',on:'E-03-grill-on'},
+    'krusty_kitchen|fridge':{s:'E-08-fridge'},
+    'krusty_kitchen|cabinet':{s:'E-10-cabinet'},
+    'krusty_kitchen|spatula':{s:'E-03-spatula-front'},
+    'krusty_kitchen|sauce':{s:'E-03-sauce'},
+    'krusty_kitchen|sesame':{s:'E-10-sesame'},
+    'krusty_kitchen|drink':{s:'E-03-drink',on:'E-09-drink-on'},
+    'krusty_kitchen|bin':{s:'E-03-bin-closed',open:'E-03-bin-open'},
+    'krusty_office|safe':{s:'E-04-safe-closed',open:'E-04-safe-open'},
+    'krusty_office|ledger':{s:'E-04-ledger-front'},
+    'krusty_office|portrait':{s:'E-04-captain_frame'},
+    'krusty_office|coin1':{s:'E-10-coin'},
+    'krusty_office|desklamp':{s:'E-08-lamp',on:'E-09-lamp-on'},
+    'krusty_office|anchor':{s:'E-05-anchor'},
+    'moai_f1|clarinet':{s:'E-07-clarinet-front'},
+    'moai_f1|lamp':{s:'E-08-lamp',on:'E-09-lamp-on'},
+    'moai_f1|gramophone':{s:'E-10-gramophone'},
+    'moai_f1|cushion':{s:'E-08-cushion'},
+    'moai_f1|selfportrait':{s:'E-10-selfportrait'},
+    'moai_f1|coffee':{s:'E-05-cup'},
+    'moai_f2|paintbox':{s:'E-09-paintbox'},
+    'moai_f2|easel':{s:'E-08-easel'},
+    'moai_f2|curtain':{s:'E-10-curtain-closed',on:'E-10-curtain-open'},
+    'moai_f2|record':{s:'E-09-vinyl'},
+    'moai_f2|calendar':{s:'E-10-calendar'},
+    'moai_f2|paint':{s:'E-08-paint'},
+    'moai_f3|nightstand':{s:'E-10-nightstand'},
+    'moai_f3|vinyl':{s:'E-09-vinyl'},
+    'moai_f3|statue':{s:'E-09-mini_moai'},
+    'moai_f3|window':{s:'E-08-round_window'},
+    'moai_f3|magazine':{s:'E-10-magazine'},
+    'moai_f3|coffee':{s:'E-05-cup'},
+    'pineapple_main|clock':{s:'E-08-alarm_clock'},
+    'pineapple_main|garyl':{s:'E-07-snail'},
+    'pineapple_main|jellynet':{s:'E-09-jellynet'},
+    'pineapple_main|tv':{s:'E-08-stone_tv',on:'E-09-stone_tv-on'},
+    'pineapple_main|pine':{s:'E-09-pine_ornament'},
+    'pineapple_kitchen|fridge':{s:'E-08-fridge'},
+    'pineapple_kitchen|record':{s:'E-08-record_player'},
+    'pineapple_kitchen|bed':{s:'E-08-pineapple_bed'},
+    'pineapple_kitchen|jar':{s:'E-08-jar'},
+    'pineapple_kitchen|toothbrush':{s:'E-09-toothbrush'},
+    'pineapple_kitchen|photo':{s:'E-10-photo_frame'},
+    'rock_main|tv':{s:'E-08-stone_tv',on:'E-09-stone_tv-on'},
+    'rock_main|chips':{s:'E-08-candy_jar'},
+    'rock_main|phone':{s:'E-10-stone_phone'},
+    'rock_main|conch':{s:'E-09-conch'},
+    'rock_main|sandcastle':{s:'E-09-sandcastle'},
+    'rock_main|shovel':{s:'E-09-shovel'},
+    'rock_under|fridge':{s:'E-08-fridge'},
+    'rock_under|rocktop':{s:'E-10-rock'},
+    'rock_under|paper':{s:'E-09-newspaper'},
+    'rock_under|cookie':{s:'E-09-cookie'},
+    'rock_under|lamp':{s:'E-08-lamp',on:'E-09-lamp-on'},
+    'rock_under|star':{s:'E-09-starfig'},
+    'treedome_main|scope':{s:'E-08-microscope'},
+    'treedome_main|board':{s:'E-10-whiteboard'},
+    'treedome_main|helmet':{s:'E-08-air_helmet'},
+    'treedome_main|nutjar':{s:'E-09-nut_jar'},
+    'treedome_main|gauge':{s:'E-10-gauge'},
+    'treedome_main|robotarm':{s:'E-10-robot_arm'},
+    'treedome_airlock|barbell':{s:'E-08-barbell'},
+    'treedome_airlock|computer':{s:'E-10-terminal'},
+    'treedome_airlock|flag':{s:'E-10-flag'},
+    'treedome_airlock|flower':{s:'E-10-flower'},
+    'treedome_airlock|treestump':{s:'E-10-treestump'},
+    'treedome_airlock|acorn':{s:'E-10-acorn'},
+    'chum_counter|karen':{s:'E-08-karen_screen',on:'E-09-karen-on'},
+    'chum_counter|chum':{s:'E-10-chum_bucket'},
+    'chum_counter|register':{s:'E-02-register-closed',open:'E-02-register-open'},
+    'chum_counter|menu':{s:'E-02-menu'},
+    'chum_counter|flyer':{s:'E-10-flyer'},
+    'chum_counter|stool':{s:'E-10-stool'},
+    'chum_lab|scanner':{s:'E-10-scanner'},
+    'chum_lab|plan':{s:'E-10-plan_map'},
+    'chum_lab|jar':{s:'E-10-test_tube'},
+    'chum_lab|bucket':{s:'E-05-bucket'},
+    'chum_lab|portrait':{s:'E-10-photo_frame'},
+    'chum_lab|mop':{s:'E-05-mop'}
+  };
+  /* 无独立「亮态」立绘的开关类：打开时挂一枚浮动状态徽标 */
+  var FXBADGE={'krusty_hall|jukebox':'♪','moai_f1|gramophone':'♪',
+    'pineapple_kitchen|record':'♪','treedome_main|robotarm':'⚙','treedome_airlock|flag':'≈'};
+  function objIdOf(el){
+    var BB=window.__BB;if(!BB||!BB.objEls)return null;
+    for(var id in BB.objEls())if(BB.objEls()[id]===el)return id;
+    return null;
+  }
+  function objSpriteFor(el){
+    var BB=window.__BB;if(!BB||!BB.getRoom)return null;
+    var room=BB.getRoom();if(!room)return null;
+    var id=objIdOf(el);if(!id)return null;
+    return (OBJ_SPR[room+'|'+id]||{}).s||null;
+  }
+
+  /* --- 2.6 物件形态同步：开关(on) / 翻找后(open) / 点餐进度 → 换立绘 + 状态徽标 ---
+     由 140ms 心跳驱动，dataset.bbSpr 缓存避免无谓重排。 */
+  function syncObjState(){
+    var BB=window.__BB;if(!BB||!BB.objEls||!BB.getRoom)return;
+    var room=BB.getRoom();if(!room)return;
+    var rst=BB.getRummageState?BB.getRummageState():{};
+    var step=(BB.quest&&BB.quest.step)||0;
+    var els=BB.objEls();
+    for(var id in els){
+      var el=els[id];if(!el||!el.classList||!el.classList.contains('obj'))continue;
+      var key=room+'|'+id,def=OBJ_SPR[key];
+      if(!def)continue;
+      var on=el.classList.contains('on');
+      var opened=rst[id]&&Object.keys(rst[id].f||{}).length>0;
+      var spr=def.s;
+      if(opened&&def.open)spr=def.open;
+      if(on&&def.on)spr=def.on;
+      if(id==='register'&&room==='krusty_hall'&&step>=2&&def.open)spr=def.open;
+      var ic=el.querySelector('.ic');
+      if(ic&&el.dataset.bbSpr!==spr){
+        el.dataset.bbSpr=spr;
+        ic.innerHTML='<img class="bbObjImg" alt="" src="../assets/props/'+spr+'.png">';
+      }
+      var fx=el.querySelector('.bbFx');
+      if(on&&FXBADGE[key]){
+        if(!fx){fx=document.createElement('div');fx.className='bbFx';
+          fx.textContent=FXBADGE[key];el.appendChild(fx);}
+      }else if(fx)fx.remove();
+    }
+    /* 旋转检视弹窗正面 → 手绘立绘 */
+    var spin=document.getElementById('spin');
+    var sf=document.getElementById('spinFront');
+    if(spin&&sf&&spin.style.display==='flex'){
+      var tt=((document.getElementById('spinTitle')||{}).textContent||'').split(' · ')[1]||'';
+      if(sf.dataset.bbTx!==tt){
+        sf.dataset.bbTx=tt;
+        var objs=BB.OBJECTS?BB.OBJECTS():[],found=null;
+        for(var i=0;i<objs.length;i++)if(objs[i].tx===tt)found=objs[i];
+        var d2=found?OBJ_SPR[room+'|'+found.id]:null;
+        if(d2)sf.innerHTML='<img class="bbObjImg" src="../assets/props/'+d2.s+'.png">';
+      }
+    }else if(sf&&sf.dataset.bbTx){sf.dataset.bbTx='';}
+  }
+
+  /* --- 2.7 房间道具化：图标按物件高度放大、微旋转、贴地阴影（莉娜式散布观感） --- */
   function propify(){
     [].slice.call(document.querySelectorAll('#room .obj')).forEach(function(el){
       if(el.dataset.bbProp==='1')return;
@@ -83,7 +235,9 @@
       var h=parseFloat(el.style.height)||52;
       var hh=hash(el.id||t+el.style.left);
       var size=Math.round(h*0.92+(hh%3)*6);
-      if(ICON)ic.innerHTML=ICON(t,size);
+      var spr=objSpriteFor(el);
+      if(spr)ic.innerHTML='<img class="bbObjImg" alt="" src="../assets/props/'+spr+'.png">';
+      else if(ICON)ic.innerHTML=ICON(t,size);
       el.style.transform='rotate('+(((hh>>4)%7)-3)+'deg)';
       var sh=document.createElement('div');sh.className='bbPropShadow';
       el.appendChild(sh);
@@ -266,7 +420,7 @@
     },true);
     // 主题层脚本可能晚于本文件加载，首帧之后再强制补一次
     setTimeout(function(){applyRoom(true);},600);
-    setInterval(syncDepth,140);
+    setInterval(function(){syncDepth();syncObjState();},140);
     window.addEventListener('resize',function(){var r=document.getElementById('room');
       if(r)r.dataset.bbKey='';applyRoom();});
   }
