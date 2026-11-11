@@ -73,6 +73,9 @@
     padding:8px 12px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,.2);}
   .btn:active{transform:scale(.95);}
   #prompt{position:fixed;left:50%;bottom:118px;transform:translateX(-50%);z-index:265;pointer-events:none;
+    /* v11.4：触屏下提示条写的是「点我进入 X」，那就得真的能点（桌面仍只当装饰） */
+    -webkit-tap-highlight-color:transparent;}
+  body.touch-ui #prompt{pointer-events:auto;cursor:pointer;}
     background:rgba(255,210,63,.95);color:#062338;padding:10px 18px;border-radius:14px;
     font-weight:700;display:none;box-shadow:0 6px 16px rgba(0,0,0,.3);}
   #toast{position:fixed;left:50%;top:76px;transform:translateX(-50%) translateY(-12px);z-index:375;
@@ -94,7 +97,8 @@
   .nearTip{position:fixed;transform:translate(-50%,-100%);background:#FFD23F;color:#062338;
     padding:5px 10px;border-radius:11px;font-size:11px;font-weight:800;white-space:nowrap;
     box-shadow:0 5px 12px rgba(0,0,0,.32);pointer-events:none;z-index:270;
-    animation:tipFloat 1.5s ease-in-out infinite;}
+    animation:tipFloat 1.5s ease-in-out infinite;-webkit-tap-highlight-color:transparent;}
+  body.touch-ui .nearTip{pointer-events:auto;cursor:pointer;}
   .nearTip:after{content:"";position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);
     border:6px solid transparent;border-top-color:#FFD23F;}
   @keyframes tipFloat{0%,100%{transform:translate(-50%,-100%)}50%{transform:translate(-50%,-114%)}}
@@ -313,6 +317,13 @@
   #dlg .opt.end{background:rgba(255,210,63,.9);color:#062338;font-weight:800;border-color:#FFD23F;text-align:center;}
   #dlg .opt.end:hover{background:#FFE07A;transform:none;}
   #dlg .fx{margin-top:9px;font-size:11.5px;color:#FFDCA0;min-height:0;}
+  /* v11.4：对话右上角常驻 ✕——手机没有 ESC，中途想走随时能走 */
+  #dlg .box{position:relative;}
+  #dlgClose{position:absolute;right:8px;top:8px;width:30px;height:30px;border-radius:50%;
+    border:2px solid rgba(255,255,255,.4);background:rgba(255,255,255,.12);color:#fff;
+    font-size:14px;line-height:1;cursor:pointer;-webkit-appearance:none;appearance:none;
+    -webkit-tap-highlight-color:transparent;}
+  #dlgClose:active{transform:scale(.9);background:rgba(255,255,255,.25);}
   @media (max-width:640px){
     #dlg{bottom:12px;gap:8px;}
     #dlg .portrait{width:58px;height:58px;font-size:30px;border-width:3px;}
@@ -446,7 +457,7 @@
   /* ===== v0.9：捉水母（打地鼠式）+ 鱼网光标 + 小蜗 ===== */
   body.net-mode #world,body.net-mode #world *,body.net-mode #jellyLayer,body.net-mode .jelly{
     cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Ccircle cx='14' cy='12' r='9' fill='%23ffffff' fill-opacity='.2' stroke='%23FFD23F' stroke-width='2'/%3E%3Cpath d='M5 12h18M14 3v18M7 6l14 12M21 6L7 18' stroke='%23FFD23F' stroke-width='1' opacity='.8'/%3E%3Cpath d='M22 19l7 10' stroke='%23CAA86A' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E") 14 12,crosshair !important;}
-  #jellyLayer{position:fixed;inset:0;z-index:250;pointer-events:none;}
+  #jellyLayer{position:fixed;inset:0;z-index:300;pointer-events:none;}
   .jelly{position:absolute;width:72px;height:82px;pointer-events:auto;transform:translate(-50%,-100%);
     animation:jellyPop .34s cubic-bezier(.2,1.3,.4,1) both;}
   @keyframes jellyPop{from{opacity:0;transform:translate(-50%,-40%) scale(.35)}
@@ -477,15 +488,15 @@
   .jelly.caught{animation:jellyCaught .34s ease-out both;pointer-events:none;}
   @keyframes jellyCaught{to{opacity:0;transform:translate(-50%,-100%) scale(1.6)}}
   .netSwing{position:fixed;width:76px;height:76px;border:3px solid #FFD23F;border-radius:50%;
-    pointer-events:none;z-index:251;animation:netSwing .45s ease-out both;}
+    pointer-events:none;z-index:306;animation:netSwing .45s ease-out both;}
   @keyframes netSwing{from{opacity:.9;transform:translate(-50%,-50%) scale(.3)}
     to{opacity:0;transform:translate(-50%,-50%) scale(1.25)}}
-  .jellyScore{position:fixed;z-index:252;font-weight:800;font-size:19px;pointer-events:none;
+  .jellyScore{position:fixed;z-index:305;font-weight:800;font-size:19px;pointer-events:none;
     color:#FFD23F;text-shadow:0 2px 6px rgba(6,35,56,.9);animation:scoreUp .8s ease-out both;}
   @keyframes scoreUp{to{opacity:0;transform:translateY(-46px)}}
   body.stung #viewport{animation:stungFlash .35s ease-out;}
   @keyframes stungFlash{0%,100%{filter:none}50%{filter:brightness(1.5) hue-rotate(20deg)}}
-  #jellyHud{position:fixed;right:12px;bottom:58px;z-index:265;pointer-events:none;
+  #jellyHud{position:fixed;right:12px;bottom:58px;z-index:308;pointer-events:none;
     background:rgba(6,35,56,.72);color:#fff;font-size:12px;line-height:1.6;
     padding:7px 11px;border-radius:10px;backdrop-filter:blur(4px);}
   #jellyHud b{color:#FFD23F;font-size:15px;}
@@ -543,6 +554,11 @@
   body.mg-active.mg-jelly #jellyHud{display:block;}
   body.mg-active #mgHud.mgUI,body.mg-active #mgExit.mgUI{display:block;}
   body.mg-active #toast{top:126px;}
+  /* v11.5：进小游戏后，世界导航 chrome 一律隐身，避免它们压在水母层之上、
+     挡掉点击（手机端底部按钮栏 / 左下摇杆最容易盖住飘到下方的电水母） */
+  body.mg-active #hud,body.mg-active #controls,body.mg-active #dpad,body.mg-active #legend,
+  body.mg-active #prompt,body.mg-active #nearTip,body.mg-active #questHud,body.mg-active #questToggle,
+  body.mg-active #bbDisclaimer,body.mg-active #mapOverlay{display:none !important;}
   body.mg-active.mg-bubble #mgBlow.mgUI{display:flex;}
   body.mg-active.mg-karate #mgKarate.mgUI{display:flex;}
   body.mg-result #mgResult.mgUI{display:flex;}
@@ -795,6 +811,7 @@
   <div class="portrait" id="dlgPortrait">🐙</div>
   <div class="box">
     <div class="who" id="dlgName">章鱼哥</div>
+    <button id="dlgClose" type="button" aria-label="结束对话">✕</button>
     <div class="text" id="dlgText"></div>
     <div class="opts" id="dlgOpts"></div>
     <div class="fx" id="dlgFx"></div>
@@ -834,13 +851,17 @@
 <!-- ===== v11 交互背包：手绘布口袋（捡到的东西挂兜口） ===== -->
 <div id="pocket" title="口袋">
   <img class="pkArt" id="pkArt" alt="" src="../assets/props/E-15-sack_closed.png">
-  <div class="pkN"><b id="colCount">0</b>/27</div>
+  <div class="pkN"><b id="colCount">0</b>/<span id="colTot">27</span></div>
   <div class="pkHang" id="pkHang"></div>
 </div>
 
 <div id="collection"><div class="pouchScatter">
   <h3 id="colHead">🥚 藏品册</h3>
   <div id="colGrid"></div>
+  <div id="lootWrap" style="display:none">
+    <h4 id="lootHead" class="colSub">🧺 兜里的零碎</h4>
+    <div id="lootGrid"></div>
+  </div>
   <button class="colClose" id="colClose">✕ 收起</button>
 </div></div>
 
@@ -964,6 +985,9 @@
     e27_weapon:{ic:'🧪',tx:'空空的秘密武器',desc:'试剂瓶标签很唬人，里面什么也没有。'}
   };
   var PORTALS=[],rummageState={},toggleState={},found={},curBid=null,eggTries={};
+  /* v11.3 兜里的零碎：翻找掉出来的实体（小票 / 瓶盖 / 海螺…）也要真记账，
+     否则"捡了东西口袋还是 0"——玩家会认为掉落物交互是坏的。 */
+  var lootBag={};
 
   /* 建筑 → 房间图：每栋含多个子房间，靠 portal 互相连通 */
   var GRAPH={
@@ -1590,7 +1614,7 @@
       chat:{day:['我刚才在空手道场外面偷看，珊迪一拳打飞了一个沙袋！','泡泡摊的叔叔说，吹得够久就能吹出小船。'],
             evening:['傍晚的沙子上还留着白天的温度，踩上去暖暖的。','我在石头屋门口喊了三声，派大星才醒。'],
             night:['夜里的水母是粉色的，比白天漂亮一百倍。','我数过，从这儿走回家要跳 213 下。']},
-      tips:['水母田的网要先按 E 拿起来，不然抓不到。','空手道要跟着箭头按方向键，按错就断连击了。','去凤梨屋找海绵宝宝，他会唱歌给你听。','章鱼哥家有楼梯，可以一层一层往上爬。'],
+      tips:['水母田的网要先点一下拿起来，不然抓不到。','空手道要跟着箭头点方向，点错就断连击了。','去凤梨屋找海绵宝宝，他会唱歌给你听。','章鱼哥家有楼梯，可以一层一层往上爬。'],
       who:'我叫神仙鱼！我今年七岁半，比奇堡跑得最快的就是我。',
       bye:['拜拜！','下次一起玩！','我要跑回家啦——']},
     '比目鱼':{
@@ -1814,7 +1838,10 @@
   window.addEventListener('keyup',function(e){var k=e.key.toLowerCase();if(keyMap[k])keys[k]=false;if(k===' '&&MG.id==='bubble'&&MG.active)blowRelease();});
 
   var dpad=document.getElementById('dpad'),stick=document.getElementById('stick');
-  if('ontouchstart' in window) dpad.style.display='block';
+  /* 触屏就亮摇杆：和 IS_TOUCH 同一套判定（ontouchstart 单独判断会漏掉
+     部分 Windows 触屏本 / 安卓 WebView）。 */
+  if(('ontouchstart' in window)||navigator.maxTouchPoints>0||
+     (window.matchMedia&&window.matchMedia('(pointer:coarse)').matches)) dpad.style.display='block';
   var drag=false;
   function dpadMove(e){
     if(!drag)return;var t=e.touches?e.touches[0]:e;
@@ -1850,7 +1877,7 @@
     if(!nearBuilding){
       var gEl=document.getElementById('garyWorld');
       if(gEl&&Math.hypot(P.x-300,P.y-950)<120){
-        nearGary=true;gEl.querySelector('.bub').textContent='……喵。（点我 / 按 E）';
+        nearGary=true;gEl.querySelector('.bub').textContent='……喵。（点我聊聊）';
         gEl.classList.add('show');clearTimeout(gEl._gt);
         gEl._gt=setTimeout(function(){gEl.classList.remove('show');},2600);
       }
@@ -1872,24 +1899,77 @@
     }
     if(nearBuilding){promptEl.style.display='block';
       promptEl.innerHTML=(IS_TOUCH?'点我进入 ':'按 <b>E</b> 进入 ')+nearBuilding.name;}
-    else if(nearGary){promptEl.style.display='block';promptEl.innerHTML='按 <b>E</b> 和 小蜗 打个招呼（或直接点它）';}
-    else if(nearSpot){promptEl.style.display='block';promptEl.innerHTML='按 <b>E</b> 开始「'+nearSpot.name+'」小玩法（或直接点击场地）';}
-    else if(nearNPC){promptEl.style.display='block';promptEl.innerHTML='按 <b>E</b> 和 '+schedule[nearNPC].name+' 聊聊';}
-    else if(nearBot){promptEl.style.display='block';promptEl.innerHTML='按 <b>E</b> 和 '+nearBot.name+' 打招呼';}
+    else if(nearGary){promptEl.style.display='block';
+      promptEl.innerHTML=IS_TOUCH?'点小蜗打个招呼':'按 <b>E</b> 和 小蜗 打个招呼（或直接点它）';}
+    else if(nearSpot){promptEl.style.display='block';
+      promptEl.innerHTML=IS_TOUCH?('点一下开始「'+nearSpot.name+'」小玩法')
+                                :('按 <b>E</b> 开始「'+nearSpot.name+'」小玩法（或直接点击场地）');}
+    else if(nearNPC){promptEl.style.display='block';
+      promptEl.innerHTML=(IS_TOUCH?'点我 ':'按 <b>E</b> 和 ')+schedule[nearNPC].name+(IS_TOUCH?'聊聊':' 聊聊');}
+    else if(nearBot){promptEl.style.display='block';
+      promptEl.innerHTML=(IS_TOUCH?'点我 ':'按 <b>E</b> 和 ')+nearBot.name+(IS_TOUCH?'打招呼':' 打招呼');}
     else promptEl.style.display='none';
   }
+  /* ===== v11.4 点地行走：触屏上点一下地面就走过去 =====
+     桌面保留键盘；点地面 = 设定目的地，主循环每帧朝它走。
+     点到任何可交互元素（门/居民/物件/按钮）不算行走，交给原有点击。 */
+  var walkTarget=null;
+  function isWalkTap(t){
+    if(!t||!t.closest)return false;
+    return !t.closest('.obj,.npc,.actor,.bot,.portal,.playspot,.jelly,.seat,.psDot,#exitDoor,#iplayer,#player,button,#dlg,#focus,#collection,#photo,#pocket,#actBtn,#dpad,#controls,#hud,#questHud,#questToggle,#jellyHud,#toast,#prompt,#nearTip,#mgBanner,#mgJelly,#mgBubble,#mgKarate,#mgResult,.mgUI,#mapOverlay,.jellyScore,.bbCap,.drop,#ticketNr,#makeBar,#burgerReady,#interior .topbar');
+  }
+  function walkableNow(){
+    return !(focusOpen||objTipOpen||dlgOpen||rummageOpen||spinOpen||colOpen||photoOpen||seated||
+             MG.active||MG.resultOpen);
+  }
+  viewport.addEventListener('click',function(e){
+    if(!IS_TOUCH||inInterior||!isWalkTap(e.target)||!walkableNow())return;
+    var r=world.getBoundingClientRect();
+    walkTarget={x:Math.max(20,Math.min(WORLD_W-20,e.clientX-r.left)),
+                y:Math.max(460,Math.min(WORLD_H-20,e.clientY-r.top))};
+  });
+  /* 室内同款：点房间地板就走过去（房间被镜头缩放过，先换算回房间坐标） */
+  document.getElementById('interior').addEventListener('click',function(e){
+    if(!IS_TOUCH||!inInterior||!isWalkTap(e.target)||!walkableNow())return;
+    var r=roomEl.getBoundingClientRect();
+    var sc=(r.width/1200)||1;
+    walkTarget={x:Math.max(40,Math.min(1160,(e.clientX-r.left)/sc)),
+                y:Math.max(150,Math.min(720,(e.clientY-r.top)/sc))};
+  });
+  function stepToward(t,cur,spd,okFn){
+    var dx=t.x-cur.x,dy=t.y-cur.y,d=Math.hypot(dx,dy);
+    if(d<6){return true;}
+    var s=Math.min(spd,d);
+    okFn(cur.x+dx/d*s,cur.y+dy/d*s);
+    return false;
+  }
+
   function updateWorld(){
     if(focusOpen||objTipOpen||dlgOpen||rummageOpen||spinOpen||colOpen)return;
     var mx=0,my=0;
     for(var k in keyMap){if(keys[k]){mx+=keyMap[k][0];my+=keyMap[k][1];}}
     if(keys['__jx']){mx+=keys['__jx'];my+=keys['__jy'];}
     if((mx||my)&&!(MG.active||MG.resultOpen)){
+      walkTarget=null;                      // 摇杆 / 键盘一旦介入，点地目的地作废
       var len=Math.hypot(mx,my)||1;mx/=len;my/=len;
       var nx=P.x+mx*P.spd,ny=P.y+my*P.spd;
       if(!blocked(nx,P.y))P.x=nx;
       if(!blocked(P.x,ny))P.y=ny;
       P.x=Math.max(20,Math.min(WORLD_W-20,P.x));
       P.y=Math.max(460,Math.min(WORLD_H-20,P.y));
+    } else if(walkTarget&&!(MG.active||MG.resultOpen)){
+      /* 点地行走：直线走过去，被建筑卡住 2.5 秒就放弃（免得原地抖） */
+      if(!walkTarget._t0)walkTarget._t0=Date.now();
+      if(Date.now()-walkTarget._t0>2500)walkTarget=null;
+      else{
+        var done=stepToward(walkTarget,P,P.spd*1.35,function(nx,ny){
+          if(!blocked(nx,P.y))P.x=nx;
+          if(!blocked(P.x,ny))P.y=ny;
+          P.x=Math.max(20,Math.min(WORLD_W-20,P.x));
+          P.y=Math.max(460,Math.min(WORLD_H-20,P.y));
+        });
+        if(done)walkTarget=null;
+      }
     }
     player.style.left=P.x+'px';player.style.top=P.y+'px';
     var vw=viewport.clientWidth,vh=viewport.clientHeight;
@@ -1907,6 +1987,29 @@
 var IS_TOUCH=('ontouchstart' in window)||navigator.maxTouchPoints>0||
     (window.matchMedia&&window.matchMedia('(pointer:coarse)').matches)||
     window.innerWidth<=600;
+
+  /* ===== v11.4 触屏话术补丁 =====
+     手机没有键盘。以前页面里写死的「按 E」「ESC」「WASD」「方向键」
+     在真机上既做不到又误导玩家（用户反馈：按不了 E）。
+     所有静态文案在这里一次性换成触屏说法；动态 toast 在各自出处判断 IS_TOUCH。 */
+  if(IS_TOUCH){
+    /* touch-ui：让「点我」类提示条真正可点（CSS 那边同步放开 pointer-events） */
+    document.body.classList.add('touch-ui');
+    var _q=document.querySelector('#questHud .hint');
+    if(_q)_q.innerHTML='跟着地上的<b>金色光圈</b>走到物件前，点它、或点右下角「互动」。<br>这张纸条只记进度，不用点它。';
+    var _fo=document.getElementById('focusOps');
+    if(_fo)_fo.textContent='拖动蟹黄堡旋转 · 点「😋 咬一口」吃它 · 点「✕ 返回」退出';
+    var _nt=document.getElementById('nearTip');
+    if(_nt)_nt.textContent='点我交互';
+    var _hu=document.querySelector('#hud>span');
+    if(_hu)_hu.innerHTML='点一下地面走过去 · 靠近门口 / 居民 / 小蜗时<b>点一下</b>就能进<br>镇上有 <b>3 处玩法场地</b>：水母田 / 泡泡摊 / 空手道场 · <b>走近点一下</b>开场';
+    /* 提示条点击 = 按下 E：镇上走近谁就触发谁，室内交给最近的交互点 */
+    promptEl.onclick=function(){
+      if(inInterior||MG.active||MG.resultOpen||dlgOpen||focusOpen)return;
+      tryInteract();
+    };
+    if(_nt)_nt.onclick=function(){if(inInterior)interiorInteract();};
+  }
   var roomDecor=document.getElementById('roomDecor');
   var roomFx=document.getElementById('roomFx');
   var roomNpcs=document.getElementById('roomNpcs');
@@ -2475,7 +2578,7 @@ var IS_TOUCH=('ontouchstart' in window)||navigator.maxTouchPoints>0||
     roomEl.style.transition='transform .45s ease';
     var s0=Math.min(1,(viewport.clientWidth-24)/1200,(viewport.clientHeight-70)/760);
     applyCam(camS*1.05,camTX,camTY);
-    toast('🪑 '+s.sit+'　（按 E 或再点一下起身）');
+    toast('🪑 '+s.sit+'　（'+(IS_TOUCH?'再点一下椅子':'按 E 或再点一下')+'起身）');
     tipKey=null;checkInteriorNearby();
   }
   function standUp(){
@@ -2495,6 +2598,8 @@ var IS_TOUCH=('ontouchstart' in window)||navigator.maxTouchPoints>0||
     patrick:'D-04-star-portrait.png',krabs:'D-05-krabs-portrait.png',
     sandy:'D-06-sandy-portrait.png',plankton:'D-07-plankton-portrait.png'};
   var dlg=document.getElementById('dlg'),dlgOpen=false,dlgState={npc:null,node:null};
+  /* v11.4：✕ 结束对话 —— 触屏没有 ESC，这个按钮就是手机玩家的退路 */
+  document.getElementById('dlgClose').onclick=function(e){e.stopPropagation();closeDialog();};
   function openDialog(npcId){
     var D=DIALOGS[npcId];if(!D)return;
     dlgState.npc=npcId;
@@ -2510,7 +2615,7 @@ var IS_TOUCH=('ontouchstart' in window)||navigator.maxTouchPoints>0||
     var pf=NPC_PORTRAIT[npcId]||(window.BB_RES_SPRITE&&window.BB_RES_SPRITE[D.name]);
     if(pf)pEl.innerHTML='<img alt="" src="../assets/characters/'+pf+'">';
     else pEl.textContent=D.emoji;
-    document.getElementById('dlgName').innerHTML=D.name+'<small>按 1-4 选择 · ESC 结束</small>';
+    document.getElementById('dlgName').innerHTML=D.name+'<small>'+(IS_TOUCH?'点选项继续 · 右上角 ✕ 结束':'按 1-4 选择 · ESC 结束')+'</small>';
     dlg.style.display='flex';dlgOpen=true;
     renderNode();
   }
@@ -2640,7 +2745,8 @@ var IS_TOUCH=('ontouchstart' in window)||navigator.maxTouchPoints>0||
       if(g){npcSay(g.npc,g.say);toast('跟着金色光圈走 → '+STEP_LABEL[Math.min(quest.step,5)]);}
       return;
     }
-    toast('走近物件 / 椅子 / 居民按 E；到右下角 🚪 门口或按 ESC 出门');
+    toast(IS_TOUCH?'走近物件 / 椅子 / 居民点一下 · 右下角 🚪 出去，顶栏「← 离开」也行'
+                  :'走近物件 / 椅子 / 居民按 E；到右下角 🚪 门口或按 ESC 出门');
   }
   function updateInterior(){
     if(focusOpen||objTipOpen||dlgOpen||rummageOpen||spinOpen||colOpen||seated)return;
@@ -2648,10 +2754,22 @@ var IS_TOUCH=('ontouchstart' in window)||navigator.maxTouchPoints>0||
     for(var k in keyMap){if(keys[k]){mx+=keyMap[k][0];my+=keyMap[k][1];}}
     if(keys['__jx']){mx+=keys['__jx'];my+=keys['__jy'];}
     if(mx||my){
+      walkTarget=null;                      // 摇杆 / 键盘一旦介入，点地目的地作废
       var len=Math.hypot(mx,my)||1;mx/=len;my/=len;
       IP.x=Math.max(40,Math.min(1160,IP.x+mx*P.spd));
       IP.y=Math.max(150,Math.min(720,IP.y+my*P.spd));
       ipEl.style.left=IP.x+'px';ipEl.style.top=IP.y+'px';
+    } else if(walkTarget){
+      if(!walkTarget._t0)walkTarget._t0=Date.now();
+      if(Date.now()-walkTarget._t0>2500)walkTarget=null;
+      else{
+        var done=stepToward(walkTarget,IP,P.spd*1.35,function(nx,ny){
+          IP.x=Math.max(40,Math.min(1160,nx));
+          IP.y=Math.max(150,Math.min(720,ny));
+        });
+        if(done)walkTarget=null;
+        ipEl.style.left=IP.x+'px';ipEl.style.top=IP.y+'px';
+      }
     }
     checkInteriorNearby();
     if(isPortraitCam())fitInterior();
@@ -2686,11 +2804,27 @@ var IS_TOUCH=('ontouchstart' in window)||navigator.maxTouchPoints>0||
     })(i);}
   }
   function eggTotal(){return Object.keys(EGGS).length;}
+  /* 战利品共 16 种，名单在 interact.js 的 LOOT 里；这里只负责数数 */
+  function lootKinds(){return (window.BB_ACT&&window.BB_ACT.LOOT)?window.BB_ACT.LOOT.length:16;}
+  function lootFound(){return Object.keys(lootBag).length;}
+  /* 口袋角标 = 彩蛋 + 零碎，分母 = 27 + 16，两边都算收集进度 */
+  function refreshPocketCount(){
+    var c=document.getElementById('colCount');
+    if(c)c.textContent=Object.keys(found).length+lootFound();
+    var t=document.getElementById('colTot');
+    if(t)t.textContent=eggTotal()+lootKinds();
+  }
+  function addLoot(key){
+    if(!key)return 0;
+    lootBag[key]=(lootBag[key]||0)+1;
+    refreshPocketCount();
+    return lootBag[key];
+  }
   function collectEgg(eid){
     if(!EGGS[eid]||found[eid])return false;
     found[eid]=true;
     var n=Object.keys(found).length;
-    document.getElementById('colCount').textContent=n;
+    refreshPocketCount();
     toast('🥚 发现彩蛋 · '+EGGS[eid].tx+'（'+n+'/'+eggTotal()+'）');
     sparkle(window.innerWidth*0.72,150);
     return true;
@@ -2740,6 +2874,11 @@ var IS_TOUCH=('ontouchstart' in window)||navigator.maxTouchPoints>0||
 
   /* ⑤ 藏品册：口袋张口后把捡到的东西摊在沙地上 */
   var colOpen=false;
+  /* 16 种零碎的土味名字 —— 玩家在口袋里能认出自己捡过什么 */
+  var LOOT_NAME={receipt:'揉皱的小票',coin:'金币',cap:'汽水瓶盖',key:'小钥匙',
+    clip:'贝壳发夹',conch:'海螺',photo:'相片',note:'便签',pouch:'小布袋',
+    kelp:'海带段',button:'纽扣',pencil:'铅笔头',wrapper:'糖纸',
+    ring:'唱片环',cork:'软木塞',vial:'小药瓶'};
   function openCollection(){
     var g=document.getElementById('colGrid');g.innerHTML='';var n=0;
     Object.keys(EGGS).forEach(function(eid){
@@ -2751,8 +2890,27 @@ var IS_TOUCH=('ontouchstart' in window)||navigator.maxTouchPoints>0||
         (got?'<div class="cDs">'+e.desc+'</div>':'');
       g.appendChild(c);
     });
+
+    /* 兜里的零碎：翻找掉出来的实体，捡到才亮，没捡到是淡淡的剪影 */
+    var kinds=(window.BB_ACT&&window.BB_ACT.LOOT)||[];
+    var lw=document.getElementById('lootWrap'),lg=document.getElementById('lootGrid');
+    if(lg&&kinds.length){
+      lg.innerHTML='';var ln=0;
+      kinds.forEach(function(k){
+        var cnt=lootBag[k]||0;if(cnt)ln++;
+        var c=document.createElement('div');
+        c.className='colItem loot'+(cnt?' got':'');
+        c.innerHTML='<div class="cIc"><img alt="" src="../assets/props/E-14-loot_'+k+'.png"></div>'+
+          '<div class="cTx">'+(cnt?(LOOT_NAME[k]||k)+(cnt>1?'×'+cnt:''):'· · ·')+'</div>';
+        lg.appendChild(c);
+      });
+      if(lw)lw.style.display='';
+      var lh=document.getElementById('lootHead');
+      if(lh)lh.textContent='🧺 兜里的零碎 · 已捡 '+ln+' / '+kinds.length;
+    }
+
     document.getElementById('colHead').textContent='口袋里 · 已发现 '+n+' / '+eggTotal();
-    document.getElementById('colCount').textContent=n;
+    refreshPocketCount();
     document.getElementById('pkArt').src='../assets/props/E-15-sack_open.png';
     document.getElementById('collection').classList.add('on');colOpen=true;
   }
@@ -2762,6 +2920,9 @@ var IS_TOUCH=('ontouchstart' in window)||navigator.maxTouchPoints>0||
     colOpen=false;
   }
   document.getElementById('pocket').onclick=openCollection;
+  /* 分母 27(彩蛋)+16(零碎)=43；interact.js 后加载才定下 LOOT 长度，所以再刷一次 */
+  refreshPocketCount();
+  window.addEventListener('load',refreshPocketCount);
   document.getElementById('colClose').onclick=closeCollection;
   document.getElementById('collection').onclick=function(e){if(e.target===this)closeCollection();};
 
@@ -2941,7 +3102,7 @@ var IS_TOUCH=('ontouchstart' in window)||navigator.maxTouchPoints>0||
   function showBanner(cfg){
     var b=mgEl('mgBanner');
     mgEl('mgBTitle').textContent=cfg.name+' · 开始！';
-    mgEl('mgBSub').textContent=cfg.goalTx+' ｜ '+cfg.time+' 秒 ｜ ESC 或「收工」随时退出';
+    mgEl('mgBSub').textContent=cfg.goalTx+' ｜ '+cfg.time+' 秒 ｜ '+(IS_TOUCH?'点「收工」随时退出':'ESC 或「收工」随时退出');
     b.classList.remove('on');void b.offsetWidth;b.classList.add('on');
     clearTimeout(MG.bannerT);
     MG.bannerT=setTimeout(function(){b.classList.remove('on');},2100);
@@ -3274,7 +3435,8 @@ var IS_TOUCH=('ontouchstart' in window)||navigator.maxTouchPoints>0||
     if(MG.active||MG.resultOpen){toast('先「收工」退出当前玩法，再去看别的场地');return;}
     PLAYSPOTS.forEach(function(sp){sp.el.classList.add('guide');});
     setTimeout(function(){PLAYSPOTS.forEach(function(sp){sp.el.classList.remove('guide');});},3200);
-    toast('镇上 3 处玩法场地：水母田 / 泡泡摊 / 空手道场 · 走近按 E 或直接点击开场');
+    toast(IS_TOUCH?'镇上 3 处玩法场地：水母田 / 泡泡摊 / 空手道场 · 走近点一下开场'
+                  :'镇上 3 处玩法场地：水母田 / 泡泡摊 / 空手道场 · 走近按 E 或直接点击开场');
   }
   mgEl('mgGuideBtn').onclick=mgGuide;
   document.getElementById('garyWorld').onclick=function(){
@@ -3288,7 +3450,7 @@ var IS_TOUCH=('ontouchstart' in window)||navigator.maxTouchPoints>0||
     try{
       localStorage.setItem(SAVE_KEY,JSON.stringify({
         v:1,ts:Date.now(),step:quest.step,eaten:quest.eaten,myNr:quest.myNr,
-        found:found,toggle:toggleState,rummage:rummageState,flags:flags,
+        found:found,toggle:toggleState,rummage:rummageState,flags:flags,loot:lootBag,
         period:curPeriod,pos:{x:Math.round(P.x),y:Math.round(P.y)}
       }));
     }catch(e){}
@@ -3308,6 +3470,8 @@ var IS_TOUCH=('ontouchstart' in window)||navigator.maxTouchPoints>0||
     if(d.toggle)Object.keys(d.toggle).forEach(function(k){toggleState[k]=d.toggle[k];});
     if(d.rummage)Object.keys(d.rummage).forEach(function(k){rummageState[k]=d.rummage[k];});
     if(d.flags)Object.keys(d.flags).forEach(function(k){flags[k]=d.flags[k];});
+    if(d.loot)Object.keys(d.loot).forEach(function(k){lootBag[k]=d.loot[k];});
+    refreshPocketCount();
     if(d.period&&periodLabels[d.period]){
       curPeriod=d.period;
       if(clockEl)clockEl.textContent=periodLabels[curPeriod];
@@ -3366,6 +3530,10 @@ var IS_TOUCH=('ontouchstart' in window)||navigator.maxTouchPoints>0||
     rollTicket:rollTicket,callNr:callNr,flags:flags,
     updateWorldGuide:updateWorldGuide,curNpcs:function(){return curNpcs;},
     GRAPH:GRAPH,EGGS:EGGS,found:function(){return found;},collectEgg:collectEgg,
+    addLoot:addLoot,lootBag:function(){return lootBag;},refreshPocketCount:refreshPocketCount,
+    walkTarget:function(){return walkTarget;},setWalk:function(x,y){walkTarget={x:x,y:y};},
+    /* QA：无头环境里 rAF 不走，主循环单步手动驱动（正常浏览器用不到） */
+    tick:function(){if(inInterior)updateInterior();else updateWorld();},
     switchRoom:switchRoom,loadRoom:loadRoom,getCurBid:function(){return curBid;},
     renderPortals:renderPortals,renderRoomNav:renderRoomNav,portals:function(){return PORTALS;},
     openRummage:openRummage,flipSlot:flipSlot,closeRummage:closeRummage,

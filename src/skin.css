@@ -392,8 +392,13 @@ body #viewport{background:linear-gradient(180deg,var(--water-deep) 0%,var(--wate
 @keyframes bbReady{0%,100%{box-shadow:0 0 0 3px rgba(251,227,75,.5)}
   50%{box-shadow:0 0 0 10px rgba(251,227,75,.14)}}
 @keyframes bbSpin{to{transform:rotate(360deg)}}
-@keyframes bbPop{from{transform:scale(.7) translateY(12px);opacity:0}
-  to{transform:scale(1) translateY(0);opacity:1}}
+/* ★ 关键帧必须带上 translateX(-50%)：#toast 靠 left:50% + translateX(-50%) 居中，
+   而 animation-fill-mode:both 会把最终帧的 transform 永久盖上去。
+   以前这里只写了 scale/translateY，动画一跑完 toast 的 -50% 就被抹掉，
+   左边缘被钉在屏幕中线 —— 窄屏上直接溢出右边界，视觉上像"提示字压在一起/飘出画面"。 */
+@keyframes bbPop{
+  from{transform:translateX(-50%) scale(.7) translateY(12px);opacity:0}
+  to{transform:translateX(-50%) scale(1) translateY(0);opacity:1}}
 @keyframes bbRoomIn{from{filter:brightness(1.22) saturate(1.12)}to{filter:none}}
 
 /* 触屏 / 窄屏 */
@@ -428,14 +433,19 @@ body #viewport{background:linear-gradient(180deg,var(--water-deep) 0%,var(--wate
   transform:translate(-50%,-50%);pointer-events:none;}
 .bbFly{filter:drop-shadow(0 6px 10px rgba(0,0,0,.28));}
 
-/* 手写题注：没有边框、没有底色，就是一句写在场景上的话 */
+/* 手写题注：一张小纸条。
+   以前是"没底色、只靠白色描边"的裸字，压在手绘地板/冰箱上完全看不清，
+   而且捡东西的题注正好落在掉落物上，两种字叠成一片（用户反馈的"提示字体重叠"）。
+   现在给它一张纸片底 + 墨线边，跟别的气泡同一套质感，压在哪里都读得出来。 */
 .bbCap{position:absolute;z-index:400;pointer-events:none;
   font-family:"Segoe Script","Bradley Hand","Kaiti SC",var(--font,inherit),cursive;
-  font-size:13.5px;line-height:1.45;color:#2b1a0d;font-weight:800;
-  max-width:216px;text-align:center;letter-spacing:.3px;
-  transform:translate(-50%,-100%) rotate(-1.6deg);
-  text-shadow:0 1px 0 rgba(255,255,255,.95),0 0 7px rgba(255,255,255,.95),
-    0 0 2px rgba(255,255,255,.9);}
+  font-size:13px;line-height:1.4;color:#2b1a0d;font-weight:800;
+  max-width:190px;text-align:center;letter-spacing:.3px;
+  background:linear-gradient(#fffdf4,#ffeec6);
+  border:2.5px solid var(--ink,#162c36);border-radius:12px;
+  padding:4px 10px 5px;
+  box-shadow:0 3px 0 rgba(22,44,54,.34),0 6px 12px rgba(6,35,56,.18);
+  transform:translate(-50%,-100%) rotate(-1.6deg);}
 @keyframes bbCapIn{from{opacity:0;transform:translate(-50%,-88%) rotate(-1.6deg) scale(.92)}
   to{opacity:1;transform:translate(-50%,-100%) rotate(-1.6deg) scale(1)}}
 .bbCap{animation:bbCapIn .26s ease-out;}
@@ -490,6 +500,20 @@ body.bb-warm #roomEl,body.bb-warm #room{filter:brightness(1.07) saturate(1.1) se
 #colGrid .cIc img{width:44px;height:44px;object-fit:contain;}
 #colGrid .cTx{font-size:11.5px;font-weight:800;color:#4a331c;line-height:1.3;text-align:center;}
 #colGrid .cDs{display:none;}
+
+/* 兜里的零碎：翻找掉出来的实体，捡到才亮；没捡到是淡淡剪影 */
+#collection .colSub{font-size:12.5px;color:#5b4426;font-weight:900;letter-spacing:.5px;
+  margin:14px 0 6px;padding-top:10px;border-top:2px dashed rgba(90,68,38,.32);}
+#lootGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:5px 3px;}
+#lootGrid .colItem{display:flex;flex-direction:column;align-items:center;gap:1px;padding:5px 3px;}
+#lootGrid .colItem:nth-child(4n+1){transform:rotate(-2deg);}
+#lootGrid .colItem:nth-child(5n+2){transform:rotate(1.6deg);}
+#lootGrid .cIc{width:38px;height:38px;display:flex;align-items:center;justify-content:center;
+  opacity:.22;filter:grayscale(1) contrast(.6);}
+#lootGrid .colItem.got .cIc{opacity:1;filter:drop-shadow(0 3px 0 rgba(22,44,54,.22));}
+#lootGrid .cIc img{width:36px;height:36px;object-fit:contain;}
+#lootGrid .cTx{font-size:10.5px;font-weight:800;color:#4a331c;line-height:1.25;text-align:center;}
+#lootGrid .colItem:not(.got) .cTx{opacity:.4;}
 #collection .colClose{margin-top:14px;background:var(--paper,#fff8e6);color:var(--ink,#162c36);
   border:2.5px solid var(--ink,#162c36);border-radius:999px;padding:8px 20px;
   font-weight:900;font-size:13px;cursor:pointer;box-shadow:0 4px 0 rgba(22,44,54,.28);}
@@ -690,10 +714,16 @@ body.bb-warm #roomEl,body.bb-warm #room{filter:brightness(1.07) saturate(1.1) se
   /* 390 宽没有位置放署名，桌面端保留 */
   #bbDisclaimer{display:none!important;}
 
-  /* 室内顶栏：标题让位给右侧按钮，不再被截断成「蟹堡王 · 前厅（」 */
-  #interior .topbar #roomTitle{font-size:12px!important;max-width:42vw;
-    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-  #interior .topbar .barBtns button{font-size:11px!important;padding:5px 9px!important;}
+  /* 室内顶栏：标题让位给右侧按钮，不再被截断成「蟹堡王 · 前厅（」
+     实测 390 宽：barBtns 带 padding-right:96px，把标题压到 136px，
+     "蟹堡王 · 后厨（微波炉区）" 直接省略号。这里把预留收到 48px
+     （只留给右上角的点单条按钮），按钮本身也缩一档，标题还给 210px。 */
+  #interior .topbar{padding:0 10px!important;gap:6px!important;}
+  #interior .topbar .barBtns{gap:5px!important;padding-right:48px!important;}
+  #interior .topbar #roomTitle{font-size:12px!important;flex:1 1 auto!important;min-width:0!important;
+    max-width:none!important;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  #interior .topbar .barBtns button{font-size:10.5px!important;padding:4px 8px!important;
+    height:32px!important;white-space:nowrap;}
 }
 /* 横屏手机（高度很小）：顶部往下压，工具条变矮 */
 @media (max-height:460px){

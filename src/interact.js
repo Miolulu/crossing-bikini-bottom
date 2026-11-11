@@ -91,14 +91,37 @@
   }
 
   /* ---------- 手写题注（唯一允许出现的文字，两行以内、自动淡出） ---------- */
+  /* 题注锚点：算到"物件视觉头顶再往上一个提示条高度"。
+     两个坑叠在一起 ——
+       ① 物件立绘被 scale(1.7) 放大过，盒子顶 o.y 不是视觉顶；
+       ② 近物提示条 #nearTip 就贴在视觉顶（objRect.top-6）。
+     以前所有题注都写 o.y-8，结果要么压在物件身上，要么和提示条、和刚掉出来的
+     掉落物叠成两层字（用户反馈的"提示字体重叠"）。这里统一换算。 */
+  function capAnchor(o, pad) {
+    var x = o.x + (o.w || 56) / 2, y = o.y - 8;
+    try {
+      var oel = BB.objEls && BB.objEls()[o.id];
+      var host = layer.getBoundingClientRect();
+      var sc = (host.width / 1200) || 1;
+      if (oel) y = (oel.getBoundingClientRect().top - host.top - (pad || 44)) / sc;
+    } catch (e) { }
+    return { x: x, y: y };
+  }
+  function capAt(o, text, ms) {
+    var a = capAnchor(o);
+    return caption(a.x, a.y, text, ms);
+  }
+
   function caption(x, y, text, ms) {
     if (!text) return;
     text = String(text).replace(/\s+/g, ' ').slice(0, 34);
     var c = document.createElement('div');
     c.className = 'bbCap';
     c.textContent = text;
-    c.style.left = Math.max(90, Math.min(1110, x)) + 'px';
-    c.style.top = Math.max(60, Math.min(730, y)) + 'px';
+    /* 纸条用 translate(-50%) 居中，所以左右各留出半个纸条宽，
+       否则贴着房间边缘的物件会把自己的题注切掉一半。 */
+    c.style.left = Math.max(112, Math.min(1088, x)) + 'px';
+    c.style.top = Math.max(64, Math.min(726, y)) + 'px';
     layer.appendChild(c);
     setTimeout(function () {
       c.style.transition = 'opacity .45s ease, transform .45s ease';
@@ -156,6 +179,7 @@ var fanIdx = 0;
 function spawnLoot(o, opt) {
     opt = opt || {};
     var key = opt.key || lootKey(o);
+    opt._key = key;
     var p = dropPoint(o);
     var f = FAN[(opt.slot != null ? opt.slot : fanIdx++) % FAN.length];
     p.lx = Math.max(90, Math.min(1110, p.x + f[0] + (Math.random() - .5) * 24));
@@ -216,21 +240,34 @@ function spawnLoot(o, opt) {
     document.body.appendChild(fly);
     el.style.visibility = 'hidden';
 
-    fly.animate([
+    fly.dataset.src = fly.src;
+
+    /* ★ 收尾不能只挂在 onfinish 上：prefers-reduced-motion、后台标签页节流、
+       或动画被打断时 onfinish 可能永不触发 —— 表现就是"点了掉落物，东西还在场景里、
+       口袋也不响"，玩家会以为这块是坏的。这里改成 onfinish + 定时器双保险，
+       并且"记账"在点击当下就完成，不等动画。 */
+    var done = false;
+    function finish() {
+      if (done) return; done = true;
+      if (fly.parentNode) fly.remove();
+      if (el.parentNode) el.remove();
+      bumpPocket(fly.dataset.src || '');
+    }
+    var anim = fly.animate([
       { transform: 'translate(0,0) scale(1) rotate(0deg)', opacity: 1 },
       { transform: 'translate(' + (tx * .35) + 'px,' + (ty * .35 - 70) + 'px) scale(1.1) rotate(120deg)', opacity: 1, offset: .45 },
       { transform: 'translate(' + tx + 'px,' + ty + 'px) scale(.18) rotate(300deg)', opacity: .1 }
-    ], { duration: 560, easing: 'cubic-bezier(.4,.05,.85,.55)' }).onfinish = function () {
-      fly.remove();
-      el.remove();
-      bumpPocket(fly.dataset.src || '');
-    };
-    fly.dataset.src = fly.src;
+    ], { duration: 560, easing: 'cubic-bezier(.4,.05,.85,.55)' });
+    if (anim) { try { anim.onfinish = finish; } catch (e) { } }
+    setTimeout(finish, 660);
 
-    /* 落袋瞬间的一行题注（不等待动画结束，手感更跟手） */
+    /* 立刻入袋：口袋里真正记账的地方（以前只有彩蛋计数，捡了东西口袋还是 0） */
+    if (opt._key && BB.addLoot) BB.addLoot(opt._key);
+
+    /* 落袋瞬间的一行题注（不等待动画结束，手感更跟手）。
+       锚点交给 capAt：它会把"物件视觉头顶 + 让开提示条"算好。 */
     var line = opt.caption || o.secret || o.desc || '';
-    var p = dropPoint(o);
-    caption(p.lx, p.ly - 34, line);
+    capAt(o, line);
 
     if (opt.egg && BB.collectEgg) BB.collectEgg(opt.egg);
     if (opt.onPick) opt.onPick(o);
@@ -328,7 +365,7 @@ function spawnLoot(o, opt) {
       el.dataset.bbBack = back ? '1' : '';
       if (back) {
         var line = (o.data && o.data.back) || o.secret || '背面什么也没有。';
-        caption(o.x + (o.w || 56) / 2, o.y - 10, line, 3000);
+        capAt(o, line, 3000);
         if (o.data && o.data.egg && BB.collectEgg) BB.collectEgg(o.data.egg);
       }
     };
@@ -340,11 +377,11 @@ function spawnLoot(o, opt) {
   function collectObj(o, el) {
     wobble(el);
     if (BB.doCollect && BB.doCollect(o) === false) {
-      caption(o.x + (o.w || 56) / 2, o.y - 8, '已经收进袋子里啦', 2000);
+      capAt(o, '已经收进袋子里啦', 2000);
       return;
     }
     var ic = el && el.querySelector('.ic img');
-    if (!ic) { caption(o.x + (o.w || 56) / 2, o.y - 8, o.tx + ' 收好了', 2200); return; }
+    if (!ic) { capAt(o, o.tx + ' 收好了', 2200); return; }
     var fake = { src: ic.src };
     var r = el.getBoundingClientRect();
     var pr = pocket ? pocket.getBoundingClientRect() : { left: innerWidth - 60, top: innerHeight - 120, width: 60, height: 60 };
@@ -364,7 +401,7 @@ function spawnLoot(o, opt) {
       fly.remove();
       bumpPocket(fake.src);
     };
-    caption(o.x + (o.w || 56) / 2, o.y - 8, o.secret || o.tx, 2400);
+    capAt(o, o.secret || o.tx, 2400);
   }
 
   /* 彩蛋类：连点三次才掉 */
@@ -398,6 +435,14 @@ function spawnLoot(o, opt) {
     var normalPicked = st.picked || 0;
 
     st.used = st.used || {};
+    /* 已经全部掏空的容器再点一次，以前是"什么也不发生"，像坏了 */
+    var pending = slots.filter(function (sl, i) {
+      return !st.dropped[i] && (!sl.deep || (st.picked || 0) >= 2);
+    }).length;
+    if (!pending) {
+      capAt(o, '已经翻空了，没剩下什么。', 1800);
+      return;
+    }
     slots.forEach(function (sl, i) {
       if (st.dropped[i]) return;
       if (sl.deep && normalPicked < 2) return;
@@ -426,7 +471,7 @@ function spawnLoot(o, opt) {
 
     if (!el.dataset.bbOpenNote) {
       el.dataset.bbOpenNote = '1';
-      caption(o.x + (o.w || 56) / 2, o.y - 10, (o.data && o.data.title) || '里头有些东西', 2400);
+      capAt(o, (o.data && o.data.title) || '里头有些东西', 2400);
     }
   }
   function rummagePeek(o, el) { /* 拿走两件后自动把夹层抖出来 */
@@ -451,6 +496,7 @@ function spawnLoot(o, opt) {
     clear: clearDrops,
     lootForEgg: function (eid) { var k = EGG_LOOT[eid]; return k ? 'E-14-loot_' + k : null; },
     lootKey: lootKey,
+    LOOT: LOOT,
     /* QA 用：直接在某物件上触发一次 */
     poke: function (id) { hit(id); }
   };
