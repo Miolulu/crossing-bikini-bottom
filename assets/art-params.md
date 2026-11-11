@@ -318,3 +318,77 @@ chum_counter `09-38-28`／chum_lab `09-38-51`。
   章鱼哥的报纸文字、河豚裙领一起被抠穿。改 `cut_residents_edge.py`：只从格边洪泛，
   内部白靠连通性保留 → 空洞从 60 处降到 0。
 - 教训：**近白抠底必须按连通性判定，不能按颜色阈值判定**，否则白眼球、白牙齿、报纸留白全会被吃掉。
+
+---
+
+## 十五、v11 交互道具与「摇—掉—捡」引擎（2026-11-11）
+
+### 15.1 两批新图集（各 1 次生图，共 2 次）
+
+| 用途 | 图集时间戳 | 网格 | 产出 |
+| --- | --- | --- | --- |
+| 小件战利品（从容器里掉出来的东西） | `2026-11-11T12-32-29` | 4×4 | `assets/props/E-14-loot_*` ×16（192²） |
+| 容器开态（抽屉/柜子/冰箱/木箱/口袋/纸袋/篮子） | `2026-11-11T12-32-59` | 4×2 | `assets/props/E-15-*` ×8（384²） |
+
+主体句沿用 §十，追加 `all objects drawn as standalone cut-outs, no shadow on the paper,
+consistent hand-drawn ink outline, warm cream palette`。负面词沿用 §二。
+
+`E-14` 名单：`receipt coin cap key clip conch photo note pouch kelp button pencil wrapper ring cork vial`
+`E-15` 名单：`open_drawer open_locker open_fridge open_chest sack_closed sack_open paperbag basket`
+
+**切分**：`cut_atlas.py` 的 `ATLAS` 表新增 `f05` / `f06` 两条，口径与 §十完全相同
+（边缘洪泛抠底 → 最大连通域 → 紧裁 → 等比缩进方形画布，留白 8.5%）。
+`alpha_audit.py` 复检：24 张全部 `ok`。
+
+### 15.2 六类物件交互（`src/interact.js`，约 440 行）
+
+传统的「点击 → 居中白卡 + 文字 + 翻转卡牌」三套弹窗（`#objTip` / `#rummage` / `#spin`）
+已从 DOM 与 CSS 中整体删除。现在所有非动线物件统一走 `window.BB_ACT.hit(id)`：
+
+| kind | 表现 |
+| --- | --- |
+| `peek`（多数） | 物件原地摇晃 → 抛物线掉出一件 `E-14` 战利品 → 点掉落物收回口袋 → 手写题注淡出 |
+| `rummage`（冰箱/柜子/垃圾桶/保险柜…） | 立绘换成 `E-15` 开态 → 按 `slots` 扇形散出 2~3 件 → 拿满 2 件后自动抖出夹层（`deep` 格） |
+| `toggle`（灯/煎炉/点唱机/唱片机） | 摇晃 + `afterToggle` 联动环境（`body.bb-warm`、蒸汽/气泡 FX、唱片旋转） |
+| `spin`（锅铲/竖笛/画像） | 原地 `rotateY` 转体 620ms 换成背面立绘 → 背面文字 + 彩蛋 |
+| `collect`（金币/芝麻） | 缩小并飞进口袋，`#pocket` 计数 +1 |
+| `egg`（彩蛋位） | 连点 3 次才掉，「摇不动 → 松了 → 掉了」三段反馈 |
+
+**层级契约**：掉落物挂在 `#roomDrops`（`z-index:182`），必须高于物件层
+（物件 `z-index = 100 + y/10`，实测最大约 170），否则会被物件挡住。
+
+**动画兜底**：`element.animate()` 在无头截图 / `prefers-reduced-motion` 下会停在首帧
+（`scale(.45)`，元素只有 20px）。落点一律由 inline `left/top` 决定，动画只是装饰；
+`settle()` 在 `onfinish` 与 700ms 定时器双保险里 `cancel()` 掉动画并强制
+`transform:translate(-50%,-50%)`。
+
+**战利品去重**：同一个容器一次翻找内不允许掉出两张一样的图（`st.used` 记录，冲突则沿 `LOOT` 顺延）。
+
+### 15.3 落位表（`ROOM_POS` / `ROOM_SPAWN`）
+
+- `ROOM_POS` 按 14 张 `G-01-*` 室内图逐间标定，口径 `obj:[x, y, w, h]`，
+  **`y + h` = 物件底边**（踩在哪条线上）；`seat:[x,y]` 凳子底边中点；`npc:[x,y]` 脚底；`portal:[x,y]` 门。
+- ★ **`w,h` 是盒子，不是视觉尺寸**：`.ic img` 有 `transform:scale(1.7)`（原点 `50% 100%`），
+  所以实际视觉尺寸 ≈ `w×1.7 × h×1.7`。填表时按目标尺寸除以 1.7。
+- `ROOM_SPAWN` 逐间给主角落点。旧版写死 `(600,690)`，正好压在房间 NPC 身上
+  （章鱼哥 / 海绵宝宝被完全遮住），现在按「空地 + 离 NPC 一个身位」重新给。
+- 门标记数量必须与 `ROOMS[k].portals` 对齐；原图只有一个拱门的房间
+  （`krusty_hall` / `krusty_kitchen`）把两个门竖排放进同一个门洞，不再钉在灶台/墙上。
+
+### 15.4 角色立绘查表的坑
+
+`schedule` 里珊迪的 emoji 是 `🐿️`（带 U+FE0F）。旧 `icons.js` 把 FE0F 留在 `CH` 的键里、
+`BB_CHAR()` 查表前却先剥掉 FE0F，导致珊迪永远命中不了 `D-06-sandy-portrait.png`，
+退回到 88px 的矢量小鱼。**建表与查表必须同一套归一化**，现在统一 `replace(/\uFE0F/g,'')` 后再建键。
+
+### 15.5 移动端（390×844 / 844×390 实测）
+
+- **竖屏室内**：`scale = max(vw/1200, vh/760)`，房间铺满屏幕，镜头中心钳制在房间内并取
+  `cy = IP.y - 70`，让主角略低于画面中心；`#room` 改为 `left:0;top:0;transform-origin:0 0`，
+  由 `applyCam(s,tx,ty)` 统一定位。
+- **横屏**：退回整间等比缩放（`min(1,(vw-24)/1200,(vh-70)/760)`）。
+- **底部工具条**：`#controls` 原本 `top:12px`（index.html）与 `bottom:16px`（skin.css）两条规则打架，
+  三键散落在 y=12 / 361 / 775；现在窄屏统一 `left:0;right:0;top:auto;bottom:8px` 横排贴底。
+- **摇杆**上移让位，`#pocket` / `#actBtn` 沿右边缘竖排，`#hud` 压成单行。
+- 触屏话术：`IS_TOUCH` 纳入 `(pointer:coarse)` 与 `innerWidth<=600`，
+  「按 E」「ESC」这类桌面提示在手机上自动换成「点我」「右下角『出去』」。

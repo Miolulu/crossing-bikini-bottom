@@ -141,8 +141,8 @@
   #interior h2{font-size:19px;color:#fff;}
   /* v4 美术挂载：14 张房间 PNG 铺在 #room 背景层；THEME 色作为底色兜底。
      原 .floor / .wall 的不透明 CSS 菱格砖与木条会盖住新房间图，故停用。 */
-  #room{position:absolute;left:50%;top:52%;width:1200px;height:760px;
-    transform:translate(-50%,-50%) scale(1);transform-origin:center center;
+  #room{position:absolute;left:0;top:0;width:1200px;height:760px;
+    transform:translate(0,0) scale(1);transform-origin:0 0;
     background-size:1200px 760px;background-position:center;background-repeat:no-repeat;
     --w1:#3f7fb5;--w2:#356fa3;--f1:#d8b878;--f2:#b8965a;}
   #room .floor{position:absolute;inset:0;border-radius:18px;
@@ -685,7 +685,7 @@
 </div>
 
 <div id="hud">
-  时段：<b id="clock">白天</b> ｜ 坐标 <span id="coord">0,0</span><br>
+  时段：<b id="clock">白天</b><span id="coordWrap"> ｜ 坐标 <span id="coord">0,0</span></span><br>
   <span style="opacity:.85">WASD 移动 · 靠近门口 / 居民 / 小蜗按 E<br>
   屋内：走近 <b>门 / 楼梯</b> 换房间 · 物件可<b>翻找 / 开关 / 旋转 / 拾取</b> · 🚪 出门<br>
   镇上有 <b>3 处玩法场地</b>：水母田 / 泡泡摊 / 空手道场 · <b>走近按 E 或直接点击</b>开场</span>
@@ -734,6 +734,13 @@
 <div id="toast"></div>
 <div id="legend">比奇堡 · 六栋建筑错落连通 · 每栋含多个房间 · 找彩蛋 · 逗小蜗 · 三处玩法场地（点了才开局）</div>
 <div id="dpad"><div class="ring"></div><div class="stick" id="stick"></div></div>
+<!-- v11 触屏：右下角大号互动键 + 点单条折叠开关（桌面端隐藏） -->
+<button id="actBtn" type="button" aria-label="互动">
+  <img alt="" src="../assets/ui/G-15-icon_target.png"><b>互动</b>
+</button>
+<button id="questToggle" type="button" aria-label="点单条">
+  <img alt="" src="../assets/ui/G-15-icon_receipt.png">
+</button>
 
 <!-- ===== 通用室内房间（6 间共用） ===== -->
 <div id="interior">
@@ -764,7 +771,7 @@
     <div id="portalLayer"></div>
     <div id="seatLayer"></div>
     <div id="iplayer"><div class="disc">🐟</div></div>
-    <div id="photoSpot">📸 合影点</div>
+    <div id="photoSpot"><img alt="" src="../assets/props/E-14-loot_photo.png"><span>合影点</span></div>
     <div id="exitDoor" title="出门 · 返回比奇堡">
       <div class="dIc"><img alt="" src="../assets/props/E-13-door_front.png"></div>
       <div class="dTx">← 出去</div>
@@ -781,15 +788,7 @@
 </div>
 <div id="nearTip" class="nearTip" style="display:none">按 E 交互</div>
 
-<!-- 物品检视小卡 -->
-<div id="objTip"><div class="card">
-  <div class="big" id="tipIcon">📦</div>
-  <h3 id="tipTitle">物件</h3>
-  <p id="tipDesc">介绍</p>
-  <div class="secret" id="tipSecret"></div>
-  <button class="btn" id="tipMore" style="margin-top:12px;display:none;background:#FFD23F">🔎 多看一眼</button>
-  <button class="btn" id="tipClose" style="margin-top:14px">✕ 收起</button>
-</div></div>
+<!-- v11：检视不再用居中白卡，改为「摇→掉→捡」的实体交互，见 interact.js -->
 
 <!-- 橙光式分支对话 -->
 <div id="dlg">
@@ -832,33 +831,17 @@
   <button class="btn" id="closePhoto">收起</button>
 </div>
 
-<!-- ===== v0.8 交互类型系统面板 ===== -->
-<div id="colBtn">🥚 <b id="colCount">0</b> / 27</div>
+<!-- ===== v11 交互背包：手绘布口袋（捡到的东西挂兜口） ===== -->
+<div id="pocket" title="口袋">
+  <img class="pkArt" id="pkArt" alt="" src="../assets/props/E-15-sack_closed.png">
+  <div class="pkN"><b id="colCount">0</b>/27</div>
+  <div class="pkHang" id="pkHang"></div>
+</div>
 
-<div id="rummage"><div class="card">
-  <h3 id="rumTitle">🔎 翻找</h3>
-  <p class="sub" id="rumSub"></p>
-  <div id="rumGrid"></div>
-  <button class="btn" id="rumClose" style="margin-top:14px">✕ 收起</button>
-</div></div>
-
-<div id="spin"><div class="card">
-  <h3 id="spinTitle">🔄 转着看</h3>
-  <div class="spinStage"><div id="spinCard">
-    <div class="spFace front" id="spinFront">📦</div>
-    <div class="spFace back"><div class="bkTx" id="spinBackTx"></div><div class="bkHint" id="spinEgg"></div></div>
-  </div></div>
-  <p class="sub">点卡片 / 按 ← → 或 A D 翻到背面，看看藏着什么</p>
-  <div class="rowBtns">
-    <button class="btn" id="spinFlip">↻ 翻到背面</button>
-    <button class="btn" id="spinClose">✕ 收起</button>
-  </div>
-</div></div>
-
-<div id="collection"><div class="card wide">
+<div id="collection"><div class="pouchScatter">
   <h3 id="colHead">🥚 藏品册</h3>
   <div id="colGrid"></div>
-  <button class="btn" id="colClose" style="margin-top:14px">✕ 收起</button>
+  <button class="colClose" id="colClose">✕ 收起</button>
 </div></div>
 
 <script>
@@ -1887,7 +1870,8 @@
          玩法场地的 .near 金圈会残留不消失；此处统一清掉。 */
       PLAYSPOTS.forEach(function(sp){sp.el.classList.remove('near');});
     }
-    if(nearBuilding){promptEl.style.display='block';promptEl.innerHTML='按 <b>E</b> 进入 '+nearBuilding.name;}
+    if(nearBuilding){promptEl.style.display='block';
+      promptEl.innerHTML=(IS_TOUCH?'点我进入 ':'按 <b>E</b> 进入 ')+nearBuilding.name;}
     else if(nearGary){promptEl.style.display='block';promptEl.innerHTML='按 <b>E</b> 和 小蜗 打个招呼（或直接点它）';}
     else if(nearSpot){promptEl.style.display='block';promptEl.innerHTML='按 <b>E</b> 开始「'+nearSpot.name+'」小玩法（或直接点击场地）';}
     else if(nearNPC){promptEl.style.display='block';promptEl.innerHTML='按 <b>E</b> 和 '+schedule[nearNPC].name+' 聊聊';}
@@ -1918,6 +1902,11 @@
   /* ============ 室内：通用房间渲染器 ============ */
   var interior=document.getElementById('interior');
   var roomEl=document.getElementById('room');
+  /* 触屏判定：真机触摸 / 粗指针 / 窄视口 三者任一，都按触屏话术走 ——
+   否则 390 宽的手机上仍会看到「按 E」「ESC」这类桌面提示。 */
+var IS_TOUCH=('ontouchstart' in window)||navigator.maxTouchPoints>0||
+    (window.matchMedia&&window.matchMedia('(pointer:coarse)').matches)||
+    window.innerWidth<=600;
   var roomDecor=document.getElementById('roomDecor');
   var roomFx=document.getElementById('roomFx');
   var roomNpcs=document.getElementById('roomNpcs');
@@ -1933,71 +1922,122 @@
   /* ===== v9 房间重绘（14 张独立手绘图 1200×760）后的坐标重排 =====
      旧坐标是按「代码家具」排的，与新手绘图完全不对位；这里按新图里的
      柜台面 / 桌面 / 货架 / 地面重新落位。obj/seat/npc/portal 均为覆盖值。 */
+  /* ===== v11 落位表（按 14 张手绘室内图逐间标定） =====
+     口径：obj 记 [x, y, w, h]，单位就是 1200x760 房间图的原生像素；
+     y+h = 物件的**底边**，也就是它站在哪个面上（台面 / 层板 / 地板）。
+     seat 记 [x, y]（凳子底边中点）；npc 记 [x, y]（脚底）。
+     角色立绘从脚底向上生长，所以 npc 的 y 直接就是"踩在房间的哪条线上"。 */
+  /* ===== 每个房间的主角落点 =====
+     以前统一落 (600,690)，正好压在房间 NPC 身上（章鱼哥/海绵宝宝全被挡住）。
+     这里按"空地 + 离 NPC 一个身位"逐间给落点；缺省仍回落 (600,690)。 */
+  var ROOM_SPAWN={
+    krusty_hall:[880,700],krusty_kitchen:[900,700],krusty_office:[340,700],
+    moai_f1:[480,720],moai_f2:[830,620],moai_f3:[700,640],
+    pineapple_main:[560,720],pineapple_kitchen:[700,690],rock_main:[360,700],
+    rock_under:[560,700],treedome_main:[300,700],treedome_airlock:[620,700],
+    chum_counter:[520,700],chum_lab:[600,690]
+  };
   var ROOM_POS={
+    /* ============ v11.1 落位表（按 14 张手绘室内图的真实台面重标） ============
+       口径：obj 记 [x, y, w, h]，单位是 1200x760 房间图的原生像素。
+       ★ y+h = 物件的**底边**，也就是它踩在哪条线上（台面 / 层板 / 地板）。
+       ★ w,h 是"盒子"，实际视觉尺寸 = w*1.7 × h*1.7（.ic img 的 scale(1.7)，原点在底边中点）。
+         所以盒子要比目测的目标尺寸小约 1.7 倍，别按视觉尺寸填。
+       seat 记 [x, y]（凳子底边中点）；npc 记 [x, y]（脚底）。
+       角色立绘从脚底向上生长，所以 npc 的 y 就是"踩在房间的哪条线上"。 */
     krusty_hall:{
-      obj:{register:[370,199],pickup:[40,212],tip:[215,245],menu:[250,80],
-        window:[480,45],jukebox:[60,657],salt:[376,408],fries:[756,431],ticket:[960,652]},
-      seat:[[360,470],[740,480],[560,350]],npc:{squid:[520,520]},
-      portal:[[930,100],[930,250]]},
+      /* 台面：柜台顶面 y≈258(x 30-500)；小圆桌A y≈300；左下圆桌B y≈435；右侧圆桌C y≈415 */
+      obj:{ticket:[40,196,80,62],register:[152,186,90,72],tip:[282,208,54,50],
+        menu:[330,60,76,90],window:[880,92,96,76],pickup:[545,228,92,72],
+        jukebox:[40,600,100,110],salt:[742,370,50,44],fries:[372,392,50,44]},
+      seat:[[615,386],[425,472],[830,492]],npc:{squid:[620,660]},
+      portal:[[1000,150],[1000,340]]},
     krusty_kitchen:{
-      obj:{grill:[40,404],fridge:[32,540],cabinet:[700,282],spatula:[300,210],
-        sauce:[280,450],sesame:[420,497],drink:[520,446],bin:[860,671]},
-      seat:[[760,540]],npc:{sponge:[780,500]},portal:[[980,120],[980,300]]},
+      /* 台面：炉盘 y≈340；岛台后沿 y≈450；右操作台 y≈333；地面带 y≈745 */
+      obj:{grill:[140,262,132,78],spatula:[300,400,58,52],sesame:[400,412,46,38],
+        sauce:[510,408,52,42],drink:[790,272,76,60],
+        fridge:[60,610,140,135],cabinet:[270,650,115,95],bin:[420,696,64,52]},
+      seat:[[700,650]],npc:{sponge:[570,700]},
+      portal:[[975,190],[975,350]]},
     krusty_office:{
-      obj:{safe:[60,233],ledger:[330,319],desklamp:[600,329],portrait:[620,40],
-        coin1:[600,520],anchor:[870,626]},
-      seat:[[740,350]],npc:{krabs:[520,330]},portal:[[890,150]]},
+      /* 台面：办公桌 y≈362(x 261-778)；木箱顶 y≈494；地面 y≈640-720 */
+      obj:{safe:[40,512,150,128],ledger:[380,310,70,52],desklamp:[556,300,62,62],
+        portrait:[890,112,76,64],coin1:[872,456,46,38],anchor:[1000,600,76,96]},
+      seat:[[800,514]],npc:{krabs:[640,690]},
+      portal:[[985,300],[40,300]]},
     moai_f1:{
-      obj:{cushion:[110,333],clarinet:[260,319],gramophone:[380,316],lamp:[520,343],
-        selfportrait:[350,100],coffee:[330,590]},
-      seat:[[280,420],[860,620]],npc:{squid:[620,600]},portal:[[800,250]]},
+      /* 台面：石桌 y≈337(x 94-533)；壁炉台 y≈375；草席 y≈734；门 y≈300 */
+      obj:{clarinet:[170,285,80,52],lamp:[300,292,56,44],coffee:[400,300,46,36],
+        gramophone:[590,325,82,50],selfportrait:[790,170,70,56],cushion:[320,690,62,44]},
+      seat:[[220,520],[430,520]],npc:{squid:[700,720]},
+      portal:[[900,300]]},
     moai_f2:{
-      obj:{easel:[360,384],paintbox:[560,414],curtain:[760,200],record:[760,560],
-        calendar:[620,150],paint:[480,540]},
-      seat:[[660,420]],portal:[[930,300],[30,280]]},
+      /* 台面：石砌长凳 y≈398(x 589-800)；小木凳 y≈510；地面 y≈600-640 */
+      obj:{easel:[600,430,110,165],paintbox:[520,560,80,55],paint:[720,470,50,40],
+        record:[610,352,56,46],calendar:[430,120,62,52],curtain:[830,190,92,92]},
+      seat:[[450,600],[300,640]],npc:{},
+      portal:[[60,300],[980,300]]},
     moai_f3:{
-      obj:{nightstand:[560,414],vinyl:[200,396],magazine:[300,355],coffee:[620,405],
-        statue:[690,170],window:[300,20]},
-      seat:[[420,450]],portal:[[760,300]]},
+      /* 台面：床头柜 y≈428(x 556-733)；床沿 y≈417；地面 y≈600-660 */
+      obj:{nightstand:[30,555,90,62],vinyl:[575,386,60,42],coffee:[650,396,44,32],
+        statue:[730,505,66,80],window:[110,170,90,72],magazine:[300,375,62,42]},
+      seat:[[300,480]],npc:{},
+      portal:[[860,430]]},
     pineapple_main:{
-      obj:{clock:[170,390],pine:[250,415],hat:[420,300],jellynet:[720,297],
-        tv:[480,515],garyl:[700,556]},
-      seat:[[350,400],[600,540]],npc:{sponge:[760,560]},portal:[[830,260]]},
+      /* 台面：沙发座面 y≈390(x 161-622)；圆茶几 y≈446；地面 y≈500-720 */
+      obj:{clock:[430,90,60,60],hat:[300,348,62,42],pine:[150,400,52,46],
+        garyl:[610,650,72,56],jellynet:[540,590,72,72],tv:[720,430,92,72]},
+      seat:[[300,545],[520,545]],npc:{sponge:[800,715]},
+      portal:[[860,300]]},
     pineapple_kitchen:{
-      obj:{fridge:[110,240],jar:[300,192],photo:[660,90],record:[420,240],
-        toothbrush:[560,295],bed:[90,615]},
-      seat:[[200,600]],portal:[[830,260]]},
+      /* 台面：弧形操作台 y≈338(x 67-867)；吊架层板 y≈233；地面 y≈560-720 */
+      obj:{record:[300,290,72,48],jar:[420,300,56,40],toothbrush:[500,305,48,36],
+        photo:[560,178,62,55],fridge:[80,590,130,130],bed:[640,560,160,105]},
+      seat:[[380,620]],npc:{},
+      portal:[[930,300]]},
     rock_main:{
-      obj:{chips:[190,263],phone:[320,227],tv:[470,318],conch:[280,684],
-        sandcastle:[760,520],shovel:[620,620]},
-      seat:[[250,470],[700,600]],npc:{patrick:[640,560]},portal:[[830,220]]},
+      /* 台面：左侧岩层板 y≈236(x 117-744)；中央石台 y≈364(x 400-822)；地面 y≈620-730 */
+      obj:{tv:[150,178,92,58],phone:[420,182,72,56],chips:[450,318,62,46],
+        conch:[200,618,56,44],sandcastle:[860,598,110,82],shovel:[600,645,62,62]},
+      seat:[[480,560],[680,560]],npc:{patrick:[700,730]},
+      portal:[[900,260]]},
     rock_under:{
-      obj:{rocktop:[380,216],paper:[520,221],fridge:[40,430],cookie:[700,606],
-        lamp:[860,526],star:[420,700]},
-      seat:[[900,560]],portal:[[860,380]]},
+      /* 台面：墙上木架 y≈230(x 317-667)；地面 y≈600-700 */
+      obj:{rocktop:[360,182,72,48],paper:[498,188,58,40],fridge:[40,540,115,112],
+        cookie:[330,640,50,40],lamp:[700,598,72,72],star:[860,638,56,44]},
+      seat:[[420,600]],npc:{},
+      portal:[[930,400]]},
     treedome_main:{
-      obj:{scope:[100,352],nutjar:[240,393],board:[520,190],gauge:[420,345],
-        robotarm:[600,385],helmet:[700,381]},
-      seat:[[250,420]],npc:{sandy:[660,560]},portal:[[930,300]]},
+      /* 台面：左长工作台 y≈418(x 33-456)；右长工作台 y≈422(x 428-828)；草地 y≈620-700 */
+      obj:{board:[60,325,120,92],nutjar:[250,375,62,46],scope:[560,368,72,56],
+        gauge:[700,372,62,48],robotarm:[762,356,84,64],helmet:[100,655,52,44]},
+      seat:[[80,610]],npc:{sandy:[770,665]},
+      portal:[[1010,300]]},
     treedome_airlock:{
-      obj:{computer:[60,401],acorn:[250,426],flag:[180,180],barbell:[200,598],
-        flower:[30,605],treestump:[700,577]},
-      seat:[[700,560]],portal:[[870,300]]},
+      /* 台面：长工作台 y≈400(x 20-430)；上层窄架 y≈378；金属地板 y≈500-714 */
+      obj:{computer:[60,336,90,64],flower:[330,342,60,58],acorn:[200,360,50,40],
+        flag:[110,312,70,66],barbell:[300,672,140,42],treestump:[780,620,110,90]},
+      seat:[[520,650]],npc:{},
+      portal:[[910,300]]},
     chum_counter:{
-      obj:{chum:[190,396],register:[470,372],karen:[600,330],menu:[400,58],
-        flyer:[330,350],stool:[170,560]},
-      seat:[[260,600],[700,600]],npc:{plankton:[680,470]},portal:[[850,300]]},
+      /* 台面：铁皮柜台 y≈350(x 117-806)；地面 y≈600-713 */
+      obj:{register:[200,290,92,58],chum:[380,302,72,48],menu:[500,292,100,58],
+        flyer:[640,310,56,40],karen:[690,288,82,62],stool:[180,655,62,58]},
+      seat:[[430,610]],npc:{plankton:[820,640]},
+      portal:[[890,330]]},
     chum_lab:{
-      obj:{jar:[330,261],scanner:[400,420],bucket:[300,691],plan:[620,100],
-        portrait:[880,120],mop:[930,608]},
-      seat:[[900,480]],portal:[[890,520]]}
+      /* 台面：大实验台 y≈416(x 244-889)；架子层板 y≈275；地面 y≈620-700 */
+      obj:{scanner:[700,352,92,62],plan:[420,358,82,58],jar:[330,372,56,44],
+        portrait:[560,188,72,56],bucket:[820,598,72,56],mop:[30,520,62,142]},
+      seat:[[400,600]],npc:{},
+      portal:[[960,440]]}
   };
   (function(){
     Object.keys(ROOM_POS).forEach(function(k){
       var R=ROOMS[k],F=ROOM_POS[k];if(!R||!F)return;
       (R.objects||[]).forEach(function(o){
         var p=F.obj&&F.obj[o.id];
-        if(p){o.x=p[0];o.y=p[1];}
+        if(p){o.x=p[0];o.y=p[1];if(p.length>2)o.w=p[2];if(p.length>3)o.h=p[3];}
       });
       if(F.seat&&R.seats){for(var i=0;i<R.seats.length&&i<F.seat.length;i++){
         R.seats[i].x=F.seat[i][0];R.seats[i].y=F.seat[i][1];}}
@@ -2005,7 +2045,7 @@
         var p=F.npc[n.id];if(p){n.x=p[0];n.y=p[1];}});}
       if(F.portal&&R.portals){for(var j=0;j<R.portals.length&&j<F.portal.length;j++){
         var pp=R.portals[j];pp.x=F.portal[j][0];pp.y=F.portal[j][1];
-        pp.cx=pp.x+48;pp.cy=pp.y+38;}}
+        pp.cx=pp.x+52;pp.cy=pp.y+52;}}
     });
   })();
 
@@ -2056,7 +2096,7 @@
         (toggleState[o.id]?' on':'')+(toggleState['taken_'+o.id]?' taken':'');
       el.style.left=o.x+'px';el.style.top=o.y+'px';
       el.style.width=(o.w||56)+'px';el.style.height=(o.h||52)+'px';
-      el.innerHTML='<div class="ic">'+o.ic+'</div><div class="tx">'+o.tx+'</div>';
+      el.innerHTML='<div class="bbPropShadow"></div><div class="ic">'+o.ic+'</div><div class="tx">'+o.tx+'</div>';
       el.onclick=function(){onObject(o.id);};
       objLayer.appendChild(el);objEls[o.id]=el;
     });
@@ -2094,10 +2134,30 @@
     n.el.querySelector('.bub').textContent=line;n.el.classList.add('show');
     clearTimeout(n.el._t);n.el._t=setTimeout(function(){n.el.classList.remove('show');},3800);
   }
+  /* v11 镜头：横屏等比缩放塞进屏幕；竖屏改成「房间铺满 + 镜头跟着主角走」，
+     否则 390 宽的手机只有 366x232 的房间，上下全是空屏。 */
+  var emptyHomeT=null;
+  var emptyHomeT=null;
+  var camS=1,camTX=0,camTY=0;
+  function isPortraitCam(){return viewport.clientWidth<viewport.clientHeight*1.15;}
+  function applyCam(s,tx,ty){
+    camS=s;camTX=tx;camTY=ty;
+    roomEl.style.transform='translate('+tx.toFixed(1)+'px,'+ty.toFixed(1)+'px) scale('+s.toFixed(4)+')';
+  }
   function fitInterior(){
     var vw=viewport.clientWidth,vh=viewport.clientHeight;
-    var s=Math.min(1,(vw-24)/1200,(vh-70)/760);
-    roomEl.style.transform='translate(-50%,-50%) scale('+s+')';
+    if(inInterior&&isPortraitCam()){
+      var s=Math.max(vw/1200,vh/760);
+      var hw=vw/2/s,hh=vh/2/s;
+      var cx=Math.max(hw,Math.min(1200-hw,IP.x));
+      var cy=Math.max(hh,Math.min(760-hh,IP.y-70));
+      applyCam(s,vw/2-cx*s,vh/2-cy*s);
+      document.body.classList.add('mob-cam');
+    }else{
+      document.body.classList.remove('mob-cam');
+      var s2=Math.min(1,(vw-24)/1200,(vh-70)/760);
+      applyCam(s2,(vw-1200*s2)/2,(vh-760*s2)/2+vh*0.01);
+    }
   }
   var portalLayer=document.getElementById('portalLayer');
   /* v10：门牌换成手绘门立绘，按目标房间挑一种门 */
@@ -2147,7 +2207,8 @@
     if(typeof MG!=='undefined'&&MG&&(MG.active||MG.resultOpen))exitMini(true);
     document.body.classList.add('in-room');
     ipEl.classList.remove('sitting');
-    IP.x=600;IP.y=690;ipEl.style.left=IP.x+'px';ipEl.style.top=IP.y+'px';
+    var sp=(ROOM_SPAWN[key]||[600,690]);
+    IP.x=sp[0];IP.y=sp[1];ipEl.style.left=IP.x+'px';ipEl.style.top=IP.y+'px';
     var th=THEME[R.bid]||THEME.krusty;
     roomEl.style.setProperty('--w1',th.w1);roomEl.style.setProperty('--w2',th.w2);
     roomEl.style.setProperty('--f1',th.f1);roomEl.style.setProperty('--f2',th.f2);
@@ -2156,6 +2217,22 @@
     document.getElementById('roomTitle').textContent=R.title;
     renderDecor(R.decor);renderFx(R);renderObjects(R.objects);renderSeats(R.seats);
     renderPortals(R);renderNPCs(key);renderRoomNav();
+    /* 住户出门时房间会一个人都没有，容易被当成"坏了"：明说一句他不在家。 */
+    if((R.npcs||[]).length&&!curNpcs.length){
+      var who=schedule[R.npcs[0].id]?schedule[R.npcs[0].id].name:'住户';
+      if(emptyHomeT){clearTimeout(emptyHomeT);emptyHomeT=null;}
+      emptyHomeT=setTimeout(function(){
+        if(inInterior&&curRoom===key)toast('🏠 '+who+' 这会儿不在家，去镇上逛逛？');
+      },2600);
+    }
+    /* 住户出门时房间会一个人都没有，容易被当成"坏了"：明说一句他不在家。 */
+    if((R.npcs||[]).length&&!curNpcs.length){
+      var who=schedule[R.npcs[0].id]?schedule[R.npcs[0].id].name:'住户';
+      if(emptyHomeT){clearTimeout(emptyHomeT);emptyHomeT=null;}
+      emptyHomeT=setTimeout(function(){
+        if(inInterior&&curRoom===key)toast('🏠 '+who+' 这会儿不在家，去镇上逛逛？');
+      },2600);
+    }
     fitInterior();interior.style.display='block';
     roomEl.classList.remove('roomIn');void roomEl.offsetWidth;roomEl.classList.add('roomIn');
     var inHall=(key==='krusty_hall');
@@ -2176,7 +2253,9 @@
     closeDialog();checkInteriorNearby();
     if(fromWorld)toast(R.intro);
     if(!exitHintShown){exitHintShown=true;setTimeout(function(){
-      if(inInterior)toast('🚪 走近发光门/楼梯换房间 · 右下角出口或 ESC 回街上');
+      if(inInterior)toast(IS_TOUCH?(isPortraitCam()?'🚪 走近发光门 / 楼梯换房间 · 镜头会跟着你'
+                                            :'🚪 走近发光门 / 楼梯换房间 · 右下角「出去」回街上')
+                                 :'🚪 走近发光门/楼梯换房间 · 右下角出口或 ESC 回街上');
     },2300);}
   }
   /* 世界层进门：building id -> 该建筑的首个房间 */
@@ -2288,14 +2367,9 @@
   function onObject(id){
     var o=findObj(id);if(!o)return;
     if(o.act){doAct(o.act);return;}
-    var k=o.kind||'peek';
+    /* v11：一切非动线物件都交给「摇→掉→捡」引擎，不再弹出居中卡 */
+    if(window.BB_ACT){window.BB_ACT.hit(id);return;}
     popObj(id);
-    if(k==='rummage'){openRummage(o);return;}
-    if(k==='toggle'){doToggle(o);return;}
-    if(k==='spin'){openSpin(o);return;}
-    if(k==='collect'){doCollect(o);return;}
-    if(k==='egg'){doEgg(o);return;}
-    curTipId=id;openObjTip(o.ic,o.tx,o.desc,o.secret);
   }
   function doAct(act){
     var s=quest.step;
@@ -2400,7 +2474,7 @@
     if(seatEls[id])seatEls[id].classList.add('occupied');
     roomEl.style.transition='transform .45s ease';
     var s0=Math.min(1,(viewport.clientWidth-24)/1200,(viewport.clientHeight-70)/760);
-    roomEl.style.transform='translate(-50%,-50%) scale('+(s0*1.05)+')';
+    applyCam(camS*1.05,camTX,camTY);
     toast('🪑 '+s.sit+'　（按 E 或再点一下起身）');
     tipKey=null;checkInteriorNearby();
   }
@@ -2540,6 +2614,7 @@
         else if(best.type==='exit') txt='按 E / 点我 · 🚪 出去，回比奇堡';
         else txt='按 E · 和 '+(DIALOGS[best.id]?DIALOGS[best.id].name:'居民')+' 聊聊';
       }
+      if(IS_TOUCH)txt=txt.replace('按 E / 点我 · ','点我 · ').replace('按 E · ','点我 · ');
       if(best&&best.el&&inInterior){
         var r=best.el.getBoundingClientRect();
         nearTip.style.display='block';
@@ -2579,9 +2654,26 @@
       ipEl.style.left=IP.x+'px';ipEl.style.top=IP.y+'px';
     }
     checkInteriorNearby();
+    if(isPortraitCam())fitInterior();
   }
   window.addEventListener('resize',function(){if(inInterior){fitInterior();tipKey=null;guideKey='';}});
   document.getElementById('photoSpot').onclick=function(){photo.style.display='flex';photoOpen=true;};
+
+  /* ===== v11 触屏：互动键与点单条折叠 ===== */
+  var actBtn=document.getElementById('actBtn'),questToggle=document.getElementById('questToggle');
+  var questHudEl=document.getElementById('questHud');
+  actBtn.onclick=function(){
+    if(inInterior)interiorInteract();else tryInteract();
+  };
+  questToggle.onclick=function(){
+    questHudEl.classList.toggle('open');
+    questToggle.classList.toggle('on',questHudEl.classList.contains('open'));
+  };
+  setInterval(function(){
+    if(!inInterior){actBtn.classList.remove('on');return;}
+    var near=iNear&&(iNear.type!=='exit'||true);
+    actBtn.classList.toggle('on',!!near);
+  },320);
 
   /* ===== v0.8 交互类型系统：翻找 / 开关 / 旋转 / 拾取 / 彩蛋 / 藏品册 ===== */
   function sparkle(x,y){
@@ -2604,135 +2696,78 @@
     return true;
   }
 
-  /* ① 翻找：抽屉/柜子逐格翻，deep 格要翻两次（莉娜式两级交互） */
-  var rummageOpen=false;
-  function openRummage(o){
-    var st=rummageState[o.id]||{f:{},d:{}};rummageState[o.id]=st;
-    document.getElementById('rumTitle').textContent='🔎 翻找 · '+o.tx;
-    document.getElementById('rumSub').textContent=(o.data&&o.data.title)||'里头好像有些东西…';
-    var grid=document.getElementById('rumGrid');grid.innerHTML='';
-    ((o.data&&o.data.slots)||[]).forEach(function(sl,i){
-      var c=document.createElement('div');c.className='slot';
-      var op=!!st.f[i];
-      c.innerHTML=op?('<div class="sIc">'+sl.ic+'</div><div class="sTx">'+sl.tx+'</div><div class="sDs">'+sl.desc+'</div>')
-                    :('<div class="sIc">❓</div><div class="sTx">还没翻</div><div class="sDs">点一下看看</div>');
-      if(op)c.classList.add('opened');
-      if(sl.deep&&op&&!st.d[i])c.classList.add('deep');
-      c.onclick=function(){flipSlot(o,i);};
-      grid.appendChild(c);
-    });
-    document.getElementById('rummage').style.display='flex';rummageOpen=true;tipKey=null;
-  }
-  function flipSlot(o,i){
-    var sl=((o.data&&o.data.slots)||[])[i];if(!sl)return;
-    var st=rummageState[o.id];
-    if(sl.deep&&st.f[i]&&!st.d[i]){
-      st.d[i]=true;toast('🔎 '+sl.tx+'……下面还压着一层！');
-      if(sl.egg)collectEgg(sl.egg);
-      openRummage(o);return;
-    }
-    if(!st.f[i]){st.f[i]=true;toast('翻到了：'+sl.tx);if(sl.egg&&!sl.deep)collectEgg(sl.egg);}
-    openRummage(o);
-  }
-  function closeRummage(){document.getElementById('rummage').style.display='none';rummageOpen=false;}
-  document.getElementById('rumClose').onclick=closeRummage;
-  document.getElementById('rummage').onclick=function(e){if(e.target===this)closeRummage();};
+  /* ===== v11 交互兼容层 =====
+     旧的三套弹窗（翻找网格 / 翻转卡 / 检视白卡）已删除，
+     一切实体反馈交给 interact.js 的「摇 → 掉 → 捡 → 翻」引擎。
+     这里只保留状态变量与对外句柄：skin.js 心跳、QA 脚本、__BB 仍按原名调用。 */
+  var rummageOpen=false,spinOpen=false,objTipOpen=false,curTipId=null;
+  function openRummage(o){ if(o&&window.BB_ACT)window.BB_ACT.hit(o.id); }
+  function flipSlot(o){ if(o&&window.BB_ACT)window.BB_ACT.hit(o.id); }
+  function closeRummage(){}
+  function openSpin(o){ if(o&&window.BB_ACT)window.BB_ACT.hit(o.id); }
+  function flipSpin(){ if(curSpinId&&window.BB_ACT)window.BB_ACT.reflip(curSpinId); }
+  var curSpinId=null;
+  function closeSpin(){}
 
-  /* ② 开关：状态切换 + 组合彩蛋（关台灯 + 开唱片机 = 独处时刻） */
+  /* ② 开关：状态切换 + 环境联动 + 组合彩蛋（关台灯 + 开唱片机 = 独处时刻） */
   function doToggle(o){
     var on=!toggleState[o.id];toggleState[o.id]=on;
     var el=objEls[o.id];if(el)el.classList.toggle('on',on);
     var d=o.data||{};
-    toast(on?(d.on||'打开了。'):(d.off||'关上了。'));
     if(on&&d.egg)collectEgg(d.egg);
     if(curRoom==='moai_f1'&&toggleState['lamp']===false&&toggleState['gramophone']===true)
       collectEgg('e21_night');
+    if(window.BB_ACT)window.BB_ACT.afterToggle(o,on);
   }
 
-  /* ③ 旋转检视：翻到背面看刻字 / 藏彩蛋 */
-  var spinOpen=false,curSpin=null,spinFlipped=false,spinCollected=false;
-  function openSpin(o){
-    curSpin=o;spinFlipped=false;spinCollected=false;
-    document.getElementById('spinTitle').textContent='🔄 转着看 · '+o.tx;
-    document.getElementById('spinFront').textContent=o.ic;
-    document.getElementById('spinBackTx').textContent=(o.data&&o.data.back)||'背面什么也没有。';
-    document.getElementById('spinEgg').textContent=(o.data&&o.data.egg)?'（背面好像藏着什么…）':'';
-    document.getElementById('spinCard').classList.remove('flipped');
-    document.getElementById('spin').style.display='flex';spinOpen=true;tipKey=null;
-  }
-  function flipSpin(){
-    spinFlipped=!spinFlipped;
-    document.getElementById('spinCard').classList.toggle('flipped',spinFlipped);
-    if(spinFlipped&&curSpin&&curSpin.data&&curSpin.data.egg&&!spinCollected){
-      spinCollected=true;collectEgg(curSpin.data.egg);
-    }
-  }
-  function closeSpin(){document.getElementById('spin').style.display='none';spinOpen=false;}
-  document.getElementById('spinFlip').onclick=flipSpin;
-  document.getElementById('spinCard').onclick=flipSpin;
-  document.getElementById('spinClose').onclick=closeSpin;
-  document.getElementById('spin').onclick=function(e){if(e.target===this)closeSpin();};
-
-  /* ④ 拾取：物件收进藏品册 */
+  /* ③ 拾取：标记已收，实体飞行动画由引擎接管 */
   function doCollect(o){
-    if(toggleState['taken_'+o.id]){toast('已经收进藏品册啦');return;}
+    if(toggleState['taken_'+o.id])return false;
     toggleState['taken_'+o.id]=true;
     var el=objEls[o.id];if(el)el.classList.add('taken');
-    if(o.data&&o.data.egg)collectEgg(o.data.egg);else toast('收好了：'+o.tx);
-    sparkle(window.innerWidth*0.5,window.innerHeight*0.45);
+    if(o.data&&o.data.egg)collectEgg(o.data.egg);
+    return true;
   }
 
-  /* ⑤ 彩蛋点击：逗够次数才触发（小蜗「喵」） */
+  /* ④ 彩蛋连点：逗够次数才触发 */
   function doEgg(o){
     eggTries[o.id]=(eggTries[o.id]||0)+1;
     var d=o.data||{},need=d.tries||3;
-    if(eggTries[o.id]>=need){
-      if(d.egg&&collectEgg(d.egg))toast('🐌 它忽然开口：「喵。」然后装作什么都没发生。');
-      sparkle(window.innerWidth*0.5,window.innerHeight*0.5);
-    }else toast(d.hint||'（好像有反应……再试试）');
+    if(eggTries[o.id]>=need){ if(d.egg)collectEgg(d.egg); return true; }
+    return false;
   }
+  function eggTriesOf(id){return eggTries[id]||0;}
 
-  /* ⑥ 藏品册 */
+  /* ⑤ 藏品册：口袋张口后把捡到的东西摊在沙地上 */
   var colOpen=false;
   function openCollection(){
     var g=document.getElementById('colGrid');g.innerHTML='';var n=0;
     Object.keys(EGGS).forEach(function(eid){
       var e=EGGS[eid],got=!!found[eid];if(got)n++;
       var c=document.createElement('div');c.className='colItem'+(got?' got':'');
-      c.innerHTML='<div class="cIc">'+(got?e.ic:'❔')+'</div>'+
+      var art=window.BB_ACT&&window.BB_ACT.lootForEgg?window.BB_ACT.lootForEgg(eid):null;
+      c.innerHTML='<div class="cIc">'+(got?(art?'<img alt="" src="../assets/props/'+art+'.png">':(window.BB_ICON?window.BB_ICON(e.ic,30):e.ic)):'')+'</div>'+
         '<div class="cTx">'+(got?e.tx:'还没发现')+'</div>'+
         (got?'<div class="cDs">'+e.desc+'</div>':'');
       g.appendChild(c);
     });
-    document.getElementById('colHead').textContent='🥚 藏品册 · 已发现 '+n+' / '+eggTotal();
+    document.getElementById('colHead').textContent='口袋里 · 已发现 '+n+' / '+eggTotal();
     document.getElementById('colCount').textContent=n;
-    document.getElementById('collection').style.display='flex';colOpen=true;
+    document.getElementById('pkArt').src='../assets/props/E-15-sack_open.png';
+    document.getElementById('collection').classList.add('on');colOpen=true;
   }
-  function closeCollection(){document.getElementById('collection').style.display='none';colOpen=false;}
-  document.getElementById('colBtn').onclick=openCollection;
+  function closeCollection(){
+    document.getElementById('collection').classList.remove('on');
+    document.getElementById('pkArt').src='../assets/props/E-15-sack_closed.png';
+    colOpen=false;
+  }
+  document.getElementById('pocket').onclick=openCollection;
   document.getElementById('colClose').onclick=closeCollection;
   document.getElementById('collection').onclick=function(e){if(e.target===this)closeCollection();};
 
-  /* ============ 物品检视小卡 ============ */
-  var objTip=document.getElementById('objTip'),objTipOpen=false;
-  function openObjTip(ic,title,desc,secret){
-    document.getElementById('tipIcon').textContent=ic;
-    document.getElementById('tipTitle').textContent=title;
-    document.getElementById('tipDesc').textContent=desc;
-    var sec=document.getElementById('tipSecret'),more=document.getElementById('tipMore');
-    sec.textContent='';sec.classList.remove('on');
-    if(secret){
-      more.style.display='inline-block';
-      more.onclick=function(){
-        sec.textContent='🔎 多看一眼：'+secret;sec.classList.add('on');
-        more.style.display='none';if(curTipId)popObj(curTipId);
-      };
-    }else more.style.display='none';
-    objTip.style.display='flex';objTipOpen=true;
-  }
-  function closeObjTip(){objTip.style.display='none';objTipOpen=false;}
-  document.getElementById('tipClose').onclick=closeObjTip;
-  objTip.onclick=function(e){if(e.target===objTip)closeObjTip();};
+  /* 检视白卡已废弃：保留同名空函数，避免 exitInterior / 键盘分支报错 */
+  function openObjTip(){}
+  function closeObjTip(){objTipOpen=false;curTipId=null;}
 
   /* ============ 聚焦检视：逐口咬痕（手绘立绘分级切换） ============ */
   var BURGER_STAGES=['E-11-burger-0','E-11-burger-1','E-11-burger-2','E-11-burger-3'];
@@ -3337,7 +3372,10 @@
     getRummageState:function(){return rummageState;},getToggleState:function(){return toggleState;},
     doToggle:doToggle,openSpin:openSpin,flipSpin:flipSpin,closeSpin:closeSpin,
     doCollect:doCollect,doEgg:doEgg,openCollection:openCollection,closeCollection:closeCollection,
-    onObject:onObject,findObj:findObj,
+    onObject:onObject,findObj:findObj,popObj:popObj,
+    roomEl:function(){return roomEl;},objLayer:function(){return objLayer;},
+    toast:toast,sparkle:sparkle,eggTriesOf:eggTriesOf,doCollect:doCollect,doEgg:doEgg,
+    closeObjTip:closeObjTip,isTipOpen:function(){return objTipOpen;},
     roomOverlaps:roomOverlaps,allOverlaps:allOverlaps,
     jelly:{spawn:spawnJelly,catch:catchJelly,setOn:setJellyOn,
       score:function(){return jellyScore;},total:function(){return jellyCaught;},
@@ -3366,5 +3404,6 @@
 <!-- v5 表现层脚本：图标库 → 房间主题层 → 注入器（顺序不可换） -->
 <script src="icons.js"></script>
 <script src="skin.js"></script>
+<script src="interact.js"></script>
 </body>
 </html>

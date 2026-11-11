@@ -140,10 +140,14 @@
       fn(c1,P.cream)+'</svg>';
   };
   /* 世界/室内角色：六位主要居民用生成立绘；其余海洋邻居用大号手绘 SVG */
-  var CH={
-    '🧽':'D-02-sponge-portrait.png','⭐':'D-04-star-portrait.png','🐙':'D-03-squid-portrait.png',
-    '🦀':'D-05-krabs-portrait.png','🐿️':'D-06-sandy-portrait.png','🦠':'D-07-plankton-portrait.png'
-  };
+  /* ★ 查表与建表必须同一套归一化：🐿️(珊迪) 带 U+FE0F 变体选择符，
+     旧写法把 FE0F 留在键里、查表时又剥掉，导致珊迪永远命中不了立绘、
+     退回到 88px 的矢量小鱼。这里统一先剥 FE0F 再建键。 */
+  var CH={};
+  [['🧽','D-02-sponge-portrait.png'],['⭐','D-04-star-portrait.png'],
+   ['🐙','D-03-squid-portrait.png'],['🦀','D-05-krabs-portrait.png'],
+   ['🐿️','D-06-sandy-portrait.png'],['🦠','D-07-plankton-portrait.png']
+  ].forEach(function(p){CH[p[0].replace(/\uFE0F/g,'')]=p[1];});
   window.BB_CHAR=function(key){return CH[String(key||'').replace(/\uFE0F/g,'')]||null;};
   window.BB_CHAR_SVG=function(key,size){
     var k=String(key||'').replace(/\uFE0F/g,''),n=size||54;

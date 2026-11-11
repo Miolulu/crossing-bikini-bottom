@@ -409,3 +409,303 @@ body #viewport{background:linear-gradient(180deg,var(--water-deep) 0%,var(--wate
   *,*:before,*:after{animation-duration:.001ms!important;animation-iteration-count:1!important;
     transition-duration:.001ms!important;}
 }
+
+/* ==========================================================================
+   v11 交互层：摇一摇掉出来 + 布口袋
+   ========================================================================== */
+#roomDrops{position:absolute;left:0;top:0;width:1200px;height:760px;
+  pointer-events:none;z-index:182;}
+#roomDrops .drop{position:absolute;transform:translate(-50%,-50%);pointer-events:auto;
+  cursor:pointer;will-change:transform;}
+#roomDrops .drop img{display:block;width:100%;height:100%;object-fit:contain;
+  pointer-events:none;-webkit-user-drag:none;
+  filter:drop-shadow(0 3px 0 rgba(22,44,54,.22));}
+#roomDrops .drop.rare img{
+  filter:drop-shadow(0 0 9px rgba(251,227,75,.95)) drop-shadow(0 3px 0 rgba(22,44,54,.22));}
+#roomDrops .drop:active{transform:translate(-50%,-50%) scale(.94);}
+#roomDrops .bbDust{position:absolute;width:9px;height:9px;border-radius:50%;
+  background:rgba(255,248,224,.9);box-shadow:0 0 0 2px rgba(255,255,255,.35);
+  transform:translate(-50%,-50%);pointer-events:none;}
+.bbFly{filter:drop-shadow(0 6px 10px rgba(0,0,0,.28));}
+
+/* 手写题注：没有边框、没有底色，就是一句写在场景上的话 */
+.bbCap{position:absolute;z-index:400;pointer-events:none;
+  font-family:"Segoe Script","Bradley Hand","Kaiti SC",var(--font,inherit),cursive;
+  font-size:13.5px;line-height:1.45;color:#2b1a0d;font-weight:800;
+  max-width:216px;text-align:center;letter-spacing:.3px;
+  transform:translate(-50%,-100%) rotate(-1.6deg);
+  text-shadow:0 1px 0 rgba(255,255,255,.95),0 0 7px rgba(255,255,255,.95),
+    0 0 2px rgba(255,255,255,.9);}
+@keyframes bbCapIn{from{opacity:0;transform:translate(-50%,-88%) rotate(-1.6deg) scale(.92)}
+  to{opacity:1;transform:translate(-50%,-100%) rotate(-1.6deg) scale(1)}}
+.bbCap{animation:bbCapIn .26s ease-out;}
+
+/* 转体检视：物件自己在原地转，不是卡片翻面 */
+#room .obj.bbSpinning{perspective:620px;}
+#room .obj.bbSpinning .ic{backface-visibility:visible;}
+
+/* 开灯后的房间暖光 */
+body.bb-warm #roomEl,body.bb-warm #room{filter:brightness(1.07) saturate(1.1) sepia(.13);}
+
+/* 布口袋：捡到的东西挂在兜口 */
+#pocket{position:fixed;right:14px;bottom:88px;z-index:300;width:84px;height:92px;
+  cursor:pointer;pointer-events:auto;touch-action:manipulation;}
+#pocket .pkArt{display:block;width:100%;height:100%;object-fit:contain;
+  filter:drop-shadow(0 6px 0 rgba(22,44,54,.28));transition:transform .18s ease;}
+#pocket:active .pkArt{transform:scale(.94);}
+#pocket .pkN{position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);
+  background:var(--paper,#fff8e6);color:var(--ink,#162c36);border:2px solid var(--ink,#162c36);
+  border-radius:999px;font-size:11px;font-weight:900;padding:0 8px;line-height:17px;white-space:nowrap;}
+#pocket .pkN b{color:#c0392b;font-size:12px;}
+#pocket .pkHang{position:absolute;left:6px;top:-4px;width:72px;display:flex;
+  flex-wrap:wrap-reverse;gap:2px;justify-content:center;pointer-events:none;}
+#pocket .pkItem{width:22px;height:22px;object-fit:contain;
+  filter:drop-shadow(0 2px 0 rgba(22,44,54,.25));}
+#pocket.bump .pkArt{animation:pkBump .42s cubic-bezier(.3,1.6,.5,1);}
+@keyframes pkBump{0%{transform:scale(1)}38%{transform:scale(1.16,.9)}70%{transform:scale(.96,1.06)}
+  100%{transform:scale(1)}}
+
+/* 口袋张口：捡到的东西摊在沙地上（不再是白卡网格） */
+#collection{display:none;}
+#collection.on{display:flex;}
+#collection{position:fixed;inset:0;z-index:356;align-items:center;justify-content:center;
+  background:rgba(6,35,56,.6);backdrop-filter:blur(4px);}
+#collection .pouchScatter{position:relative;width:min(720px,94vw);max-height:86vh;overflow:auto;
+  padding:22px 20px 18px;text-align:center;
+  background:
+    radial-gradient(circle at 22% 18%,rgba(255,255,255,.30),transparent 46%),
+    radial-gradient(circle at 78% 74%,rgba(255,255,255,.22),transparent 50%),
+    linear-gradient(#f6e4b8,#eed7a2);
+  border:3px solid var(--ink,#162c36);border-radius:22px;
+  box-shadow:0 18px 46px rgba(0,0,0,.42),inset 0 0 0 6px rgba(255,255,255,.28);}
+#collection h3{font-size:17px;color:#3a2612;margin-bottom:10px;letter-spacing:.5px;}
+#colGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:6px 4px;}
+#colGrid .colItem{display:flex;flex-direction:column;align-items:center;gap:2px;
+  padding:6px 4px;background:none;border:0;}
+#colGrid .colItem:nth-child(3n){transform:rotate(-2.2deg);}
+#colGrid .colItem:nth-child(4n){transform:rotate(1.8deg);}
+#colGrid .cIc{width:46px;height:46px;display:flex;align-items:center;justify-content:center;
+  opacity:.32;filter:grayscale(1);}
+#colGrid .colItem.got .cIc{opacity:1;filter:drop-shadow(0 4px 0 rgba(22,44,54,.2));}
+#colGrid .cIc img{width:44px;height:44px;object-fit:contain;}
+#colGrid .cTx{font-size:11.5px;font-weight:800;color:#4a331c;line-height:1.3;text-align:center;}
+#colGrid .cDs{display:none;}
+#collection .colClose{margin-top:14px;background:var(--paper,#fff8e6);color:var(--ink,#162c36);
+  border:2.5px solid var(--ink,#162c36);border-radius:999px;padding:8px 20px;
+  font-weight:900;font-size:13px;cursor:pointer;box-shadow:0 4px 0 rgba(22,44,54,.28);}
+
+/* ==========================================================================
+   v11 室内角色比例：v10 的 92px 立绘在 1200×760 的手绘房间里只有家具的 1/2.6，
+   看着像玩偶趴在椅子上。这里按房间透视统一放到 176px（主角 196px），
+   锚点仍是脚底（.disc 的 bottom 负值），所以只改尺寸不会离地。
+   ========================================================================== */
+#roomNpcs .actor{width:190px;height:186px;}
+#roomNpcs .actor .disc{width:176px!important;height:176px!important;bottom:-2px!important;}
+#roomNpcs .actor .nm{top:-16px!important;font-size:13px!important;padding:3px 11px!important;}
+#roomNpcs .actor .bub{bottom:206px!important;}
+#roomNpcs .actor .disc:after{content:"";position:absolute;left:50%;bottom:-10px;
+  transform:translateX(-50%);width:104px;height:22px;border-radius:50%;pointer-events:none;
+  background:radial-gradient(ellipse,rgba(22,44,54,.34),transparent 72%);}
+#iplayer{width:210px;height:206px;}
+#iplayer .disc{width:196px!important;height:196px!important;bottom:-4px!important;}
+#iplayer .nm{bottom:-44px!important;font-size:12px!important;}
+/* 物件按新落位表放大后，标签与热区同步放宽 */
+#room .obj:after{content:"";position:absolute;left:-12px;right:-12px;top:-22px;bottom:-6px;}
+
+/* v11：合影点不再用 CSS 画的虚线圆圈，换成地上一张手绘相纸 + 药丸标签 */
+#photoSpot{position:absolute;left:300px;bottom:40px;transform:translateX(-50%);
+  width:82px;height:82px;border:0!important;background:none!important;box-shadow:none!important;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:6;}
+#photoSpot img{width:100%;height:100%;object-fit:contain;
+  filter:drop-shadow(0 4px 0 rgba(22,44,54,.25));animation:bbBob 2.6s ease-in-out infinite;}
+#photoSpot span{position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);
+  background:var(--paper)!important;color:var(--ink)!important;border:2px solid var(--ink);
+  border-radius:999px;font-size:10px;font-weight:900;padding:1px 8px;white-space:nowrap;
+  box-shadow:0 2px 0 rgba(22,44,54,.25);}
+
+/* 物件的暖白描边收细：原来 1.5px 四向叠出来是一圈厚贴纸边，太抢眼 */
+#room .obj .ic .bbObjImg{
+  filter:
+    drop-shadow(0.9px 0 0 rgba(255,250,236,.62))
+    drop-shadow(-0.9px 0 0 rgba(255,250,236,.62))
+    drop-shadow(0 0.9px 0 rgba(255,250,236,.62))
+    drop-shadow(0 -0.9px 0 rgba(255,250,236,.62))
+    drop-shadow(0 6px 5px rgba(22,44,54,.34));
+}
+
+/* ==========================================================================
+   v11 触屏 / 窄屏
+   ========================================================================== */
+#actBtn,#questToggle{display:none;}
+@media (max-width:900px),(pointer:coarse){
+  #actBtn{
+    display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1px;
+    position:fixed;right:14px;bottom:104px;width:88px;height:88px;z-index:330;
+    border-radius:50%;border:3px solid var(--ink,#162c36);
+    background-color:#F7C94B;
+    box-shadow:0 6px 0 rgba(22,44,54,.35),0 0 0 6px rgba(251,227,75,.22),inset 0 -6px 0 rgba(190,140,40,.35);
+    color:#2b1a0d;font-weight:900;font-size:12px;cursor:pointer;
+    -webkit-appearance:none;appearance:none;
+    -webkit-tap-highlight-color:transparent;touch-action:manipulation;
+    transition:transform .14s ease,filter .18s ease;
+    filter:saturate(.55) brightness(.9);}
+  #actBtn img{width:34px;height:34px;object-fit:contain;pointer-events:none;}
+  #actBtn b{font-size:12px;letter-spacing:.5px;pointer-events:none;}
+  #actBtn.on{filter:none;transform:scale(1.06);
+    animation:actPulse 1.5s ease-in-out infinite;}
+  #actBtn:active{transform:scale(.93);}
+  @keyframes actPulse{0%,100%{box-shadow:0 6px 0 rgba(22,44,54,.35),0 0 0 6px rgba(251,227,75,.22)}
+    50%{box-shadow:0 6px 0 rgba(22,44,54,.35),0 0 0 15px rgba(251,227,75,.06)}}
+
+  #questToggle{
+    display:flex;align-items:center;justify-content:center;
+    position:fixed;right:14px;top:12px;width:46px;height:46px;z-index:330;
+    border-radius:14px;border:2.5px solid var(--ink,#162c36);
+    background:var(--paper,#fff8e6);box-shadow:0 4px 0 rgba(22,44,54,.28);cursor:pointer;
+    -webkit-tap-highlight-color:transparent;}
+  #questToggle img{width:26px;height:26px;object-fit:contain;pointer-events:none;}
+  #questToggle.on{background:#FBE34B;}
+
+  /* 点单条：默认收起，点开才是从底部升起的半屏抽屉 */
+  #questHud{
+    left:50%!important;right:auto!important;top:auto!important;bottom:96px!important;
+    transform:translateX(-50%) translateY(12px);
+    width:min(92vw,430px)!important;max-height:46vh;overflow:auto;
+    z-index:340;opacity:0;pointer-events:none;transition:opacity .22s ease,transform .22s ease;}
+  #questHud.open{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0);}
+  #questHud .hint{font-size:10px;}
+
+  /* 顶部条收窄，只留房间名 + 快进 + 离开 */
+  #interior .topbar{height:52px;padding:0 8px;gap:8px;}
+  #interior .topbar h2{font-size:13px;max-width:44vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  #interior .topbar .btn{min-width:0;height:36px;padding:0 12px;font-size:12px;}
+  #interior .topbar .barBtns{gap:6px;margin-left:auto;padding-right:96px;}
+
+  /* 口袋挪到互动键左边，别叠在一起 */
+  #pocket{right:16px!important;bottom:206px!important;width:70px;height:78px;}
+  #pocket .pkItem{width:18px;height:18px;}
+
+  /* 出门按钮缩小，避免和互动键打架 */
+  #exitDoor{width:64px!important;height:74px!important;right:12px!important;bottom:12px!important;}
+  #exitDoor .dIc{width:44px!important;height:44px!important;}
+  #exitDoor .dTx{font-size:10px!important;}
+  #exitDoor .dSub{display:none;}
+
+  /* 触摸热区：物件可点范围再放大一圈 */
+  #room .obj:after{left:-18px!important;right:-18px!important;top:-28px!important;bottom:-12px!important;}
+
+  /* 掉落物也放大，手指点得中 */
+  #roomDrops .drop{min-width:56px;min-height:56px;}
+  .bbCap{font-size:12.5px;max-width:180px;}
+  #collection .pouchScatter{width:96vw;max-height:82vh;padding:16px 12px 14px;}
+  #colGrid{grid-template-columns:repeat(auto-fill,minmax(84px,1fr));}
+}
+
+/* 极窄竖屏：房间铺满时的镜头模式，隐藏会在画面里乱飘的坐标/提示 */
+@media (max-width:520px){
+  body.mob-cam #hud{display:none;}
+  body.mob-cam #coord{display:none;}
+}
+
+/* 竖屏 toast 收窄，别糊住半个画面 */
+@media (max-width:900px){
+  #toast{font-size:12px!important;max-width:78vw!important;padding:8px 14px!important;
+    top:64px!important;line-height:1.5;}
+  #disclaimer,#footNote,.bbDisclaimer{font-size:9px!important;bottom:2px!important;left:8px!important;
+    right:auto!important;transform:none!important;max-width:70vw;}
+}
+
+/* v11：出门门牌不再是一张白卡（会盖住房间右侧的物件与掉落物），改回手绘门 + 药丸标签 */
+#exitDoor{
+  background:none!important;border:0!important;box-shadow:none!important;
+  width:96px!important;height:112px!important;right:10px!important;bottom:8px!important;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
+  padding:0!important;color:var(--ink)!important;opacity:.94;transition:opacity .18s,transform .18s;}
+#exitDoor:hover{opacity:1;transform:translateY(-3px) scale(1.04);}
+#exitDoor .dIc{width:74px!important;height:74px!important;background:none!important;border:0!important;
+  box-shadow:none!important;display:flex;align-items:flex-end;justify-content:center;}
+#exitDoor .dIc img{width:100%;height:100%;object-fit:contain;object-position:50% 100%;
+  filter:drop-shadow(0 4px 0 rgba(22,44,54,.3));}
+#exitDoor .dTx{margin-top:-2px;background:var(--paper)!important;color:var(--ink)!important;
+  border:2px solid var(--ink);border-radius:999px;font-size:11px;font-weight:900;
+  padding:1px 9px;white-space:nowrap;box-shadow:0 2px 0 rgba(22,44,54,.25);}
+#exitDoor .dSub{display:none!important;}
+
+/* v11：出门门牌不再是一张白卡（会盖住房间右侧的物件与掉落物），改回手绘门 + 药丸标签 */
+#exitDoor{
+  background:none!important;border:0!important;box-shadow:none!important;
+  width:96px!important;height:112px!important;right:10px!important;bottom:8px!important;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
+  padding:0!important;color:var(--ink)!important;opacity:.94;transition:opacity .18s,transform .18s;}
+#exitDoor:hover{opacity:1;transform:translateY(-3px) scale(1.04);}
+#exitDoor .dIc{width:74px!important;height:74px!important;background:none!important;border:0!important;
+  box-shadow:none!important;display:flex;align-items:flex-end;justify-content:center;}
+#exitDoor .dIc img{width:100%;height:100%;object-fit:contain;object-position:50% 100%;
+  filter:drop-shadow(0 4px 0 rgba(22,44,54,.3));}
+#exitDoor .dTx{margin-top:-2px;background:var(--paper)!important;color:var(--ink)!important;
+  border:2px solid var(--ink);border-radius:999px;font-size:11px;font-weight:900;
+  padding:1px 9px;white-space:nowrap;box-shadow:0 2px 0 rgba(22,44,54,.25);}
+#exitDoor .dSub{display:none!important;}
+
+/* =====================================================================
+   v11.2 · 手机端 UI 重排
+   实测（390x844）：#controls 原本 left:50% + top:12px 两条规则打架，
+   三个按钮散在 y=12 / 361 / 775 三处，还压住 HUD；
+   摇杆 140px 又会和底部工具条叠在一起。这里统一收成：
+     顶部    HUD 压成一行 + 右上角点单条开关
+     底部    三键横排贴底
+     左下    摇杆上移让位
+     右下    互动键 + 口袋
+   ===================================================================== */
+@media (max-width:600px){
+  #controls{
+    left:0!important;right:0!important;top:auto!important;bottom:8px!important;
+    transform:none!important;width:100%!important;box-sizing:border-box;
+    justify-content:center!important;flex-wrap:nowrap!important;
+    align-items:stretch!important;gap:6px!important;padding:0 8px!important;
+  }
+  #controls .btn{
+    flex:1 1 0!important;min-width:0!important;min-height:56px!important;
+    font-size:10.5px!important;padding:4px 2px!important;gap:1px!important;
+    border-width:3px!important;border-radius:14px!important;
+    box-shadow:0 4px 0 var(--ink),0 8px 14px rgba(6,35,56,.32)!important;
+  }
+  #controls .btn .btnIco{width:24px!important;height:24px!important;}
+
+  #dpad{left:12px!important;bottom:78px!important;width:124px!important;height:124px!important;}
+  #dpad .ring{width:112px!important;height:112px!important;}
+  #dpad .stick{width:52px!important;height:52px!important;}
+
+  #hud{
+    left:8px!important;top:8px!important;max-width:calc(100vw - 70px)!important;
+    padding:7px 10px 7px 54px!important;font-size:10.5px!important;
+    line-height:1.35!important;border-radius:16px!important;border-width:3px!important;
+  }
+  #hud:before{width:38px!important;height:38px!important;background-size:36px 36px!important;
+    border-width:3px!important;left:6px!important;top:6px!important;}
+  #hud>span,#hud:after,#hud #coordWrap{display:none!important;}
+  #legend{display:none!important;}
+  #questToggle{right:8px!important;top:8px!important;width:42px!important;height:42px!important;}
+
+  /* 390 宽没有位置放署名，桌面端保留 */
+  #bbDisclaimer{display:none!important;}
+
+  /* 室内顶栏：标题让位给右侧按钮，不再被截断成「蟹堡王 · 前厅（」 */
+  #interior .topbar #roomTitle{font-size:12px!important;max-width:42vw;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  #interior .topbar .barBtns button{font-size:11px!important;padding:5px 9px!important;}
+}
+/* 横屏手机（高度很小）：顶部往下压，工具条变矮 */
+@media (max-height:460px){
+  #hud{display:none!important;}
+  #controls{bottom:6px!important;}
+  #controls .btn{min-height:44px!important;font-size:10px!important;}
+  #controls .btn .btnIco{width:18px!important;height:18px!important;}
+  #dpad{bottom:56px!important;width:104px!important;height:104px!important;}
+  #dpad .ring{width:94px!important;height:94px!important;}
+  #dpad .stick{width:44px!important;height:44px!important;}
+  #pocket{bottom:150px!important;}
+  #actBtn{bottom:60px!important;width:74px!important;height:74px!important;}
+  #bbDisclaimer{display:none!important;}
+  #legend{display:none!important;}
+}

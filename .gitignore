@@ -13,3 +13,4 @@ assets/_review/validation-report.md
 # QA 临时档案
 src/.qa-prof-*/
 qa-*.html
+src/_qa_*.html

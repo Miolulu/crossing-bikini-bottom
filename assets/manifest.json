@@ -51,14 +51,14 @@
     "note": "code_only=true 的条目不需要交付；default=css 的条目已由 CSS 实现，交了才替换"
   },
   "counts": {
-    "total": 61,
+    "total": 64,
     "code_only": 6,
-    "deliverable": 182,
-    "required": 38,
-    "optional": 17,
-    "expected_png": 161,
+    "deliverable": 206,
+    "required": 41,
+    "optional": 29,
+    "expected_png": 206,
     "remaining": 0,
-    "entries": 68
+    "entries": 70
   },
   "assets": [
     {
@@ -2017,6 +2017,80 @@
       "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / v5-handdrawn-2d",
       "params_ref": "assets/art-params.md",
       "note": "16 枚界面图标（时钟/快进/地图/靶心/清单/垃圾桶/蛋/放大镜/咬一口/翻面/相机/木箱/音符/叉/凳/门）；替代 icons.js 内联 SVG"
+    },
+    {
+      "id": "E-14",
+      "slot": "props.loot",
+      "name": "掉落杂物（摇出来的小物）",
+      "code": "loot",
+      "dir": "props",
+      "files": [
+        "E-14-loot_button.png",
+        "E-14-loot_cap.png",
+        "E-14-loot_clip.png",
+        "E-14-loot_coin.png",
+        "E-14-loot_conch.png",
+        "E-14-loot_cork.png",
+        "E-14-loot_kelp.png",
+        "E-14-loot_key.png",
+        "E-14-loot_note.png",
+        "E-14-loot_pencil.png",
+        "E-14-loot_photo.png",
+        "E-14-loot_pouch.png",
+        "E-14-loot_receipt.png",
+        "E-14-loot_ring.png",
+        "E-14-loot_vial.png",
+        "E-14-loot_wrapper.png"
+      ],
+      "status": "delivered",
+      "required": false,
+      "code_only": false,
+      "default": "png",
+      "template": "A",
+      "spec": {
+        "size": [
+          192,
+          192
+        ],
+        "bg": "transparent",
+        "ratio": 1.0
+      },
+      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / 4x4 图集 hand_drawn_2D_cartoon_illustra_2026-11-11T12-32-29.png，cut_atlas.py f05 切分",
+      "params_ref": "assets/art-params.md §十五",
+      "note": "16 件小物（小票/硬币/瓶盖/钥匙/贝壳发夹/海螺/旧照片/纸条/布兜/海草/纽扣/铅笔头/糖纸/木环/软木塞/小瓶），交互层摇一摇后掉出的实体，替代原「白卡+文字」说明"
+    },
+    {
+      "id": "E-15",
+      "slot": "props.container",
+      "name": "容器开态与布口袋",
+      "code": "container",
+      "dir": "props",
+      "files": [
+        "E-15-basket.png",
+        "E-15-open_chest.png",
+        "E-15-open_drawer.png",
+        "E-15-open_fridge.png",
+        "E-15-open_locker.png",
+        "E-15-paperbag.png",
+        "E-15-sack_closed.png",
+        "E-15-sack_open.png"
+      ],
+      "status": "delivered",
+      "required": false,
+      "code_only": false,
+      "default": "png",
+      "template": "A",
+      "spec": {
+        "size": [
+          384,
+          384
+        ],
+        "bg": "transparent",
+        "ratio": 1.0
+      },
+      "generated_by": "WorkBuddy ImageGen / high / 2026-11-11 / 4x2 图集 hand_drawn_2D_cartoon_illustra_2026-11-11T12-32-59.png，cut_atlas.py f06 切分",
+      "params_ref": "assets/art-params.md §十五",
+      "note": "拉出的抽屉/双开铁柜/开门冰箱/掀盖木箱（空腔可见，翻找时作开态立绘）+ 布口袋合/开（右下角收纳口）+ 纸袋/藤篮"
     }
   ]
 }
