@@ -32,6 +32,12 @@
       .replace('%ACC%','<rect x="15" y="25" width="34" height="12" rx="4"/>');},
     sea:function(c1,c2){return S(c1,c2).replace('%BODY%','<path d="M12 32q12-19 34 0-22 19-34 0z"/><path d="M46 32l12-10v20z"/>')
       .replace('%ACC%','<circle cx="24" cy="29" r="3.4" fill="'+P.ink+'"/><path d="M18 38q9 5 18 0" fill="none" stroke="'+P.white+'" stroke-width="2.4"/>');},
+    fish1:function(c1,c2){return S(c1,c2).replace('%BODY%','<ellipse cx="29" cy="35" rx="19" ry="14"/><path d="M45 35l13-9v18z"/><path d="M24 21q9-7 17-2z"/>')
+      .replace('%ACC%','<circle cx="21" cy="31" r="3.2" fill="'+P.ink+'" stroke="none"/><path d="M15 41q7 5 14 1" fill="none" stroke="'+P.ink+'" stroke-width="2.6"/><path d="M33 23v24M41 25v20" fill="none" stroke="'+P.ink+'" stroke-width="2.6" opacity=".5"/>');},
+    fish2:function(c1,c2){return S(c1,c2).replace('%BODY%','<path d="M12 36q3-16 21-16 17 0 18 14 1 13-15 15-21 3-24-13z"/><path d="M49 29q10-4 8 7-2 8-10 5z"/>')
+      .replace('%ACC%','<circle cx="23" cy="31" r="3" fill="'+P.ink+'" stroke="none"/><circle cx="34" cy="26" r="2.4" fill="'+P.ink+'" stroke="none" opacity=".45"/><circle cx="39" cy="39" r="2.6" fill="'+P.ink+'" stroke="none" opacity=".45"/><circle cx="28" cy="42" r="2.2" fill="'+P.ink+'" stroke="none" opacity=".45"/><path d="M17 41q6 4 12 1" fill="none" stroke="'+P.ink+'" stroke-width="2.4"/>');},
+    fish3:function(c1,c2){return S(c1,c2).replace('%BODY%','<path d="M8 34q10-10 26-10 16 0 24 9-8 10-24 10-16 0-26-9z"/><path d="M55 29l5-8 2 10 2-2v8l-4-2z"/><path d="M30 24l4-9 6 8z"/>')
+      .replace('%ACC%','<circle cx="18" cy="31" r="3" fill="'+P.ink+'" stroke="none"/><path d="M12 38q8 5 17 2" fill="none" stroke="'+P.ink+'" stroke-width="2.6"/><path d="M36 27v14M44 26v13" fill="none" stroke="'+P.ink+'" stroke-width="2.4" opacity=".5"/>');},
     bubble:function(c1,c2){return S(c1,c2).replace('%BODY%','<circle cx="32" cy="33" r="21"/>')
       .replace('%ACC%','<path d="M18 26q5-9 14-9" fill="none" stroke="'+P.white+'" stroke-width="4"/><circle cx="43" cy="43" r="4" fill="'+P.white+'" stroke="none"/>');},
     note:function(c1,c2){return S(c1,c2).replace('%BODY%','<path d="M26 10l24-5v34q-7 10-17 8-8-2-7-10 1-8 10-8 5 0 8 2V16l-18 4z"/>')
@@ -112,9 +118,11 @@
   window.BB_CHAR=function(key){return CH[String(key||'').replace(/\uFE0F/g,'')]||null;};
   window.BB_CHAR_SVG=function(key,size){
     var k=String(key||'').replace(/\uFE0F/g,''),n=size||54;
-    var map={'🐟':['sea','teal'],'🐠':['sea','coral'],'🐡':['sea','gold'],'🐌':['shell','green'],
-      '🐳':['sea','blue'],'🦑':['sea','purple'],'🪼':['bubble','pink'],'🧽':['sea','gold']};
-    var p=map[k]||['sea','teal'];
+    var map={'🐟':['fish1','teal'],'🐠':['fish1','coral'],'🐡':['fish2','gold'],'🐌':['shell','green'],
+      '🐳':['fish3','blue'],'🦑':['fish2','purple'],'🪼':['bubble','pink'],'🧽':['sea','gold']};
+    var pool=[['fish1','teal'],['fish1','coral'],['fish1','gold'],['fish2','purple'],['fish2','gold'],
+      ['fish2','pink'],['fish3','blue'],['fish3','green'],['fish3','deep'],['sea','pink']];
+    var p=map[k]||pool[hash(k)%pool.length];
     return '<svg class="bbCharSvg" viewBox="0 0 64 64" width="'+n+'" height="'+n+'">'+
       shapes[p[0]](C[p[1]],P.cream)+'</svg>';
   };

@@ -41,8 +41,10 @@ body #viewport{background:linear-gradient(180deg,var(--water-deep) 0%,var(--wate
 #paths path{stroke:#405C68!important;stroke-width:56px!important;opacity:.78;}
 #paths path:nth-child(2){stroke:#A6C4CC!important;stroke-width:56px!important;
   opacity:.32!important;stroke-dasharray:3 110!important;}
-/* 玩法场地：去掉「绿色椭圆贴片」感，改成手绘草皮 + 虚线圈 */
-.playspot .psArea{background:radial-gradient(ellipse at 40% 35%,rgba(154,211,92,.42),rgba(79,195,199,.24) 70%,rgba(79,195,199,.08))!important;}
+/* 玩法场地：手绘草皮（SVG 草丛+卵石平铺）+ 墨线圈，替代绿色椭圆贴片 */
+.playspot .psArea{background:
+  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='90' viewBox='0 0 120 90'%3E%3Cg fill='none' stroke='%233F7A3F' stroke-width='3' stroke-linecap='round'%3E%3Cpath d='M22 74 C20 62 16 55 11 51 M22 74 C23 60 26 53 30 47 M22 74 C26 64 32 60 36 58'/%3E%3Cpath d='M86 36 C84 26 81 20 78 15 M86 36 C87 24 90 18 94 13 M86 36 C90 28 95 25 99 22'/%3E%3Cpath d='M60 62 C58 54 56 49 53 46 M60 62 C61 52 63 47 66 42'/%3E%3C/g%3E%3Cellipse cx='44' cy='80' rx='9' ry='5' fill='%23A8B3B8'/%3E%3Ccircle cx='106' cy='70' r='4' fill='%23A8B3B8'/%3E%3C/svg%3E") repeat,
+  radial-gradient(ellipse at 42% 38%,rgba(158,214,102,.55),rgba(110,182,122,.34) 60%,rgba(79,195,199,.12))!important;}
 #world .building{
   transition:transform .28s cubic-bezier(.2,1.5,.5,1),filter .28s ease;
   filter:drop-shadow(0 10px 10px rgba(22,44,54,.22));

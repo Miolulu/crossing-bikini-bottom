@@ -118,12 +118,14 @@ A single hand-drawn isometric interior room of a seaside wooden diner: one uneve
 
 ## 八、v5 角色（1 次生图 → 程序化切分，零追加积分）
 
-**源图**：`generated-images/hand_drawn_2D_cartoon_illustra_2026-11-11T05-24-17.png`（1536×1024，六角色横排群像，v4 锚点 + 负面词 + 主体句「six underwater cartoon town residents standing in a row…」，一次调用）。
+**源图（v5b，2026-11-11 二次重出）**：
+- 群像 `hand_drawn_2D_cartoon_illustra_2026-11-11T06-19-03.png`（1536×1024，六角色横排）。v5 首版群像（05-24-17）被用户否决：海绵/章鱼无手、派大星无花裤衩 → 重出提示词在主体句中强制「EVERY character must have BOTH ARMS CLEARLY VISIBLE…four fingers」并给海星写明花裤衩。
+- 派大星单人 `hand_drawn_2D_cartoon_illustra_2026-11-11T06-23-39.png`（1024×1536）。群像版派大星被用户否决「变成 7 角 + 脚上有脚趾」→ 教训：**给海星写「外伸手臂 + 四指手」必然撑出多余的角**，正确写法是「EXACTLY A FIVE POINTED STAR…NO hands NO fingers NO toes」，单人重出一次即过。
 
 **切分脚本**：工作区 `recut_chars.py`（numpy + Pillow），要点：
 
-1. 列连通域切分：`SEGS=[(46,314),(339,589),(599,808),(830,1044),(1049,1309),(1335,1470)]`，
-   `NAMES=[D-02-sponge, D-04-star, D-03-squid, D-05-krabs, D-06-sandy, D-07-plankton]`。
+1. 分列：以列墨量谷点为分界（`SPLITS=[325,555,845,1095,1360]`，谷点 ±6px 内取最小列作精确分界）。**蟹钳与珊迪尾巴在 x≈1090 处投影重叠，纯分列切不干净** → 每段只保留最大连通块（4 连通洪泛，种子取实心像素最底行的中位 x；种子不能取「掩膜最底像素」，会落在孤立半透明碎点上导致整图被清空）。
+2. 派大星走 `SINGLE` 表单独从 1024×1536 单人图切分，不参与群像分列。
 2. 白底转 alpha：不做整体阈值——`min(RGB)>232 且 max-min<22` 判白（alpha=0）；`min>205` 的过渡带给 alpha=130 软化锯齿；再清 alpha<26 碎边。
 3. **立绘**：裁紧后等比缩到主体高 600，落位 `(512-nw)/2, 700-nh` → 512×768（2:3），透明边距 8.7%。
 4. **token**：取全身顶部 52% 作头肩，等比缩到圆内可视直径 `0.74×画布`，**圆内垂直居中**；奶油底圆 `pad=21`（内缩 8.2%，满足边距告警线）+ 墨线描边 `width=10` → 256×256（规范 128 的 2×，供 92px 头像与高分屏）。
